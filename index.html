@@ -34,9 +34,44 @@
     .form-label {
       font-weight: bold;
     }
+    @media (max-width: 768px) {
+  #resumePreview {
+    width: 100%;
+    padding: 15px;
+    font-size: 14px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .form-label {
+    font-size: 14px;
+  }
+}
+
+#welcomePopup {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -60%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
   </style>
 </head>
 <body>
+<!-- Welcome Popup -->
+<div id="welcomePopup" class="position-fixed top-50 start-50 translate-middle text-center bg-white shadow-lg p-4 rounded" style="z-index: 1050; width: 90%; max-width: 400px; display: none;">
+  <h5 class="mb-2">👋 Welcome to ATS Resume Maker!</h5>
+  <p class="mb-0">Create your resume in minutes. Let’s get started!</p>
+</div>
+
 <div class="container">
   <h1 class="text-center mb-4">ATS Friendly Resume Maker</h1>
   <form id="resumeForm">
@@ -162,6 +197,16 @@
     };
     html2pdf().set(opt).from(element).save();
   }
+  // Show welcome popup for 5 seconds
+window.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("welcomePopup");
+  popup.style.display = "block";
+  setTimeout(() => {
+    popup.style.display = "none";
+  }, 5000);
+});
+
 </script>
+
 </body>
 </html>
