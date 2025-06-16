@@ -10,6 +10,7 @@
       background-color: #f8f9fa;
       padding: 20px;
     }
+
     #resumePreview {
       background: white;
       width: 210mm;
@@ -20,114 +21,126 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       font-family: Arial, sans-serif;
     }
+
     #resumePreview h2 {
       font-weight: bold;
       font-size: 28px;
       text-align: center;
       margin-bottom: 20px;
     }
+
     #resumePreview h4 {
       margin-top: 20px;
       border-bottom: 1px solid #333;
       padding-bottom: 4px;
     }
+
     .form-label {
       font-weight: bold;
     }
+
     @media (max-width: 768px) {
-  #resumePreview {
-    width: 100%;
-    padding: 15px;
-    font-size: 14px;
-  }
+      #resumePreview {
+        width: 100%;
+        padding: 15px;
+        font-size: 14px;
+      }
 
-  .container {
-    padding: 10px;
-  }
+      .container {
+        padding: 10px;
+      }
 
-  h1 {
-    font-size: 24px;
-  }
+      h1 {
+        font-size: 24px;
+      }
 
-  .form-label {
-    font-size: 14px;
-  }
-}
+      .form-label {
+        font-size: 14px;
+      }
+    }
 
-#welcomePopup {
-  animation: fadeIn 0.5s ease-in-out;
-}
+    #welcomePopup {
+      animation: fadeIn 0.5s ease-in-out;
+    }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translate(-50%, -60%); }
-  to { opacity: 1; transform: translate(-50%, -50%); }
-}
-
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
+    }
   </style>
 </head>
 <body>
+
 <!-- Welcome Popup -->
-<div id="welcomePopup" class="position-fixed top-50 start-50 translate-middle text-center bg-white shadow-lg p-4 rounded" style="z-index: 1050; width: 90%; max-width: 400px; display: none;">
+<div id="welcomePopup" class="position-fixed top-50 start-50 translate-middle text-center bg-white shadow-lg p-4 rounded" style="z-index: 1050; width: 90%; max-width: 400px;">
   <h5 class="mb-2">👋 Welcome to ATS Resume Maker!</h5>
   <p class="mb-0">Create your resume in minutes. Let’s get started!</p>
 </div>
 
-<div class="container">
-  <h1 class="text-center mb-4">ATS Friendly Resume Maker</h1>
-  <form id="resumeForm">
-    <div class="mb-3">
-      <label class="form-label">Full Name</label>
-      <input type="text" class="form-control" id="name" placeholder="Full Name" required />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-control" id="email" placeholder="Email Address" />
-      <label class="form-label mt-2">Mobile Number</label>
-      <input type="text" class="form-control" id="mobile" placeholder="Mobile Number" />
-      <label class="form-label mt-2">LinkedIn Profile</label>
-      <input type="text" class="form-control" id="linkedin" placeholder="LinkedIn Profile URL" />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Objective</label>
-      <textarea class="form-control" id="objective" placeholder="Objective"></textarea>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Skills</label>
-      <input type="text" class="form-control" id="skills" placeholder="Skills (comma separated)" />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Work Experience</label>
-      <input type="text" class="form-control mb-2" id="company" placeholder="Company Name" />
-      <input type="text" class="form-control mb-2" id="duration" placeholder="Duration (e.g., Jan 2022 - Dec 2023)" />
-      <input type="text" class="form-control" id="jobRole" placeholder="Job Role / Responsibilities" />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Projects</label>
-      <textarea class="form-control" id="projects" placeholder="Projects"></textarea>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Education</label>
-      <textarea class="form-control" id="education" placeholder="Education"></textarea>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Career Goal</label>
-      <textarea class="form-control" id="careerGoal" placeholder="Career Goal"></textarea>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Select Template</label>
-      <select class="form-select" id="template">
-        <option value="template1">Template 1 (Classic)</option>
-        <option value="template2">Template 2 (Modern)</option>
-        <option value="template3">Template 3 (Creative)</option>
-      </select>
-    </div>
-    <div class="d-grid gap-2">
-      <button type="button" class="btn btn-primary" onclick="generateResume()">Preview Resume</button>
-      <button type="button" class="btn btn-success" onclick="downloadPDF()">Download PDF</button>
-    </div>
-  </form>
-
-  <div id="resumePreview" class="mt-5"></div>
+<!-- Main content, hidden initially -->
+<div id="mainContent" style="display: none;">
+  <div class="container">
+    <h1 class="text-center mb-4">ATS Friendly Resume Maker</h1>
+    <form id="resumeForm">
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-control" id="name" placeholder="Full Name" required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" placeholder="Email Address" />
+        <label class="form-label mt-2">Mobile Number</label>
+        <input type="text" class="form-control" id="mobile" placeholder="Mobile Number" />
+        <label class="form-label mt-2">LinkedIn Profile</label>
+        <input type="text" class="form-control" id="linkedin" placeholder="LinkedIn Profile URL" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Objective</label>
+        <textarea class="form-control" id="objective" placeholder="Objective"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Skills</label>
+        <input type="text" class="form-control" id="skills" placeholder="Skills (comma separated)" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Work Experience</label>
+        <input type="text" class="form-control mb-2" id="company" placeholder="Company Name" />
+        <input type="text" class="form-control mb-2" id="duration" placeholder="Duration (e.g., Jan 2022 - Dec 2023)" />
+        <input type="text" class="form-control" id="jobRole" placeholder="Job Role / Responsibilities" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Projects</label>
+        <textarea class="form-control" id="projects" placeholder="Projects"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Education</label>
+        <textarea class="form-control" id="education" placeholder="Education"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Career Goal</label>
+        <textarea class="form-control" id="careerGoal" placeholder="Career Goal"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Select Template</label>
+        <select class="form-select" id="template">
+          <option value="template1">Template 1 (Classic)</option>
+          <option value="template2">Template 2 (Modern)</option>
+          <option value="template3">Template 3 (Creative)</option>
+        </select>
+      </div>
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-primary" onclick="generateResume()">Preview Resume</button>
+        <button type="button" class="btn btn-success" onclick="downloadPDF()">Download PDF</button>
+      </div>
+    </form>
+    <div id="resumePreview" class="mt-5"></div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
@@ -197,16 +210,20 @@
     };
     html2pdf().set(opt).from(element).save();
   }
-  // Show welcome popup for 5 seconds
-window.addEventListener("DOMContentLoaded", () => {
-  const popup = document.getElementById("welcomePopup");
-  popup.style.display = "block";
-  setTimeout(() => {
-    popup.style.display = "none";
-  }, 5000);
-});
 
+  // Show welcome popup for 2 seconds, then reveal main content
+  window.addEventListener("DOMContentLoaded", () => {
+    const popup = document.getElementById("welcomePopup");
+    const mainContent = document.getElementById("mainContent");
+
+    popup.style.display = "block";
+    mainContent.style.display = "none";
+
+    setTimeout(() => {
+      popup.style.display = "none";
+      mainContent.style.display = "block";
+    }, 2000);
+  });
 </script>
-
 </body>
 </html>
