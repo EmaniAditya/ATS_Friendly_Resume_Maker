@@ -17,26 +17,27 @@ A simple, straightforward tool to create ATS-optimized resumes that pass through
 
 ## Resume Sections
 
-- **Personal Information**: Name, contact details, location, and LinkedIn profile
-- **Professional Summary**: Brief overview of your qualifications and career goals
+- **Personal Information**: Name, contact details, location, LinkedIn profile, and optional date of birth
+- **Summary**: Brief overview of your qualifications and career goals
 - **Skills**: Technical skills and soft skills with proper formatting
-- **Work Experience**: Multiple job entries with dates, responsibilities, and achievements
-- **Education**: Academic background with institution, degree, date ranges, and GPA
+- **Experience**: Multiple job entries with dates, responsibilities, and achievements
+- **Education**: Academic background with institution, degree, date ranges, and GPA or percentage
 - **Certifications**: Professional certifications with issuing organizations and dates
 - **Projects**: Showcase your work with descriptions and technologies used
 
 ## How to Use
 
-1. Fill in your personal information, professional summary, and skills
-2. Add your work experiences with bullet points for responsibilities and achievements
-3. Include your education history with date ranges
-4. Add relevant certifications with issuing organizations and dates
-5. Add projects with technologies used
-6. Select a template (Classic is the most ATS-friendly)
-7. Enable single-page mode to automatically fit content to one page
-8. Paste a job description to analyze keyword matches
-9. Preview your resume and make any necessary adjustments
-10. Download as PDF or plain text format
+1. Fill in your personal information (include date of birth only if specifically requested by employer)
+2. Add a concise professional summary
+3. Add your work experiences with bullet points for responsibilities and achievements
+4. Include your education history with date ranges and GPA or percentage scores
+5. Add relevant certifications with issuing organizations and dates
+6. Add projects with technologies used
+7. Select a template (Classic is the most ATS-friendly)
+8. Enable single-page mode to automatically fit content to one page
+9. Paste a job description to analyze keyword matches
+10. Preview your resume and make any necessary adjustments
+11. Download as PDF or plain text format
 
 ## ATS Optimization Features
 
@@ -59,6 +60,8 @@ A simple, straightforward tool to create ATS-optimized resumes that pass through
 - For online applications, use the plain text export feature
 - Include certifications to demonstrate professional credentials
 - Provide date ranges for education to show progression
+- Only include date of birth if specifically requested by the employer
+- Use either GPA or percentage for education scores based on what's standard in your region
 
 ## Local Development
 

@@ -291,19 +291,26 @@
             </div>
           </div>
           
-          <div class="mb-3">
-            <label class="form-label">LinkedIn</label>
-            <input type="text" class="form-control" id="linkedin" placeholder="LinkedIn URL" />
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">LinkedIn</label>
+              <input type="text" class="form-control" id="linkedin" placeholder="LinkedIn URL" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Location</label>
+              <input type="text" class="form-control" id="location" placeholder="City, State" />
+            </div>
           </div>
           
           <div class="mb-3">
-            <label class="form-label">Location</label>
-            <input type="text" class="form-control" id="location" placeholder="City, State" />
+            <label class="form-label">Date of Birth (Optional)</label>
+            <input type="text" class="form-control" id="dob" placeholder="DD/MM/YYYY" />
+            <div class="ats-tip">Only include if specifically requested by the employer</div>
           </div>
         </div>
         
         <div class="form-section">
-          <h3 class="section-title">Professional Summary</h3>
+          <h3 class="section-title">Summary</h3>
           <div class="mb-3">
             <textarea class="form-control" id="summary" rows="4" placeholder="Brief professional summary (3-4 sentences)"></textarea>
             <div class="ats-tip">Include relevant keywords and highlight your expertise</div>
@@ -328,7 +335,7 @@
         </div>
         
         <div class="form-section">
-          <h3 class="section-title">Work Experience</h3>
+          <h3 class="section-title">Experience</h3>
           <div id="experienceContainer">
             <div class="experience-item">
               <div class="row mb-2">
@@ -386,8 +393,15 @@
               </div>
               <div class="row mb-2">
                 <div class="col-md-6">
-                  <label class="form-label">GPA (Optional)</label>
-                  <input type="text" class="form-control gpa" placeholder="GPA" />
+                  <label class="form-label">GPA/Percentage</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control gpa" placeholder="Score (e.g., 3.8 or 85%)" />
+                    <select class="form-select scoreType" style="max-width: 100px;">
+                      <option value="gpa">GPA</option>
+                      <option value="percentage">Percentage</option>
+                      <option value="none">None</option>
+                    </select>
+                  </div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Location (Optional)</label>
@@ -618,8 +632,15 @@
         </div>
         <div class="row mb-2">
           <div class="col-md-6">
-            <label class="form-label">GPA (Optional)</label>
-            <input type="text" class="form-control gpa" placeholder="GPA" />
+            <label class="form-label">GPA/Percentage</label>
+            <div class="input-group">
+              <input type="text" class="form-control gpa" placeholder="Score (e.g., 3.8 or 85%)" />
+              <select class="form-select scoreType" style="max-width: 100px;">
+                <option value="gpa">GPA</option>
+                <option value="percentage">Percentage</option>
+                <option value="none">None</option>
+              </select>
+            </div>
           </div>
           <div class="col-md-6">
             <label class="form-label">Location (Optional)</label>
@@ -827,6 +848,7 @@
       const phone = document.getElementById("phone").value || '';
       const linkedin = document.getElementById("linkedin").value || '';
       const location = document.getElementById("location").value || '';
+      const dob = document.getElementById("dob").value || '';
       const summary = document.getElementById("summary").value || '';
       const technicalSkills = document.getElementById("technicalSkills").value || '';
       const softSkills = document.getElementById("softSkills").value || '';
@@ -863,6 +885,7 @@
         const startDate = item.querySelector('.educationStartDate')?.value;
         const endDate = item.querySelector('.educationEndDate')?.value;
         const gpa = item.querySelector('.gpa').value;
+        const scoreType = item.querySelector('.scoreType').value;
         const educationLocation = item.querySelector('.educationLocation')?.value;
         
         if (institution || degree) {
@@ -870,7 +893,7 @@
             <div class="education-entry">
               <p><strong>${degree || 'Degree'}</strong> | ${institution || 'Institution'} ${startDate && endDate ? `| ${startDate} - ${endDate}` : ''}</p>
               ${educationLocation ? `<p>${educationLocation}</p>` : ''}
-              ${gpa ? `<p>GPA: ${gpa}</p>` : ''}
+              ${gpa && scoreType !== 'none' ? `<p>${scoreType === 'gpa' ? 'GPA' : 'Percentage'}: ${gpa}</p>` : ''}
             </div>
           `;
         }
@@ -890,7 +913,7 @@
         if (certName || certOrg) {
           certificationsHTML += `
             <div class="certification-entry">
-              <p><strong>${certName || 'Certification'}</strong> | ${certOrg || 'Organization'} | ${certDate || 'Issue Date'}</p>
+              <p><strong>${certName || 'Certification'}</strong> | ${certOrg || 'Organization'} ${certDate ? `| ${certDate}` : ''}</p>
               ${certExpiration ? `<p>Expiration: ${certExpiration}</p>` : ''}
               ${credentialID ? `<p>Credential ID: ${credentialID}</p>` : ''}
             </div>
@@ -942,12 +965,13 @@
       if (phone) contactInfo.push(`${phone}`);
       if (linkedin) contactInfo.push(`<a href="${linkedin}">${linkedin.replace(/^https?:\/\/(www\.)?/i, '')}</a>`);
       if (location) contactInfo.push(`${location}`);
+      if (dob) contactInfo.push(`DOB: ${dob}`);
       
       resumeHTML += `<p class="contact-info">${contactInfo.join(' | ')}</p>`;
       
       // Summary section
       if (summary) {
-        resumeHTML += `<h4>PROFESSIONAL SUMMARY</h4>`;
+        resumeHTML += `<h4>SUMMARY</h4>`;
         resumeHTML += `<p>${summary}</p>`;
       }
       
@@ -964,7 +988,7 @@
       
       // Experience section
       if (experienceHTML) {
-        resumeHTML += `<h4>PROFESSIONAL EXPERIENCE</h4>`;
+        resumeHTML += `<h4>EXPERIENCE</h4>`;
         resumeHTML += experienceHTML;
       }
       
@@ -1154,6 +1178,7 @@
       const phone = document.getElementById("phone").value || '';
       const linkedin = document.getElementById("linkedin").value || '';
       const location = document.getElementById("location").value || '';
+      const dob = document.getElementById("dob").value || '';
       const summary = document.getElementById("summary").value || '';
       const technicalSkills = document.getElementById("technicalSkills").value || '';
       const softSkills = document.getElementById("softSkills").value || '';
@@ -1192,6 +1217,7 @@
         const startDate = item.querySelector('.educationStartDate')?.value;
         const endDate = item.querySelector('.educationEndDate')?.value;
         const gpa = item.querySelector('.gpa').value;
+        const scoreType = item.querySelector('.scoreType').value;
         const educationLocation = item.querySelector('.educationLocation')?.value;
         
         if (institution || degree) {
@@ -1204,8 +1230,8 @@
           if (educationLocation) {
             educationText += `${educationLocation}\n`;
           }
-          if (gpa) {
-            educationText += `GPA: ${gpa}\n`;
+          if (gpa && scoreType !== 'none') {
+            educationText += `${scoreType === 'gpa' ? 'GPA' : 'Percentage'}: ${gpa}\n`;
           }
           educationText += '\n';
         }
@@ -1223,7 +1249,11 @@
         const credentialID = item.querySelector('.credentialID')?.value;
         
         if (certName || certOrg) {
-          certificationsText += `${certName || 'Certification'} | ${certOrg || 'Organization'} | ${certDate || 'Issue Date'}\n`;
+          certificationsText += `${certName || 'Certification'} | ${certOrg || 'Organization'}`;
+          if (certDate) {
+            certificationsText += ` | ${certDate}`;
+          }
+          certificationsText += '\n';
           
           if (certExpiration) {
             certificationsText += `Expiration: ${certExpiration}\n`;
@@ -1280,12 +1310,13 @@
       if (phone) contactInfo.push(phone);
       if (linkedin) contactInfo.push(linkedin.replace(/^https?:\/\/(www\.)?/i, ''));
       if (location) contactInfo.push(location);
+      if (dob) contactInfo.push(`DOB: ${dob}`);
       
       plainTextResume += `${contactInfo.join(' | ')}\n\n`;
       
       // Summary
       if (summary) {
-        plainTextResume += `PROFESSIONAL SUMMARY\n${summary}\n\n`;
+        plainTextResume += `SUMMARY\n${summary}\n\n`;
       }
       
       // Skills
@@ -1302,7 +1333,7 @@
       
       // Experience
       if (experienceText) {
-        plainTextResume += `PROFESSIONAL EXPERIENCE\n${experienceText}`;
+        plainTextResume += `EXPERIENCE\n${experienceText}`;
       }
       
       // Projects
