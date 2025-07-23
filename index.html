@@ -15,11 +15,65 @@
       background: white;
       width: 210mm;
       min-height: 297mm;
-      padding: 25mm;
+      max-height: 297mm; /* Limit to A4 height */
+      padding: 20mm;
       margin: auto;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       font-family: Arial, sans-serif;
+      overflow: hidden; /* Hide overflow content */
+      position: relative;
+    }
+
+    .page-warning {
+      display: none;
+      color: #dc3545;
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* Compact mode styles */
+    .compact-mode #resumePreview {
+      font-size: 11px;
+      line-height: 1.2;
+      padding: 15mm;
+    }
+
+    .compact-mode #resumePreview h2 {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .compact-mode #resumePreview h4 {
+      font-size: 13px;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+    .compact-mode #resumePreview p {
+      margin-bottom: 5px;
+    }
+
+    .compact-mode #resumePreview ul {
+      margin-top: 5px;
+      margin-bottom: 5px;
+      padding-left: 20px;
+    }
+
+    .compact-mode #resumePreview li {
+      margin-bottom: 2px;
+    }
+
+    .compact-mode .experience-entry,
+    .compact-mode .education-entry,
+    .compact-mode .project-entry {
+      margin-bottom: 5px;
+    }
+
+    /* Toggle switch for compact mode */
+    .form-check-label {
+      user-select: none;
     }
 
     .template-classic h2 {
@@ -117,6 +171,77 @@
       font-size: 12px;
       color: #6c757d;
       margin-top: 5px;
+    }
+
+    /* Priority levels for content */
+    .priority-high {
+      opacity: 1;
+    }
+    
+    .priority-medium {
+      opacity: 0.95;
+    }
+    
+    .priority-low {
+      opacity: 0.9;
+    }
+    
+    /* Extreme compact mode for very long content */
+    .extreme-compact-mode #resumePreview {
+      font-size: 10px;
+      line-height: 1.1;
+      padding: 12mm;
+    }
+    
+    .extreme-compact-mode #resumePreview h2 {
+      font-size: 16px;
+      margin-bottom: 3px;
+    }
+    
+    .extreme-compact-mode #resumePreview h4 {
+      font-size: 12px;
+      margin-top: 8px;
+      margin-bottom: 3px;
+    }
+    
+    .extreme-compact-mode #resumePreview p,
+    .extreme-compact-mode #resumePreview ul,
+    .extreme-compact-mode #resumePreview li {
+      margin-bottom: 2px;
+    }
+    
+    .extreme-compact-mode .experience-entry,
+    .extreme-compact-mode .education-entry,
+    .extreme-compact-mode .project-entry {
+      margin-bottom: 3px;
+    }
+    
+    .truncated-content {
+      position: relative;
+    }
+    
+    .truncated-content:after {
+      content: "...";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+    }
+    
+    /* Content density controls */
+    .density-controls {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+    
+    .density-slider {
+      flex-grow: 1;
+      margin: 0 10px;
+    }
+    
+    .density-label {
+      font-size: 12px;
+      color: #6c757d;
     }
 
     @media (max-width: 768px) {
@@ -299,6 +424,28 @@
             </select>
             <div class="ats-tip">Classic template has the highest ATS compatibility</div>
           </div>
+          
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="compactMode" checked>
+            <label class="form-check-label" for="compactMode">Single-page mode (automatically fit content to one page)</label>
+          </div>
+
+          <div class="density-controls">
+            <span class="density-label">Content Density:</span>
+            <input type="range" class="form-range density-slider" id="densitySlider" min="1" max="3" value="2">
+            <span class="density-label" id="densityValue">Normal</span>
+          </div>
+
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="smartTruncate" checked>
+            <label class="form-check-label" for="smartTruncate">Smart content prioritization</label>
+            <div class="ats-tip">Automatically prioritizes the most important content when space is limited</div>
+          </div>
+          
+          <div id="pageWarning" class="page-warning">
+            Content may exceed one page. Enable single-page mode to auto-fit.
+          </div>
+          
           <div class="d-grid gap-2">
             <button type="button" class="btn btn-primary" onclick="generateResume()">Preview Resume</button>
             <button type="button" class="btn btn-success" onclick="downloadPDF()">Download PDF</button>
@@ -415,6 +562,124 @@
       });
       
       return formattedLines.filter(line => line !== '').join('');
+    }
+
+    function truncateText(text, maxLength) {
+      if (!text || text.length <= maxLength) return text;
+      return text.substring(0, maxLength - 3) + '...';
+    }
+    
+    function prioritizeContent() {
+      if (!document.getElementById("smartTruncate").checked) return;
+      
+      const resumePreview = document.getElementById("resumePreview");
+      const isOverflowing = resumePreview.scrollHeight > resumePreview.clientHeight;
+      
+      if (!isOverflowing) return;
+      
+      // Apply extreme compact mode if still overflowing after compact mode
+      if (document.getElementById("compactMode").checked) {
+        const densityValue = parseInt(document.getElementById("densitySlider").value);
+        
+        if (densityValue === 3) {
+          document.body.classList.add('extreme-compact-mode');
+        }
+        
+        // Check if still overflowing after extreme compact mode
+        setTimeout(() => {
+          if (resumePreview.scrollHeight > resumePreview.clientHeight) {
+            // Smart truncation of less important content
+            const descriptions = resumePreview.querySelectorAll('.project-entry ul, .experience-entry ul');
+            
+            // Start with the least important content
+            for (let i = descriptions.length - 1; i >= 0; i--) {
+              const element = descriptions[i];
+              const bullets = element.querySelectorAll('li');
+              
+              // Keep first 2 bullet points, truncate the rest
+              for (let j = bullets.length - 1; j >= 2; j--) {
+                const bullet = bullets[j];
+                const text = bullet.textContent;
+                
+                if (text.length > 60) {
+                  bullet.textContent = truncateText(text, 60);
+                  bullet.classList.add('truncated-content');
+                  
+                  // Check if we've fixed the overflow
+                  if (resumePreview.scrollHeight <= resumePreview.clientHeight) {
+                    break;
+                  }
+                }
+              }
+              
+              // If we've fixed the overflow, stop processing
+              if (resumePreview.scrollHeight <= resumePreview.clientHeight) {
+                break;
+              }
+            }
+          }
+        }, 100);
+      }
+    }
+
+    function checkPageOverflow() {
+      const resumePreview = document.getElementById("resumePreview");
+      const pageWarning = document.getElementById("pageWarning");
+      
+      // Reset to normal mode for accurate measurement
+      document.body.classList.remove('compact-mode');
+      document.body.classList.remove('extreme-compact-mode');
+      
+      // Check if content exceeds the page height
+      const isOverflowing = resumePreview.scrollHeight > resumePreview.clientHeight;
+      
+      if (isOverflowing) {
+        // If single-page mode is enabled, apply compact styling
+        if (document.getElementById("compactMode").checked) {
+          document.body.classList.add('compact-mode');
+          pageWarning.style.display = 'none';
+          
+          // Apply content prioritization
+          setTimeout(prioritizeContent, 100);
+          
+          // If still overflowing after compact mode, show warning
+          setTimeout(() => {
+            if (resumePreview.scrollHeight > resumePreview.clientHeight) {
+              pageWarning.textContent = "Content still exceeds one page. Try increasing density or reducing content.";
+              pageWarning.style.display = 'block';
+            }
+          }, 200);
+        } else {
+          // Show warning if compact mode is disabled
+          pageWarning.textContent = "Content exceeds one page. Enable single-page mode to auto-fit.";
+          pageWarning.style.display = 'block';
+        }
+      } else {
+        pageWarning.style.display = 'none';
+      }
+    }
+
+    function applyDensitySetting() {
+      const densityValue = parseInt(document.getElementById("densitySlider").value);
+      const densityLabel = document.getElementById("densityValue");
+      
+      // Remove existing classes
+      document.body.classList.remove('compact-mode');
+      document.body.classList.remove('extreme-compact-mode');
+      
+      // Apply appropriate class based on density setting
+      if (densityValue === 2) {
+        document.body.classList.add('compact-mode');
+        densityLabel.textContent = "Normal";
+      } else if (densityValue === 3) {
+        document.body.classList.add('extreme-compact-mode');
+        densityLabel.textContent = "High";
+      } else {
+        densityLabel.textContent = "Low";
+      }
+      
+      // Check if content fits on one page
+      setTimeout(checkPageOverflow, 100);
     }
 
     function generateResume() {
@@ -554,12 +819,15 @@
       resumeHTML += `</div>`;
       
       document.getElementById("resumePreview").innerHTML = resumeHTML;
+      
+      // Check if content fits on one page
+      setTimeout(checkPageOverflow, 100);
     }
 
     function downloadPDF() {
       const element = document.getElementById("resumePreview");
       const opt = {
-        margin: 10,
+        margin: 0,
         filename: 'ATS_Friendly_Resume.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
@@ -572,6 +840,9 @@
         return;
       }
       
+      // Apply current density setting
+      applyDensitySetting();
+      
       html2pdf().set(opt).from(element).save();
     }
     
@@ -580,6 +851,21 @@
       setTimeout(function() {
         generateResume();
       }, 500);
+      
+      // Add event listener for compact mode toggle
+      document.getElementById("compactMode").addEventListener("change", function() {
+        checkPageOverflow();
+      });
+      
+      // Add event listener for density slider
+      document.getElementById("densitySlider").addEventListener("input", function() {
+        applyDensitySetting();
+      });
+      
+      // Add event listener for smart truncate toggle
+      document.getElementById("smartTruncate").addEventListener("change", function() {
+        checkPageOverflow();
+      });
     });
   </script>
 </body>
