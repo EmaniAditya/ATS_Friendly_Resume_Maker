@@ -376,17 +376,60 @@
               </div>
               <div class="row mb-2">
                 <div class="col-md-6">
-                  <label class="form-label">Graduation Date</label>
-                  <input type="text" class="form-control gradDate" placeholder="MM/YYYY or Expected MM/YYYY" />
+                  <label class="form-label">Start Date</label>
+                  <input type="text" class="form-control educationStartDate" placeholder="MM/YYYY" />
                 </div>
+                <div class="col-md-6">
+                  <label class="form-label">End Date</label>
+                  <input type="text" class="form-control educationEndDate" placeholder="MM/YYYY or Expected MM/YYYY" />
+                </div>
+              </div>
+              <div class="row mb-2">
                 <div class="col-md-6">
                   <label class="form-label">GPA (Optional)</label>
                   <input type="text" class="form-control gpa" placeholder="GPA" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Location (Optional)</label>
+                  <input type="text" class="form-control educationLocation" placeholder="City, State/Country" />
                 </div>
               </div>
             </div>
           </div>
           <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addEducation()">+ Add Another Education</button>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Certifications</h3>
+          <div id="certificationsContainer">
+            <div class="certification-item">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Certification Name</label>
+                  <input type="text" class="form-control certificationName" placeholder="Certification Title" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Issuing Organization</label>
+                  <input type="text" class="form-control certificationOrg" placeholder="Issuing Organization" />
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Issue Date</label>
+                  <input type="text" class="form-control certificationDate" placeholder="MM/YYYY" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Expiration Date (Optional)</label>
+                  <input type="text" class="form-control certificationExpiration" placeholder="MM/YYYY or No Expiration" />
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Credential ID (Optional)</label>
+                <input type="text" class="form-control credentialID" placeholder="Credential ID" />
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addCertification()">+ Add Another Certification</button>
         </div>
         
         <div class="form-section">
@@ -565,16 +608,60 @@
         </div>
         <div class="row mb-2">
           <div class="col-md-6">
-            <label class="form-label">Graduation Date</label>
-            <input type="text" class="form-control gradDate" placeholder="MM/YYYY or Expected MM/YYYY" />
+            <label class="form-label">Start Date</label>
+            <input type="text" class="form-control educationStartDate" placeholder="MM/YYYY" />
           </div>
+          <div class="col-md-6">
+            <label class="form-label">End Date</label>
+            <input type="text" class="form-control educationEndDate" placeholder="MM/YYYY or Expected MM/YYYY" />
+          </div>
+        </div>
+        <div class="row mb-2">
           <div class="col-md-6">
             <label class="form-label">GPA (Optional)</label>
             <input type="text" class="form-control gpa" placeholder="GPA" />
           </div>
+          <div class="col-md-6">
+            <label class="form-label">Location (Optional)</label>
+            <input type="text" class="form-control educationLocation" placeholder="City, State/Country" />
+          </div>
         </div>
       `;
       container.appendChild(newEducation);
+    }
+
+    function addCertification() {
+      const container = document.getElementById('certificationsContainer');
+      const newCertification = document.createElement('div');
+      newCertification.className = 'certification-item mt-3';
+      newCertification.innerHTML = `
+        <hr>
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label class="form-label">Certification Name</label>
+            <input type="text" class="form-control certificationName" placeholder="Certification Title" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Issuing Organization</label>
+            <input type="text" class="form-control certificationOrg" placeholder="Issuing Organization" />
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label class="form-label">Issue Date</label>
+            <input type="text" class="form-control certificationDate" placeholder="MM/YYYY" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Expiration Date (Optional)</label>
+            <input type="text" class="form-control certificationExpiration" placeholder="MM/YYYY or No Expiration" />
+          </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Credential ID (Optional)</label>
+          <input type="text" class="form-control credentialID" placeholder="Credential ID" />
+        </div>
+      `;
+      container.appendChild(newCertification);
     }
 
     function addProject() {
@@ -773,14 +860,39 @@
       educationItems.forEach(item => {
         const institution = item.querySelector('.institution').value;
         const degree = item.querySelector('.degree').value;
-        const gradDate = item.querySelector('.gradDate').value;
+        const startDate = item.querySelector('.educationStartDate')?.value;
+        const endDate = item.querySelector('.educationEndDate')?.value;
         const gpa = item.querySelector('.gpa').value;
+        const educationLocation = item.querySelector('.educationLocation')?.value;
         
         if (institution || degree) {
           educationHTML += `
             <div class="education-entry">
-              <p><strong>${degree || 'Degree'}</strong> | ${institution || 'Institution'} | ${gradDate || 'Graduation Date'}</p>
+              <p><strong>${degree || 'Degree'}</strong> | ${institution || 'Institution'} ${startDate && endDate ? `| ${startDate} - ${endDate}` : ''}</p>
+              ${educationLocation ? `<p>${educationLocation}</p>` : ''}
               ${gpa ? `<p>GPA: ${gpa}</p>` : ''}
+            </div>
+          `;
+        }
+      });
+      
+      // Get certification items
+      const certificationItems = document.querySelectorAll('.certification-item');
+      let certificationsHTML = '';
+      
+      certificationItems.forEach(item => {
+        const certName = item.querySelector('.certificationName')?.value;
+        const certOrg = item.querySelector('.certificationOrg')?.value;
+        const certDate = item.querySelector('.certificationDate')?.value;
+        const certExpiration = item.querySelector('.certificationExpiration')?.value;
+        const credentialID = item.querySelector('.credentialID')?.value;
+        
+        if (certName || certOrg) {
+          certificationsHTML += `
+            <div class="certification-entry">
+              <p><strong>${certName || 'Certification'}</strong> | ${certOrg || 'Organization'} | ${certDate || 'Issue Date'}</p>
+              ${certExpiration ? `<p>Expiration: ${certExpiration}</p>` : ''}
+              ${credentialID ? `<p>Credential ID: ${credentialID}</p>` : ''}
             </div>
           `;
         }
@@ -866,6 +978,12 @@
       if (educationHTML) {
         resumeHTML += `<h4>EDUCATION</h4>`;
         resumeHTML += educationHTML;
+      }
+      
+      // Certifications section
+      if (certificationsHTML) {
+        resumeHTML += `<h4>CERTIFICATIONS</h4>`;
+        resumeHTML += certificationsHTML;
       }
       
       resumeHTML += `</div>`;
@@ -1064,22 +1182,56 @@
         }
       });
       
-      // Get education items
+      // Get education items with updated fields
       const educationItems = document.querySelectorAll('.education-item');
       let educationText = '';
       
       educationItems.forEach(item => {
         const institution = item.querySelector('.institution').value;
         const degree = item.querySelector('.degree').value;
-        const gradDate = item.querySelector('.gradDate').value;
+        const startDate = item.querySelector('.educationStartDate')?.value;
+        const endDate = item.querySelector('.educationEndDate')?.value;
         const gpa = item.querySelector('.gpa').value;
+        const educationLocation = item.querySelector('.educationLocation')?.value;
         
         if (institution || degree) {
-          educationText += `${degree || 'Degree'} | ${institution || 'Institution'} | ${gradDate || 'Graduation Date'}\n`;
+          educationText += `${degree || 'Degree'} | ${institution || 'Institution'}`;
+          if (startDate && endDate) {
+            educationText += ` | ${startDate} - ${endDate}`;
+          }
+          educationText += '\n';
+          
+          if (educationLocation) {
+            educationText += `${educationLocation}\n`;
+          }
           if (gpa) {
             educationText += `GPA: ${gpa}\n`;
           }
           educationText += '\n';
+        }
+      });
+      
+      // Get certification items
+      const certificationItems = document.querySelectorAll('.certification-item');
+      let certificationsText = '';
+      
+      certificationItems.forEach(item => {
+        const certName = item.querySelector('.certificationName')?.value;
+        const certOrg = item.querySelector('.certificationOrg')?.value;
+        const certDate = item.querySelector('.certificationDate')?.value;
+        const certExpiration = item.querySelector('.certificationExpiration')?.value;
+        const credentialID = item.querySelector('.credentialID')?.value;
+        
+        if (certName || certOrg) {
+          certificationsText += `${certName || 'Certification'} | ${certOrg || 'Organization'} | ${certDate || 'Issue Date'}\n`;
+          
+          if (certExpiration) {
+            certificationsText += `Expiration: ${certExpiration}\n`;
+          }
+          if (credentialID) {
+            certificationsText += `Credential ID: ${credentialID}\n`;
+          }
+          certificationsText += '\n';
         }
       });
       
@@ -1161,6 +1313,11 @@
       // Education
       if (educationText) {
         plainTextResume += `EDUCATION\n${educationText}`;
+      }
+      
+      // Certifications
+      if (certificationsText) {
+        plainTextResume += `CERTIFICATIONS\n${certificationsText}`;
       }
       
       return plainTextResume;
