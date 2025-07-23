@@ -451,6 +451,31 @@
             <button type="button" class="btn btn-success" onclick="downloadPDF()">Download PDF</button>
           </div>
         </div>
+        <div class="form-section">
+          <h3 class="section-title">ATS Optimization</h3>
+          <div class="mb-3">
+            <label class="form-label">Job Description Analysis</label>
+            <textarea class="form-control" id="jobDescription" rows="4" placeholder="Paste job description here to analyze keyword matches and optimize your resume"></textarea>
+            <div class="ats-tip">Paste the job description to highlight matching keywords and optimize your resume</div>
+          </div>
+          <div class="mb-3">
+            <button type="button" class="btn btn-outline-primary w-100" onclick="analyzeJobDescription()">Analyze Keywords</button>
+          </div>
+          <div id="keywordResults" class="mb-3" style="display: none;">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Keyword Analysis</span>
+                <span class="badge bg-primary" id="matchScore">0%</span>
+              </div>
+              <div class="card-body">
+                <h6>Matched Keywords:</h6>
+                <div id="matchedKeywords" class="mb-2"></div>
+                <h6>Missing Keywords:</h6>
+                <div id="missingKeywords"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div class="col-md-6">
@@ -844,6 +869,138 @@
       applyDensitySetting();
       
       html2pdf().set(opt).from(element).save();
+    }
+    
+    function analyzeJobDescription() {
+      const jobDescription = document.getElementById("jobDescription").value.trim();
+      if (!jobDescription) {
+        alert("Please paste a job description to analyze");
+        return;
+      }
+      
+      // Extract keywords from job description
+      const jobKeywords = extractKeywords(jobDescription);
+      
+      // Get resume content
+      const resumeContent = document.getElementById("resumePreview").innerText;
+      
+      // Find matches
+      const matches = [];
+      const missing = [];
+      
+      jobKeywords.forEach(keyword => {
+        if (resumeContent.toLowerCase().includes(keyword.toLowerCase())) {
+          matches.push(keyword);
+        } else {
+          missing.push(keyword);
+        }
+      });
+      
+      // Calculate match percentage
+      const matchPercentage = Math.round((matches.length / jobKeywords.length) * 100);
+      
+      // Display results
+      document.getElementById("matchScore").textContent = matchPercentage + "%";
+      
+      const matchedKeywordsElement = document.getElementById("matchedKeywords");
+      matchedKeywordsElement.innerHTML = matches.length > 0 
+        ? matches.map(keyword => `<span class="badge bg-success me-1 mb-1">${keyword}</span>`).join('')
+        : '<span class="text-muted">No matches found</span>';
+      
+      const missingKeywordsElement = document.getElementById("missingKeywords");
+      missingKeywordsElement.innerHTML = missing.length > 0
+        ? missing.map(keyword => `<span class="badge bg-secondary me-1 mb-1">${keyword}</span>`).join('')
+        : '<span class="text-muted">No missing keywords</span>';
+      
+      // Show results
+      document.getElementById("keywordResults").style.display = "block";
+      
+      // Highlight matching keywords in the resume
+      highlightKeywords(matches);
+    }
+    
+    function extractKeywords(text) {
+      // Common words to exclude
+      const stopWords = new Set([
+        "a", "an", "the", "and", "or", "but", "is", "are", "was", "were", "be", "been", "being",
+        "in", "on", "at", "to", "for", "with", "by", "about", "as", "of", "from", "this", "that",
+        "these", "those", "it", "its", "we", "us", "our", "they", "them", "their", "you", "your",
+        "he", "him", "his", "she", "her", "hers", "will", "would", "shall", "should", "may", "might",
+        "can", "could", "must", "have", "has", "had", "do", "does", "did", "not", "more", "most",
+        "some", "such", "no", "nor", "too", "very", "just", "only", "than", "then", "so", "also"
+      ]);
+      
+      // Extract words, remove punctuation, and filter out common words
+      const words = text.toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter(word => word.length > 2 && !stopWords.has(word));
+      
+      // Count word frequency
+      const wordCount = {};
+      words.forEach(word => {
+        wordCount[word] = (wordCount[word] || 0) + 1;
+      });
+      
+      // Get unique words sorted by frequency
+      const uniqueWords = Object.keys(wordCount).sort((a, b) => wordCount[b] - wordCount[a]);
+      
+      // Extract technical skills and job-specific terms
+      const technicalTerms = uniqueWords.filter(word => {
+        return !stopWords.has(word) && (
+          // Common technical terms
+          word.includes("develop") || word.includes("program") || word.includes("engineer") ||
+          word.includes("analy") || word.includes("design") || word.includes("manag") ||
+          word.includes("data") || word.includes("software") || word.includes("web") ||
+          word.includes("app") || word.includes("tech") || word.includes("code") ||
+          word.includes("test") || word.includes("script") || word.includes("cloud") ||
+          word.includes("agile") || word.includes("devops") || word.includes("frontend") ||
+          word.includes("backend") || word.includes("fullstack") || word.includes("database") ||
+          word.includes("security") || word.includes("network") || word.includes("system") ||
+          word.includes("api") || word.includes("architecture") || word.includes("framework") ||
+          word.includes("platform") || word.includes("solution") || word.includes("integration") ||
+          word.includes("implement") || word.includes("infrastructure") || word.includes("deploy")
+        );
+      });
+      
+      // Extract programming languages and technologies
+      const technologies = uniqueWords.filter(word => {
+        return !stopWords.has(word) && (
+          // Common programming languages and technologies
+          word === "java" || word === "python" || word === "javascript" || word === "typescript" ||
+          word === "html" || word === "css" || word === "react" || word === "angular" ||
+          word === "vue" || word === "node" || word === "express" || word === "django" ||
+          word === "flask" || word === "spring" || word === "hibernate" || word === "sql" ||
+          word === "nosql" || word === "mongodb" || word === "mysql" || word === "postgresql" ||
+          word === "oracle" || word === "aws" || word === "azure" || word === "gcp" ||
+          word === "docker" || word === "kubernetes" || word === "jenkins" || word === "git" ||
+          word === "github" || word === "gitlab" || word === "bitbucket" || word === "jira" ||
+          word === "confluence" || word === "linux" || word === "unix" || word === "windows" ||
+          word === "macos" || word === "android" || word === "ios" || word === "mobile" ||
+          word === "responsive" || word === "rest" || word === "graphql" || word === "soap" ||
+          word === "microservices" || word === "serverless" || word === "ci" || word === "cd"
+        );
+      });
+      
+      // Combine and remove duplicates
+      const keywords = [...new Set([...technicalTerms, ...technologies])];
+      
+      // Limit to top 20 most relevant keywords
+      return keywords.slice(0, 20);
+    }
+    
+    function highlightKeywords(keywords) {
+      const resumePreview = document.getElementById("resumePreview");
+      let html = resumePreview.innerHTML;
+      
+      // Create a regex pattern for all keywords
+      const pattern = new RegExp(`\\b(${keywords.join('|')})\\b`, 'gi');
+      
+      // Replace with highlighted version
+      html = html.replace(pattern, '<span class="bg-warning text-dark">$1</span>');
+      
+      // Update the preview
+      resumePreview.innerHTML = html;
     }
     
     // Initialize with a preview
