@@ -537,10 +537,10 @@
         <div class="form-section">
           <h3 class="section-title">Template & Export</h3>
           <div class="mb-3">
-            <label class="form-label">Select Template</label>
-            <select class="form-select" id="template">
-              <option value="classic">Classic (Most ATS-Friendly)</option>
-              <option value="modern">Modern Professional</option>
+            <label class="form-label">Template Style</label>
+            <select class="form-select" id="template" onchange="generateResume()">
+              <option value="classic">Classic</option>
+              <option value="modern">Modern</option>
               <option value="minimalist">Minimalist</option>
               <option value="professional">Professional</option>
             </select>
@@ -551,6 +551,45 @@
             <label class="form-label">Resume Versions</label>
             <button type="button" class="btn btn-outline-primary w-100" onclick="showVersionsModal()">Manage Saved Versions</button>
             <div class="ats-tip">Your resume versions are saved locally in your browser</div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Data Management</label>
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <button type="button" class="btn btn-outline-primary w-100" onclick="exportData()">Export Data</button>
+              </div>
+              <div class="col-md-6 mb-2">
+                <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#importModal">Import Data</button>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-12">
+                <button type="button" class="btn btn-outline-danger w-100" onclick="clearForm()">Clear All Form Data</button>
+              </div>
+            </div>
+            <div class="ats-tip">Export your data for backup or transfer to another device</div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Export Options</label>
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <button type="button" class="btn btn-primary w-100" onclick="generateResume()">Preview Resume</button>
+              </div>
+              <div class="col-md-6 mb-2">
+                <button type="button" class="btn btn-success w-100" onclick="downloadPDF()">Download PDF</button>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-6 mb-2">
+                <button type="button" class="btn btn-outline-secondary w-100" onclick="viewPlainText()">View Plain Text</button>
+              </div>
+              <div class="col-md-6 mb-2">
+                <button type="button" class="btn btn-outline-secondary w-100" onclick="downloadPlainText()">Download Plain Text</button>
+              </div>
+            </div>
+            <div class="ats-tip">Plain text version is useful for copying into online application forms</div>
           </div>
           
           <div class="mb-3">
@@ -697,6 +736,29 @@
       </div>
       <div class="toast-body">
         Resume saved successfully!
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="importModalLabel">Import Resume Data</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="importFileInput" class="form-label">Select JSON File</label>
+            <input type="file" class="form-control" id="importFileInput" accept=".json">
+            <div class="form-text">Select a previously exported JSON file to import your resume data.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="importData()">Import Data</button>
+        </div>
       </div>
     </div>
   </div>
