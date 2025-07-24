@@ -71,36 +71,6 @@
       margin-bottom: 5px;
     }
 
-    /* Extreme compact mode for very long content */
-    .extreme-compact-mode #resumePreview {
-      font-size: 10px;
-      line-height: 1.1;
-      padding: 12mm;
-    }
-    
-    .extreme-compact-mode #resumePreview h2 {
-      font-size: 16px;
-      margin-bottom: 3px;
-    }
-    
-    .extreme-compact-mode #resumePreview h4 {
-      font-size: 12px;
-      margin-top: 8px;
-      margin-bottom: 3px;
-    }
-    
-    .extreme-compact-mode #resumePreview p,
-    .extreme-compact-mode #resumePreview ul,
-    .extreme-compact-mode #resumePreview li {
-      margin-bottom: 2px;
-    }
-    
-    .extreme-compact-mode .experience-entry,
-    .extreme-compact-mode .education-entry,
-    .extreme-compact-mode .project-entry {
-      margin-bottom: 3px;
-    }
-
     /* Toggle switch for compact mode */
     .form-check-label {
       user-select: none;
@@ -202,64 +172,76 @@
       color: #6c757d;
       margin-top: 5px;
     }
+
+    /* Priority levels for content */
+    .priority-high {
+      opacity: 1;
+    }
     
-    .rated-skills {
+    .priority-medium {
+      opacity: 0.95;
+    }
+    
+    .priority-low {
+      opacity: 0.9;
+    }
+    
+    /* Extreme compact mode for very long content */
+    .extreme-compact-mode #resumePreview {
+      font-size: 10px;
+      line-height: 1.1;
+      padding: 12mm;
+    }
+    
+    .extreme-compact-mode #resumePreview h2 {
+      font-size: 16px;
+      margin-bottom: 3px;
+    }
+    
+    .extreme-compact-mode #resumePreview h4 {
+      font-size: 12px;
+      margin-top: 8px;
+      margin-bottom: 3px;
+    }
+    
+    .extreme-compact-mode #resumePreview p,
+    .extreme-compact-mode #resumePreview ul,
+    .extreme-compact-mode #resumePreview li {
+      margin-bottom: 2px;
+    }
+    
+    .extreme-compact-mode .experience-entry,
+    .extreme-compact-mode .education-entry,
+    .extreme-compact-mode .project-entry {
+      margin-bottom: 3px;
+    }
+    
+    .truncated-content {
+      position: relative;
+    }
+    
+    .truncated-content:after {
+      content: "...";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+    }
+    
+    /* Content density controls */
+    .density-controls {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    
-    .rated-skill {
-      background-color: #f8f9fa;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 0.9em;
-    }
-    
-    .rated-skill .skill-name {
-      font-weight: bold;
-    }
-    
-    /* Section order styling */
-    #sectionOrder {
-      cursor: move;
-    }
-    
-    #sectionOrder li {
-      cursor: grab;
-      user-select: none;
-    }
-    
-    #sectionOrder li:active {
-      cursor: grabbing;
-    }
-    
-    /* Toast styling */
-    .toast {
-      min-width: 250px;
-    }
-    
-    /* Loading spinner */
-    .loading-spinner {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(255, 255, 255, 0.7);
-      z-index: 9999;
-      justify-content: center;
       align-items: center;
+      margin-top: 10px;
     }
     
-    /* Sticky preview on scroll for desktop */
-    @media (min-width: 992px) {
-      .sticky-preview {
-        position: sticky;
-        top: 20px;
-      }
+    .density-slider {
+      flex-grow: 1;
+      margin: 0 10px;
+    }
+    
+    .density-label {
+      font-size: 12px;
+      color: #6c757d;
     }
 
     @media (max-width: 768px) {
@@ -267,8 +249,6 @@
         width: 100%;
         padding: 15px;
         font-size: 14px;
-        min-height: auto;
-        max-height: none;
       }
 
       .container {
@@ -282,31 +262,6 @@
       .form-label {
         font-size: 14px;
       }
-      
-      .form-section {
-        padding: 15px;
-      }
-      
-      /* Collapsible sections for mobile */
-      .mobile-collapsible .section-title {
-        cursor: pointer;
-        position: relative;
-      }
-      
-      .mobile-collapsible .section-title:after {
-        content: "\25BC";
-        position: absolute;
-        right: 0;
-        transition: transform 0.3s;
-      }
-      
-      .mobile-collapsible.collapsed .section-title:after {
-        transform: rotate(-90deg);
-      }
-      
-      .mobile-collapsible.collapsed .section-content {
-        display: none;
-      }
     }
   </style>
 </head>
@@ -314,136 +269,445 @@
   <div class="container">
     <h1 class="text-center mb-4">ATS Friendly Resume Maker</h1>
     
-    <!-- Loading Spinner -->
-    <div class="loading-spinner" id="loadingSpinner">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
-    
     <div class="row">
-      <div class="col-lg-6">
+      <div class="col-md-6">
         <!-- Form Sections -->
-        <div class="form-section mobile-collapsible">
-          <h3 class="section-title" onclick="toggleMobileSection(this)">Personal Information</h3>
-          <div class="section-content">
-            <!-- Personal Info content -->
+        <div class="form-section">
+          <h3 class="section-title">Personal Information</h3>
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Full Name" required />
+            <div class="ats-tip">Use your legal name as it appears on official documents</div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" placeholder="Email Address" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Phone Number</label>
+              <input type="text" class="form-control" id="phone" placeholder="Phone Number" />
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">LinkedIn</label>
+              <input type="text" class="form-control" id="linkedin" placeholder="LinkedIn URL" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Location</label>
+              <input type="text" class="form-control" id="location" placeholder="City, State" />
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Date of Birth (Optional)</label>
+            <input type="text" class="form-control" id="dob" placeholder="DD/MM/YYYY" />
+            <div class="ats-tip">Only include if specifically requested by the employer</div>
           </div>
         </div>
         
-        <!-- Other form sections with mobile-collapsible class -->
-        <!-- ... existing code ... -->
-      </div>
-      
-      <div class="col-lg-6">
-        <div class="sticky-preview">
-          <div id="resumePreview" class="mt-3"></div>
+        <div class="form-section">
+          <h3 class="section-title">Summary</h3>
+          <div class="mb-3">
+            <textarea class="form-control" id="summary" rows="4" placeholder="Brief professional summary (3-4 sentences)"></textarea>
+            <div class="ats-tip">Include relevant keywords and highlight your expertise</div>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Skills</h3>
+          <div class="mb-3">
+            <div id="skillsContainer">
+              <div class="skill-group mb-2">
+                <label class="form-label">Technical Skills</label>
+                <input type="text" class="form-control" id="technicalSkills" placeholder="Technical skills (comma separated)" />
+              </div>
+              <div class="skill-group mb-2">
+                <label class="form-label">Soft Skills</label>
+                <input type="text" class="form-control" id="softSkills" placeholder="Soft skills (comma separated)" />
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Add Individual Skills with Ratings (Optional)</label>
+                <div class="ats-tip">Adding individual skills with ratings can help highlight your proficiency levels</div>
+                <div id="ratedSkillsContainer">
+                  <div class="rated-skill-item input-group mb-2">
+                    <input type="text" class="form-control skillName" placeholder="Skill name (e.g., Python, Project Management)" />
+                    <select class="form-select skillRating" style="max-width: 150px;">
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                      <option value="Expert">Expert</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-secondary" onclick="removeRatedSkill(this)">×</button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addRatedSkill()">+ Add Skill with Rating</button>
+              </div>
+            </div>
+            <div class="ats-tip">Include specific technologies, programming languages, and tools</div>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Languages</h3>
+          <div id="languagesContainer">
+            <div class="language-item">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Language</label>
+                  <input type="text" class="form-control language" placeholder="Language Name" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Proficiency</label>
+                  <select class="form-control proficiency">
+                    <option value="Native">Native</option>
+                    <option value="Fluent">Fluent</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Basic">Basic</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addLanguage()">+ Add Another Language</button>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Achievements & Honors</h3>
+          <div id="achievementsContainer">
+            <div class="achievement-item">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Title</label>
+                  <input type="text" class="form-control achievementTitle" placeholder="Achievement or Honor Title" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Date</label>
+                  <input type="text" class="form-control achievementDate" placeholder="MM/YYYY" />
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Description (Optional)</label>
+                <textarea class="form-control achievementDescription" rows="2" placeholder="Brief description of the achievement"></textarea>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addAchievement()">+ Add Another Achievement</button>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Experience</h3>
+          <div id="experienceContainer">
+            <div class="experience-item">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Company</label>
+                  <input type="text" class="form-control company" placeholder="Company Name" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Job Title</label>
+                  <input type="text" class="form-control title" placeholder="Job Title" />
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Start Date</label>
+                  <input type="text" class="form-control startDate" placeholder="MM/YYYY" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">End Date</label>
+                  <input type="text" class="form-control endDate" placeholder="MM/YYYY or Present" />
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Responsibilities & Achievements</label>
+                <textarea class="form-control description" rows="3" placeholder="• Use bullet points starting with action verbs&#10;• Quantify achievements when possible&#10;• Include relevant keywords"></textarea>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addExperience()">+ Add Another Experience</button>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Education</h3>
+          <div id="educationContainer">
+            <div class="education-item">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Institution</label>
+                  <input type="text" class="form-control institution" placeholder="University/College Name" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Degree</label>
+                  <input type="text" class="form-control degree" placeholder="Degree & Major" />
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Start Date</label>
+                  <input type="text" class="form-control educationStartDate" placeholder="MM/YYYY" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">End Date</label>
+                  <input type="text" class="form-control educationEndDate" placeholder="MM/YYYY or Expected MM/YYYY" />
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">GPA/Percentage</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control gpa" placeholder="Score (e.g., 3.8 or 85%)" />
+                    <select class="form-select scoreType" style="max-width: 100px;">
+                      <option value="gpa">GPA</option>
+                      <option value="percentage">Percentage</option>
+                      <option value="none">None</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Location (Optional)</label>
+                  <input type="text" class="form-control educationLocation" placeholder="City, State/Country" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addEducation()">+ Add Another Education</button>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Certifications</h3>
+          <div id="certificationsContainer">
+            <div class="certification-item">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Certification Name</label>
+                  <input type="text" class="form-control certificationName" placeholder="Certification Title" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Issuing Organization</label>
+                  <input type="text" class="form-control certificationOrg" placeholder="Issuing Organization" />
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Issue Date</label>
+                  <input type="text" class="form-control certificationDate" placeholder="MM/YYYY" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Expiration Date (Optional)</label>
+                  <input type="text" class="form-control certificationExpiration" placeholder="MM/YYYY or No Expiration" />
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Credential ID (Optional)</label>
+                <input type="text" class="form-control credentialID" placeholder="Credential ID" />
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addCertification()">+ Add Another Certification</button>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Projects</h3>
+          <div id="projectsContainer">
+            <div class="project-item">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Project Name</label>
+                  <input type="text" class="form-control projectName" placeholder="Project Name" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Technologies</label>
+                  <input type="text" class="form-control technologies" placeholder="Technologies Used" />
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Description</label>
+                <textarea class="form-control projectDescription" rows="3" placeholder="• Describe the project and your role&#10;• Highlight challenges overcome&#10;• Mention outcomes and impact"></textarea>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addProject()">+ Add Another Project</button>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Template & Export</h3>
+          <div class="mb-3">
+            <label class="form-label">Select Template</label>
+            <select class="form-select" id="template">
+              <option value="classic">Classic (Most ATS-Friendly)</option>
+              <option value="modern">Modern Professional</option>
+              <option value="minimalist">Minimalist</option>
+              <option value="professional">Professional</option>
+            </select>
+            <div class="ats-tip">Classic template has the highest ATS compatibility</div>
+          </div>
           
-          <div class="mt-3 d-flex justify-content-center">
-            <div class="btn-group">
-              <button type="button" class="btn btn-sm btn-outline-secondary" onclick="applyDensitySetting(1)">Low Density</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary active" onclick="applyDensitySetting(2)">Normal</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary" onclick="applyDensitySetting(3)">High Density</button>
+          <div class="mb-3">
+            <label class="form-label">Resume Versions</label>
+            <button type="button" class="btn btn-outline-primary w-100" onclick="showVersionsModal()">Manage Saved Versions</button>
+            <div class="ats-tip">Your resume versions are saved locally in your browser</div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Section Order</label>
+            <div class="ats-tip">Drag and drop sections to customize their order in your resume</div>
+            <div class="section-order-container">
+              <ul id="sectionOrder" class="list-group">
+                <li class="list-group-item" data-section="summary">Summary</li>
+                <li class="list-group-item" data-section="skills">Skills</li>
+                <li class="list-group-item" data-section="experience">Experience</li>
+                <li class="list-group-item" data-section="education">Education</li>
+                <li class="list-group-item" data-section="projects">Projects</li>
+                <li class="list-group-item" data-section="certifications">Certifications</li>
+                <li class="list-group-item" data-section="languages">Languages</li>
+                <li class="list-group-item" data-section="achievements">Achievements & Honors</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="compactMode" checked>
+            <label class="form-check-label" for="compactMode">Single-page mode (automatically fit content to one page)</label>
+          </div>
+          
+          <div class="mb-3">
+            <div id="pageWarning" class="page-warning">
+              Content may exceed one page. Enable single-page mode to auto-fit.
+            </div>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-primary" onclick="generateResume()">Preview Resume</button>
+            <div class="btn-group mt-2">
+              <button type="button" class="btn btn-success" onclick="downloadPDF()">Download PDF</button>
+              <button type="button" class="btn btn-outline-secondary" onclick="downloadPlainText()">Download Plain Text</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#plainTextModal">View Plain Text</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h3 class="section-title">ATS Optimization</h3>
+          <div class="mb-3">
+            <label class="form-label">Job Description Analysis</label>
+            <textarea class="form-control" id="jobDescription" rows="4" placeholder="Paste job description here to analyze keyword matches and optimize your resume"></textarea>
+            <div class="ats-tip">Paste the job description to highlight matching keywords and optimize your resume</div>
+          </div>
+          <div class="mb-3">
+            <button type="button" class="btn btn-outline-primary w-100" onclick="analyzeJobDescription()">Analyze Keywords</button>
+          </div>
+          <div id="keywordResults" class="mb-3" style="display: none;">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Keyword Analysis</span>
+                <span class="badge bg-primary" id="matchScore">0%</span>
+              </div>
+              <div class="card-body">
+                <h6>Matched Keywords:</h6>
+                <div id="matchedKeywords" class="mb-2"></div>
+                <h6>Missing Keywords:</h6>
+                <div id="missingKeywords"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      
+      <div class="col-md-6">
+        <div id="resumePreview" class="mt-3"></div>
+      </div>
     </div>
   </div>
-  
-  <!-- ... existing modals ... -->
-  
+
+  <!-- Plain Text Modal -->
+  <div class="modal fade" id="plainTextModal" tabindex="-1" aria-labelledby="plainTextModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="plainTextModalLabel">Plain Text Resume (ATS-Friendly Format)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted mb-2">Copy this text for pasting into online application forms:</p>
+          <div class="bg-light p-3 border rounded">
+            <pre id="plainTextContent" class="mb-0" style="white-space: pre-wrap; font-family: monospace;"></pre>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="copyPlainText()">Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Versions Modal -->
+  <div class="modal fade" id="versionsModal" tabindex="-1" aria-labelledby="versionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="versionsModalLabel">Saved Resume Versions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="versionsModalContent">
+            <!-- Content will be populated dynamically -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saveVersionModal">Save Current Version</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Version Modal -->
+  <div class="modal fade" id="saveVersionModal" tabindex="-1" aria-labelledby="saveVersionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="saveVersionModalLabel">Save Resume Version</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="versionName" class="form-label">Version Name</label>
+            <input type="text" class="form-control" id="versionName" placeholder="e.g., Software Developer Resume, Google Application">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveNamedVersion()">Save Version</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="toastNotification" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">ATS Resume Maker</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        Resume saved successfully!
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
-    // ... existing code ...
-    
-    // Toggle mobile section collapse
-    function toggleMobileSection(titleElement) {
-      if (window.innerWidth <= 768) {
-        const section = titleElement.closest('.mobile-collapsible');
-        section.classList.toggle('collapsed');
-      }
-    }
-    
-    // Show loading spinner
-    function showLoading() {
-      document.getElementById('loadingSpinner').style.display = 'flex';
-    }
-    
-    // Hide loading spinner
-    function hideLoading() {
-      document.getElementById('loadingSpinner').style.display = 'none';
-    }
-    
-    // Apply density setting with visual feedback
-    function applyDensitySetting(densityValue) {
-      // Update the slider if it exists
-      const densitySlider = document.getElementById("densitySlider");
-      if (densitySlider) {
-        densitySlider.value = densityValue;
-      }
-      
-      // Remove existing classes
-      document.body.classList.remove('compact-mode');
-      document.body.classList.remove('extreme-compact-mode');
-      
-      // Update active button state
-      const densityButtons = document.querySelectorAll('.btn-group .btn');
-      densityButtons.forEach((btn, index) => {
-        btn.classList.remove('active');
-        if (index === densityValue - 1) {
-          btn.classList.add('active');
-        }
-      });
-      
-      // Apply appropriate class based on density setting
-      if (densityValue === 2) {
-        document.body.classList.add('compact-mode');
-      } else if (densityValue === 3) {
-        document.body.classList.add('extreme-compact-mode');
-      }
-      
-      // Save current data with the new density setting
-      saveCurrentData();
-      
-      // Check if content fits on one page
-      setTimeout(checkPageOverflow, 100);
-    }
-    
-    // Modified functions to handle loading state
-    function downloadPDF() {
-      showLoading();
-      
-      const element = document.getElementById("resumePreview");
-      const opt = {
-        margin: 0,
-        filename: 'ATS_Friendly_Resume.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      
-      // Check if preview is empty
-      if (element.innerHTML.trim() === '') {
-        hideLoading();
-        alert('Please preview your resume before downloading');
-        return;
-      }
-      
-      // Apply current density setting
-      applyDensitySetting(parseInt(document.getElementById("densitySlider")?.value || 2));
-      
-      // Save a version when downloading PDF
-      const versionName = `Resume - ${new Date().toLocaleString()}`;
-      saveVersion(versionName);
-      
-      html2pdf().set(opt).from(element).save().then(() => {
-        hideLoading();
-        showToast('Resume version saved! You can access it later from "Manage Versions".');
-      }).catch(error => {
-        hideLoading();
-        showToast('Error generating PDF: ' + error.message, 'error');
-      });
-    }
+    // Constants for localStorage
+    const VERSIONS_KEY = 'ats_resume_versions';
+    const CURRENT_DATA_KEY = 'ats_resume_current_data';
     
     // Sample resume data
     const SAMPLE_RESUME_DATA = {
@@ -579,22 +843,144 @@
       }
     }
     
-    // Initialize with saved data or preview
-    window.addEventListener('DOMContentLoaded', function() {
-      // Initialize mobile sections
-      if (window.innerWidth <= 768) {
-        const sections = document.querySelectorAll('.mobile-collapsible');
-        sections.forEach((section, index) => {
-          // Keep first section expanded, collapse others
-          if (index > 0) {
-            section.classList.add('collapsed');
+    // Helper function to populate multi-item sections
+    function populateMultiItemSection(sectionType, items) {
+      if (!items || !items.length) return;
+      
+      // Get container
+      const container = document.getElementById(`${sectionType}Container`);
+      if (!container) return;
+      
+      // Get the first item template
+      const firstItem = container.querySelector(`.${sectionType}-item`);
+      if (!firstItem) return;
+      
+      // Clear the container
+      container.innerHTML = '';
+      
+      // Add and populate items
+      items.forEach((itemData, index) => {
+        // For the first item, clone the template
+        if (index === 0) {
+          const clonedItem = firstItem.cloneNode(true);
+          container.appendChild(clonedItem);
+          populateItemFields(clonedItem, itemData);
+        } else {
+          // For additional items, use the appropriate add function
+          switch(sectionType) {
+            case 'experience':
+              addExperience();
+              break;
+            case 'education':
+              addEducation();
+              break;
+            case 'certifications':
+              addCertification();
+              break;
+            case 'projects':
+              addProject();
+              break;
+            case 'languages':
+              addLanguage();
+              break;
+            case 'achievements':
+              addAchievement();
+              break;
           }
-        });
+          
+          // Populate the newly added item
+          const newItem = container.lastElementChild;
+          populateItemFields(newItem, itemData);
+        }
+      });
+    }
+    
+    // Helper function to populate fields in an item
+    function populateItemFields(item, data) {
+      if (!item || !data) return;
+      
+      // Get all input, select, and textarea elements
+      const inputs = item.querySelectorAll('input, select, textarea');
+      
+      // For each input, find the corresponding data
+      inputs.forEach(input => {
+        const classList = input.className.split(' ');
+        
+        // Find the relevant class name (not form-control, form-select, etc.)
+        const className = classList.find(cls => 
+          !cls.includes('form-') && 
+          cls !== 'input-group' && 
+          cls !== 'form-check-input'
+        );
+        
+        if (className) {
+          // Convert camelCase to snake_case for data lookup
+          const dataKey = className.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+          
+          if (data[dataKey] !== undefined) {
+            if (input.tagName === 'SELECT') {
+              // For select elements, set the value and trigger change event
+              input.value = data[dataKey] || '';
+              
+              // Create and dispatch change event
+              const event = new Event('change', { bubbles: true });
+              input.dispatchEvent(event);
+            } else {
+              // For regular inputs and textareas
+              input.value = data[dataKey] || '';
+            }
+          }
+        }
+      });
+    }
+    
+    // Load a specific version
+    function loadVersion(versionId) {
+      const versions = getVersions();
+      const version = versions.find(v => v.id === versionId);
+      
+      if (version) {
+        populateFormData(version.data);
+        
+        // Close the modal
+        const versionsModal = bootstrap.Modal.getInstance(document.getElementById('versionsModal'));
+        if (versionsModal) {
+          versionsModal.hide();
+        }
+        
+        // Show success message
+        showToast(`Loaded resume version: "${version.name}"`);
+        
+        return true;
       }
       
-      // Setup auto-save
-      setupAutoSave();
+      return false;
+    }
+    
+    // Show toast notification with type
+    function showToast(message, type = 'success') {
+      const toastElement = document.getElementById('toastNotification');
+      const toastBody = toastElement.querySelector('.toast-body');
+      toastBody.textContent = message;
       
+      // Set toast color based on type
+      const toastHeader = toastElement.querySelector('.toast-header');
+      toastHeader.className = 'toast-header';
+      
+      if (type === 'error') {
+        toastHeader.classList.add('bg-danger', 'text-white');
+      } else if (type === 'warning') {
+        toastHeader.classList.add('bg-warning');
+      } else {
+        toastHeader.classList.add('bg-success', 'text-white');
+      }
+      
+      const toast = new bootstrap.Toast(toastElement);
+      toast.show();
+    }
+    
+    // Initialize with saved data or preview
+    window.addEventListener('DOMContentLoaded', function() {
       // Try to load saved data
       const savedData = localStorage.getItem(CURRENT_DATA_KEY);
       if (savedData) {
@@ -612,33 +998,25 @@
         loadSampleData();
       }
       
-      // Initialize sortable for section reordering
-      new Sortable(document.getElementById('sectionOrder'), {
-        animation: 150,
-        ghostClass: 'bg-light',
-        onEnd: function() {
-          saveCurrentData();
-          generateResume();
-        }
-      });
+      // ... existing initialization code ...
     });
     
     // ... existing code ...
   </script>
-  
-  <!-- Footer -->
-  <footer class="mt-5 py-3 bg-light">
-    <div class="container">
-      <div class="row">
-        <div class="col-12 text-center">
-          <p class="mb-0">
-            <small class="text-muted">
-              Designed by <a href="https://github.com/anjalisahu4644" target="_blank">@anjalisahu4644</a> | 
-              Developed by <a href="https://github.com/EmaniAditya" target="_blank">@EmaniAditya</a>
-            </small>
-          </p>
-        </div>
+</body>
+<!-- Footer -->
+<footer class="mt-5 py-3 bg-light">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center">
+        <p class="mb-0">
+          <small class="text-muted">
+            Designed by <a href="https://github.com/anjalisahu4644" target="_blank">@anjalisahu4644</a> | 
+            Developed by <a href="https://github.com/EmaniAditya" target="_blank">@EmaniAditya</a>
+          </small>
+        </p>
       </div>
     </div>
-  </footer>
-</body>
+  </div>
+</footer>
+</html>
