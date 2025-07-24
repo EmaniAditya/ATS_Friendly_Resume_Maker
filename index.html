@@ -244,6 +244,20 @@
       color: #6c757d;
     }
 
+    /* Loading spinner */
+    .loading-spinner {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.7);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+
     @media (max-width: 768px) {
       #resumePreview {
         width: 100%;
@@ -268,6 +282,13 @@
 <body>
   <div class="container">
     <h1 class="text-center mb-4">ATS Friendly Resume Maker</h1>
+    
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
     
     <div class="row">
       <div class="col-md-6">
@@ -1062,6 +1083,108 @@
       
       // ... existing initialization code ...
     });
+    
+    // Show loading spinner
+    function showLoading() {
+      document.getElementById('loadingSpinner').style.display = 'flex';
+    }
+    
+    // Hide loading spinner
+    function hideLoading() {
+      document.getElementById('loadingSpinner').style.display = 'none';
+    }
+    
+    function downloadPDF() {
+      showLoading();
+      
+      setTimeout(() => {
+        const element = document.getElementById("resumePreview");
+        const opt = {
+          margin: 0,
+          filename: 'ATS_Friendly_Resume.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        // Save a version when downloading PDF
+        const versionName = `Resume - ${new Date().toLocaleString()}`;
+        saveVersion(versionName);
+        
+        html2pdf().set(opt).from(element).save().then(() => {
+          hideLoading();
+          showToast('Resume version saved! You can access it later from "Manage Versions".');
+        }).catch(error => {
+          hideLoading();
+          showToast('Error generating PDF: ' + error.message, 'error');
+        });
+      }, 100); // Small delay to ensure loading spinner appears
+    }
+    
+    // Import data from JSON file
+    function importData() {
+      const fileInput = document.getElementById('importFileInput');
+      
+      if (fileInput.files.length === 0) {
+        showToast('Please select a file to import', 'error');
+        return;
+      }
+      
+      showLoading();
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          
+          // Validate imported data
+          if (!importedData.versions && !importedData.currentData) {
+            throw new Error('Invalid import file format');
+          }
+          
+          // Confirm before overwriting
+          if (confirm('Importing will overwrite your current data. Continue?')) {
+            // Import versions
+            if (importedData.versions && Array.isArray(importedData.versions)) {
+              localStorage.setItem(VERSIONS_KEY, JSON.stringify(importedData.versions));
+            }
+            
+            // Import current data
+            if (importedData.currentData) {
+              localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(importedData.currentData));
+              populateFormData(importedData.currentData);
+            }
+            
+            // Generate resume preview
+            generateResume();
+            
+            showToast('Data imported successfully');
+            
+            // Close the modal
+            const importModal = bootstrap.Modal.getInstance(document.getElementById('importModal'));
+            if (importModal) {
+              importModal.hide();
+            }
+          }
+        } catch (error) {
+          console.error('Import error:', error);
+          showToast('Error importing data: Invalid file format', 'error');
+        }
+        
+        // Clear file input
+        fileInput.value = '';
+        hideLoading();
+      };
+      
+      reader.onerror = function() {
+        showToast('Error reading file', 'error');
+        fileInput.value = '';
+        hideLoading();
+      };
+      
+      reader.readAsText(file);
+    }
     
     // ... existing code ...
   </script>
