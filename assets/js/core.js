@@ -523,8 +523,9 @@ function loadVersion(versionId) {
         if (modal) {
           modal.hide();
         } else {
-          // If we can't get the instance, try to hide it using jQuery or data API
-          $(versionsModal).modal('hide');
+          // If we can't get the instance, try to use the data API
+          const bsModal = new bootstrap.Modal(versionsModal);
+          bsModal.hide();
         }
       }
       
