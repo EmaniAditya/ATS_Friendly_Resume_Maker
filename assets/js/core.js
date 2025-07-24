@@ -463,23 +463,26 @@ function saveNamedVersion() {
   const name = nameInput.value.trim();
   
   if (!name) {
-    showToast('Please enter a version name', 'error');
+    showToast('Please enter a version name', 'warning');
     return;
   }
   
-  const newVersion = saveVersion(name);
-  showToast(`Version "${name}" saved successfully`);
+  // Save the version but don't show a toast yet
+  const versionId = saveVersion(name);
   
-  // Close modal
-  const saveVersionModal = bootstrap.Modal.getInstance(document.getElementById('saveVersionModal'));
-  if (saveVersionModal) {
-    saveVersionModal.hide();
+  if (versionId) {
+    // Close modal first
+    const saveVersionModal = document.getElementById('saveVersionModal');
+    if (saveVersionModal) {
+      const modal = bootstrap.Modal.getInstance(saveVersionModal);
+      if (modal) {
+        modal.hide();
+      }
+    }
+    
+    // Clear input
+    nameInput.value = '';
   }
-  
-  // Clear input
-  nameInput.value = '';
-  
-  return newVersion;
 }
 
 // Load a specific version
@@ -528,14 +531,14 @@ function deleteVersion(versionId) {
 // Show versions modal with current versions
 function showVersionsModal() {
   const versions = getVersions();
-  const versionsBody = document.getElementById('versionsBody');
+  const versionsModalContent = document.getElementById('versionsModalContent');
   
-  if (versionsBody) {
+  if (versionsModalContent) {
     // Clear previous content
-    versionsBody.innerHTML = '';
+    versionsModalContent.innerHTML = '';
     
     if (versions.length === 0) {
-      versionsBody.innerHTML = '<p class="text-center text-muted">No saved versions yet</p>';
+      versionsModalContent.innerHTML = '<p class="text-center text-muted">No saved versions yet</p>';
     } else {
       // Create table
       const table = document.createElement('table');
@@ -568,10 +571,10 @@ function showVersionsModal() {
         tbody.appendChild(tr);
       });
       table.appendChild(tbody);
-      versionsBody.appendChild(table);
+      versionsModalContent.appendChild(table);
       
       // Add event listeners
-      const loadButtons = versionsBody.querySelectorAll('.load-version');
+      const loadButtons = versionsModalContent.querySelectorAll('.load-version');
       loadButtons.forEach(button => {
         button.addEventListener('click', () => {
           const versionId = button.dataset.versionId;
@@ -579,7 +582,7 @@ function showVersionsModal() {
         });
       });
       
-      const deleteButtons = versionsBody.querySelectorAll('.delete-version');
+      const deleteButtons = versionsModalContent.querySelectorAll('.delete-version');
       deleteButtons.forEach(button => {
         button.addEventListener('click', () => {
           const versionId = button.dataset.versionId;
