@@ -300,46 +300,71 @@ function downloadPDF() {
   
   // Give time for the resume to render completely
   setTimeout(() => {
-    const element = document.getElementById('resumePreview');
-    const fullName = document.getElementById('fullName')?.value || 'Resume';
-    const fileName = `${fullName.replace(/\s+/g, '_')}_Resume.pdf`;
-    
-    // Set PDF options
-    const opt = {
-      margin: [10, 10, 10, 10],
-      filename: fileName,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2, 
-        useCORS: true, 
-        logging: true,
-        allowTaint: true,
-        removeContainer: true
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    
     try {
-      // Generate PDF
-      html2pdf()
-        .from(element)
-        .set(opt)
-        .save()
-        .then(() => {
-          hideLoading();
-          showToast('PDF downloaded successfully!');
-        })
-        .catch(error => {
-          console.error('Error generating PDF:', error);
-          hideLoading();
-          showToast('Error generating PDF. Please try again.', 'error');
-        });
+      // Get the resume preview element
+      const element = document.getElementById('resumePreview');
+      if (!element) {
+        throw new Error('Resume preview element not found');
+      }
+      
+      // Clone the element to avoid modifying the original
+      const clonedElement = element.cloneNode(true);
+      
+      // Add some styling to ensure it looks good in the PDF
+      clonedElement.style.padding = '20px';
+      clonedElement.style.maxWidth = '100%';
+      clonedElement.style.margin = '0';
+      
+      // Append to body temporarily (but hide it)
+      clonedElement.style.position = 'absolute';
+      clonedElement.style.left = '-9999px';
+      document.body.appendChild(clonedElement);
+      
+      // Get filename
+      const fullName = document.getElementById('fullName')?.value || 'Resume';
+      const fileName = `${fullName.replace(/\s+/g, '_')}_Resume.pdf`;
+      
+      // PDF options
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 1.0 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          allowTaint: true,
+          backgroundColor: '#ffffff'
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait',
+          compress: true
+        }
+      };
+      
+      // Generate PDF from the cloned element
+      html2pdf().from(clonedElement).set(opt).save().then(() => {
+        // Clean up
+        document.body.removeChild(clonedElement);
+        hideLoading();
+        showToast('PDF downloaded successfully!');
+      }).catch(error => {
+        console.error('Error generating PDF:', error);
+        // Clean up
+        if (document.body.contains(clonedElement)) {
+          document.body.removeChild(clonedElement);
+        }
+        hideLoading();
+        showToast('Error generating PDF. Please try again.', 'error');
+      });
     } catch (error) {
       console.error('Error in PDF generation:', error);
       hideLoading();
       showToast('Error generating PDF. Please try again.', 'error');
     }
-  }, 500); // Wait 500ms for content to render properly
+  }, 1000); // Wait a full second for content to render properly
 }
 
 // Generate plain text version of the resume

@@ -300,3 +300,33 @@ body {
     display: none;
   }
 } 
+
+/* PDF Export Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #resumePreview, #resumePreview * {
+    visibility: visible;
+  }
+  
+  #resumePreview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* Ensure the resume preview is properly rendered */
+#resumePreview {
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  min-height: 297mm; /* A4 height */
+  width: 210mm; /* A4 width */
+  margin: 0 auto;
+  overflow-x: hidden;
+} 
