@@ -424,7 +424,7 @@ function getVersions() {
 }
 
 // Save a version of the current resume data
-function saveVersion(name) {
+function saveVersion(name, showNotification = true) {
   try {
     // Get current data
     const currentData = collectFormData();
@@ -446,8 +446,10 @@ function saveVersion(name) {
     // Save to localStorage
     localStorage.setItem(VERSIONS_KEY, JSON.stringify(versions));
     
-    // Show success message
-    showToast(`Version "${newVersion.name}" saved successfully!`);
+    // Show success message if requested
+    if (showNotification) {
+      showToast(`Version "${newVersion.name}" saved successfully!`);
+    }
     
     return newVersion.id;
   } catch (error) {
@@ -474,10 +476,13 @@ function saveNamedVersion() {
   }
   
   try {
-    // Save the version
-    const versionId = saveVersion(name);
+    // Save the version without showing notification (we'll show our own)
+    const versionId = saveVersion(name, false);
     
     if (versionId) {
+      // Show success message
+      showToast(`Version "${name}" saved successfully!`);
+      
       // Clear input
       nameInput.value = '';
       
@@ -502,49 +507,100 @@ function loadVersion(versionId) {
   const version = versions.find(v => v.id === versionId);
   
   if (version) {
-    populateFormData(version.data);
-    
-    // Close the modal
-    const versionsModal = bootstrap.Modal.getInstance(document.getElementById('versionsModal'));
-    if (versionsModal) {
-      versionsModal.hide();
+    try {
+      // Populate form with version data
+      populateFormData(version.data);
+      
+      // Generate the resume preview
+      if (typeof generateResume === 'function') {
+        generateResume();
+      }
+      
+      // Close the modal
+      const versionsModal = document.getElementById('versionsModal');
+      if (versionsModal) {
+        const modal = bootstrap.Modal.getInstance(versionsModal);
+        if (modal) {
+          modal.hide();
+        } else {
+          // If we can't get the instance, try to hide it using jQuery or data API
+          $(versionsModal).modal('hide');
+        }
+      }
+      
+      // Show success message
+      showToast(`Loaded resume version: "${version.name}"`);
+      
+      return true;
+    } catch (error) {
+      console.error('Error loading version:', error);
+      showToast('Error loading version. Please try again.', 'error');
+      return false;
     }
-    
-    // Show success message
-    showToast(`Loaded resume version: "${version.name}"`);
-    
-    // Track version load
-    if (typeof trackFeatureUsage === 'function') {
-      trackFeatureUsage('versionLoad');
-    }
-    
-    return true;
+  } else {
+    showToast('Version not found', 'error');
+    return false;
   }
-  
-  return false;
 }
 
 // Delete a version
 function deleteVersion(versionId) {
-  if (confirm('Are you sure you want to delete this version?')) {
+  try {
     const versions = getVersions();
+    const versionToDelete = versions.find(v => v.id === versionId);
+    
+    if (!versionToDelete) {
+      showToast('Version not found', 'error');
+      return;
+    }
+    
+    const versionName = versionToDelete.name;
     const updatedVersions = versions.filter(v => v.id !== versionId);
     localStorage.setItem(VERSIONS_KEY, JSON.stringify(updatedVersions));
     
     // Show success message
-    showToast('Version deleted successfully');
+    showToast(`Version "${versionName}" deleted successfully`);
     
     // Refresh versions list
-    showVersionsModal();
+    if (updatedVersions.length === 0) {
+      // If no versions left, close the modal
+      const versionsModal = document.getElementById('versionsModal');
+      if (versionsModal) {
+        const modal = bootstrap.Modal.getInstance(versionsModal);
+        if (modal) {
+          modal.hide();
+        }
+      }
+    } else {
+      // Otherwise refresh the list
+      showVersionsModal();
+    }
+  } catch (error) {
+    console.error('Error deleting version:', error);
+    showToast('Error deleting version. Please try again.', 'error');
   }
 }
 
 // Show versions modal with current versions
 function showVersionsModal() {
-  const versions = getVersions();
-  const versionsModalContent = document.getElementById('versionsModalContent');
-  
-  if (versionsModalContent) {
+  try {
+    // Get the modal element
+    const versionsModalElement = document.getElementById('versionsModal');
+    if (!versionsModalElement) {
+      console.error('Versions modal element not found');
+      return;
+    }
+    
+    // Get the content container
+    const versionsModalContent = document.getElementById('versionsModalContent');
+    if (!versionsModalContent) {
+      console.error('Versions modal content element not found');
+      return;
+    }
+    
+    // Get versions from localStorage
+    const versions = getVersions();
+    
     // Clear previous content
     versionsModalContent.innerHTML = '';
     
@@ -601,11 +657,49 @@ function showVersionsModal() {
         });
       });
     }
+    
+    // Close any existing modal first
+    const existingModal = bootstrap.Modal.getInstance(versionsModalElement);
+    if (existingModal) {
+      existingModal.dispose();
+    }
+    
+    // Create and show new modal
+    const versionsModal = new bootstrap.Modal(versionsModalElement);
+    versionsModal.show();
+  } catch (error) {
+    console.error('Error showing versions modal:', error);
+    showToast('Error showing versions. Please try again.', 'error');
   }
-  
-  // Show modal
-  const versionsModal = new bootstrap.Modal(document.getElementById('versionsModal'));
-  versionsModal.show();
+}
+
+// Open the save version modal, closing any other modals first
+function openSaveVersionModal() {
+  try {
+    // First, close the versions modal if it's open
+    const versionsModalElement = document.getElementById('versionsModal');
+    if (versionsModalElement) {
+      const versionsModal = bootstrap.Modal.getInstance(versionsModalElement);
+      if (versionsModal) {
+        versionsModal.hide();
+      }
+    }
+    
+    // Wait a bit for the modal to close
+    setTimeout(() => {
+      // Then open the save version modal
+      const saveVersionModalElement = document.getElementById('saveVersionModal');
+      if (saveVersionModalElement) {
+        const saveVersionModal = new bootstrap.Modal(saveVersionModalElement);
+        saveVersionModal.show();
+      } else {
+        console.error('Save version modal element not found');
+      }
+    }, 300); // Short delay to allow the first modal to close
+  } catch (error) {
+    console.error('Error opening save version modal:', error);
+    showToast('Error opening save version modal. Please try again.', 'error');
+  }
 }
 
 // Setup auto-save functionality
