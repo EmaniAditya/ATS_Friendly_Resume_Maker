@@ -460,6 +460,12 @@ function saveVersion(name) {
 // Save a named version
 function saveNamedVersion() {
   const nameInput = document.getElementById('versionName');
+  if (!nameInput) {
+    console.error('Version name input not found');
+    showToast('Error saving version. Please try again.', 'error');
+    return;
+  }
+  
   const name = nameInput.value.trim();
   
   if (!name) {
@@ -467,21 +473,26 @@ function saveNamedVersion() {
     return;
   }
   
-  // Save the version but don't show a toast yet
-  const versionId = saveVersion(name);
-  
-  if (versionId) {
-    // Close modal first
-    const saveVersionModal = document.getElementById('saveVersionModal');
-    if (saveVersionModal) {
-      const modal = bootstrap.Modal.getInstance(saveVersionModal);
-      if (modal) {
-        modal.hide();
+  try {
+    // Save the version
+    const versionId = saveVersion(name);
+    
+    if (versionId) {
+      // Clear input
+      nameInput.value = '';
+      
+      // Close modal
+      const saveVersionModal = document.getElementById('saveVersionModal');
+      if (saveVersionModal) {
+        const bsModal = bootstrap.Modal.getInstance(saveVersionModal);
+        if (bsModal) {
+          bsModal.hide();
+        }
       }
     }
-    
-    // Clear input
-    nameInput.value = '';
+  } catch (error) {
+    console.error('Error in saveNamedVersion:', error);
+    showToast('Error saving version. Please try again.', 'error');
   }
 }
 

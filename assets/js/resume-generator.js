@@ -298,34 +298,48 @@ function downloadPDF() {
   // Ensure the resume is generated first
   generateResume();
   
-  const element = document.getElementById('resumePreview');
-  const fullName = document.getElementById('fullName')?.value || 'Resume';
-  const fileName = `${fullName.replace(/\s+/g, '_')}_Resume.pdf`;
-  
-  // Set PDF options
-  const opt = {
-    margin: [10, 10, 10, 10],
-    filename: fileName,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, logging: false },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-  
-  try {
-    // Generate PDF
-    html2pdf().from(element).set(opt).save().then(() => {
-      hideLoading();
-      showToast('PDF downloaded successfully!');
-    }).catch(error => {
-      console.error('Error generating PDF:', error);
+  // Give time for the resume to render completely
+  setTimeout(() => {
+    const element = document.getElementById('resumePreview');
+    const fullName = document.getElementById('fullName')?.value || 'Resume';
+    const fileName = `${fullName.replace(/\s+/g, '_')}_Resume.pdf`;
+    
+    // Set PDF options
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true, 
+        logging: true,
+        allowTaint: true,
+        removeContainer: true
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    try {
+      // Generate PDF
+      html2pdf()
+        .from(element)
+        .set(opt)
+        .save()
+        .then(() => {
+          hideLoading();
+          showToast('PDF downloaded successfully!');
+        })
+        .catch(error => {
+          console.error('Error generating PDF:', error);
+          hideLoading();
+          showToast('Error generating PDF. Please try again.', 'error');
+        });
+    } catch (error) {
+      console.error('Error in PDF generation:', error);
       hideLoading();
       showToast('Error generating PDF. Please try again.', 'error');
-    });
-  } catch (error) {
-    console.error('Error in PDF generation:', error);
-    hideLoading();
-    showToast('Error generating PDF. Please try again.', 'error');
-  }
+    }
+  }, 500); // Wait 500ms for content to render properly
 }
 
 // Generate plain text version of the resume
@@ -529,8 +543,11 @@ function generatePlainText() {
 // View plain text version
 function viewPlainText() {
   const plainText = generatePlainText();
+  const plainTextContent = document.getElementById('plainTextContent');
+  if (plainTextContent) {
+    plainTextContent.textContent = plainText;
+  }
   const plainTextModal = new bootstrap.Modal(document.getElementById('plainTextModal'));
-  document.getElementById('plainTextContent').value = plainText;
   plainTextModal.show();
 }
 
@@ -559,7 +576,50 @@ function downloadPlainText() {
 // Copy plain text to clipboard
 function copyPlainText() {
   const plainTextContent = document.getElementById('plainTextContent');
-  plainTextContent.select();
-  document.execCommand('copy');
-  showToast('Plain text copied to clipboard');
+  if (!plainTextContent) {
+    showToast('Error copying text. Please try again.', 'error');
+    return;
+  }
+  
+  const text = plainTextContent.textContent;
+  
+  // Use modern Clipboard API if available
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        showToast('Plain text copied to clipboard');
+      })
+      .catch(err => {
+        console.error('Failed to copy text: ', err);
+        // Fallback to older method
+        fallbackCopyTextToClipboard(plainTextContent);
+      });
+  } else {
+    // Fallback for browsers that don't support Clipboard API
+    fallbackCopyTextToClipboard(plainTextContent);
+  }
+}
+
+// Fallback method for copying text
+function fallbackCopyTextToClipboard(element) {
+  try {
+    // Create a range and selection
+    const range = document.createRange();
+    range.selectNode(element);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    
+    // Execute copy command
+    const successful = document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    
+    if (successful) {
+      showToast('Plain text copied to clipboard');
+    } else {
+      showToast('Failed to copy text. Please try manually.', 'warning');
+    }
+  } catch (err) {
+    console.error('Failed to copy text: ', err);
+    showToast('Failed to copy text. Please try manually.', 'warning');
+  }
 } 
