@@ -1,0 +1,16 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="64" fill="#2a5885"/>
+  
+  <!-- Paper icon -->
+  <rect x="128" y="96" width="256" height="320" rx="16" fill="#ffffff"/>
+  
+  <!-- Lines representing text -->
+  <rect x="160" y="160" width="192" height="24" rx="12" fill="#2a5885"/>
+  <rect x="160" y="224" width="160" height="24" rx="12" fill="#2a5885"/>
+  <rect x="160" y="288" width="128" height="24" rx="12" fill="#2a5885"/>
+  <rect x="160" y="352" width="96" height="24" rx="12" fill="#2a5885"/>
+  
+  <!-- ATS checkmark -->
+  <path d="M384 256L416 288L480 224" stroke="#4CAF50" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+</svg> 
