@@ -291,37 +291,41 @@ function applyDensitySetting(densityValue) {
   setTimeout(checkPageOverflow, 100);
 }
 
-// Download PDF
+// Download resume as PDF
 function downloadPDF() {
   showLoading();
   
-  setTimeout(() => {
-    const element = document.getElementById("resumePreview");
-    const opt = {
-      margin: 0,
-      filename: 'ATS_Friendly_Resume.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    
-    // Save a version when downloading PDF
-    const versionName = `Resume - ${new Date().toLocaleString()}`;
-    saveVersion(versionName);
-    
-    // Track PDF download
-    if (typeof trackFeatureUsage === 'function') {
-      trackFeatureUsage('pdfDownload');
-    }
-    
-    html2pdf().set(opt).from(element).save().then(() => {
+  // Ensure the resume is generated first
+  generateResume();
+  
+  const element = document.getElementById('resumePreview');
+  const fullName = document.getElementById('fullName')?.value || 'Resume';
+  const fileName = `${fullName.replace(/\s+/g, '_')}_Resume.pdf`;
+  
+  // Set PDF options
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: fileName,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  try {
+    // Generate PDF
+    html2pdf().from(element).set(opt).save().then(() => {
       hideLoading();
-      showToast('Resume version saved! You can access it later from "Manage Versions".');
+      showToast('PDF downloaded successfully!');
     }).catch(error => {
+      console.error('Error generating PDF:', error);
       hideLoading();
-      showToast('Error generating PDF: ' + error.message, 'error');
+      showToast('Error generating PDF. Please try again.', 'error');
     });
-  }, 100); // Small delay to ensure loading spinner appears
+  } catch (error) {
+    console.error('Error in PDF generation:', error);
+    hideLoading();
+    showToast('Error generating PDF. Please try again.', 'error');
+  }
 }
 
 // Generate plain text version of the resume

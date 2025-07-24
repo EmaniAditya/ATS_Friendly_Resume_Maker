@@ -21,6 +21,19 @@
       </div>
     </div>
     
+    <!-- Toast Notification -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      <div id="toastNotification" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+          <strong class="me-auto">Notification</strong>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          This is a notification message.
+        </div>
+      </div>
+    </div>
+    
     <div class="row">
       <div class="col-md-6">
         <!-- Form Sections -->
@@ -28,7 +41,7 @@
           <h3 class="section-title">Personal Information</h3>
           <div class="mb-3">
             <label class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="name" placeholder="Full Name" required />
+            <input type="text" class="form-control" id="fullName" placeholder="Full Name" required />
             <div class="ats-tip">Use your legal name as it appears on official documents</div>
           </div>
           
@@ -45,12 +58,23 @@
           
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">LinkedIn</label>
-              <input type="text" class="form-control" id="linkedin" placeholder="LinkedIn URL" />
+              <label class="form-label">GitHub</label>
+              <input type="text" class="form-control" id="github" placeholder="GitHub URL" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Website</label>
+              <input type="text" class="form-control" id="website" placeholder="Personal Website URL" />
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Job Title</label>
+              <input type="text" class="form-control" id="jobTitle" placeholder="e.g., Software Developer" />
             </div>
             <div class="col-md-6 mb-3">
               <label class="form-label">Location</label>
-              <input type="text" class="form-control" id="location" placeholder="City, State" />
+              <input type="text" class="form-control" id="location" placeholder="City, State/Country" />
             </div>
           </div>
           
@@ -106,7 +130,7 @@
         <div class="form-section">
           <h3 class="section-title">Languages</h3>
           <div id="languagesContainer">
-            <div class="language-item">
+            <div class="languages-item">
               <div class="row mb-2">
                 <div class="col-md-6">
                   <label class="form-label">Language</label>
@@ -114,15 +138,17 @@
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Proficiency</label>
-                  <select class="form-control proficiency">
-                    <option value="Native">Native</option>
-                    <option value="Fluent">Fluent</option>
-                    <option value="Advanced">Advanced</option>
-                    <option value="Intermediate">Intermediate</option>
+                  <select class="form-select proficiency">
+                    <option value="">Select Proficiency</option>
                     <option value="Basic">Basic</option>
+                    <option value="Conversational">Conversational</option>
+                    <option value="Proficient">Proficient</option>
+                    <option value="Fluent">Fluent</option>
+                    <option value="Native">Native</option>
                   </select>
                 </div>
               </div>
+              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeLanguage(this)">Remove</button>
             </div>
           </div>
           <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addLanguage()">+ Add Another Language</button>
@@ -131,21 +157,22 @@
         <div class="form-section">
           <h3 class="section-title">Achievements & Honors</h3>
           <div id="achievementsContainer">
-            <div class="achievement-item">
+            <div class="achievements-item">
               <div class="row mb-2">
-                <div class="col-md-6">
-                  <label class="form-label">Title</label>
+                <div class="col-md-8">
+                  <label class="form-label">Achievement Title</label>
                   <input type="text" class="form-control achievementTitle" placeholder="Achievement or Honor Title" />
                 </div>
-                <div class="col-md-6">
-                  <label class="form-label">Date</label>
+                <div class="col-md-4">
+                  <label class="form-label">Date (Optional)</label>
                   <input type="text" class="form-control achievementDate" placeholder="MM/YYYY" />
                 </div>
               </div>
               <div class="mb-2">
-                <label class="form-label">Description (Optional)</label>
-                <textarea class="form-control achievementDescription" rows="2" placeholder="Brief description of the achievement"></textarea>
+                <label class="form-label">Description</label>
+                <textarea class="form-control achievementDescription" rows="2" placeholder="Describe the achievement or honor"></textarea>
               </div>
+              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeAchievement(this)">Remove</button>
             </div>
           </div>
           <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addAchievement()">+ Add Another Achievement</button>
@@ -233,7 +260,7 @@
         <div class="form-section">
           <h3 class="section-title">Certifications</h3>
           <div id="certificationsContainer">
-            <div class="certification-item">
+            <div class="certifications-item">
               <div class="row mb-2">
                 <div class="col-md-6">
                   <label class="form-label">Certification Name</label>
@@ -251,13 +278,14 @@
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Expiration Date (Optional)</label>
-                  <input type="text" class="form-control certificationExpiration" placeholder="MM/YYYY or No Expiration" />
+                  <input type="text" class="form-control certificationExpiration" placeholder="MM/YYYY or N/A" />
                 </div>
               </div>
               <div class="mb-2">
                 <label class="form-label">Credential ID (Optional)</label>
                 <input type="text" class="form-control credentialID" placeholder="Credential ID" />
               </div>
+              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeCertification(this)">Remove</button>
             </div>
           </div>
           <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addCertification()">+ Add Another Certification</button>
@@ -378,6 +406,10 @@
               <button type="button" class="btn btn-success" onclick="downloadPDF()">Download PDF</button>
               <button type="button" class="btn btn-outline-secondary" onclick="downloadPlainText()">Download Plain Text</button>
               <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#plainTextModal">View Plain Text</button>
+            </div>
+            <div class="btn-group mt-2">
+              <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#saveVersionModal">Save Version</button>
+              <button type="button" class="btn btn-outline-primary" onclick="showVersionsModal()">Manage Versions</button>
             </div>
           </div>
         </div>

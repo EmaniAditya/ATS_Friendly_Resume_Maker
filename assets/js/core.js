@@ -53,7 +53,13 @@ function populateMultiItemSection(sectionType, items) {
   if (!container) return;
   
   // Get the first item template
-  const firstItem = container.querySelector(`.${sectionType}-item`);
+  let itemClass = `${sectionType}-item`;
+  // Handle plural forms for consistency
+  if (sectionType === 'certifications') itemClass = 'certifications-item';
+  if (sectionType === 'languages') itemClass = 'languages-item';
+  if (sectionType === 'achievements') itemClass = 'achievements-item';
+  
+  const firstItem = container.querySelector(`.${itemClass}`);
   if (!firstItem) return;
   
   // Clear the container
@@ -87,7 +93,7 @@ function populateMultiItemSection(sectionType, items) {
         case 'achievements':
           addAchievement();
           break;
-        case 'ratedSkill':
+        case 'ratedSkills':
           addRatedSkill();
           break;
       }
@@ -233,17 +239,16 @@ function populateFormData(data) {
 // Collect form data into object
 function collectFormData() {
   const data = {
-    fullName: document.getElementById('fullName').value,
-    jobTitle: document.getElementById('jobTitle').value,
-    phone: document.getElementById('phone').value,
-    email: document.getElementById('email').value,
-    github: document.getElementById('github').value,
-    website: document.getElementById('website').value,
-    location: document.getElementById('location').value,
-    dob: document.getElementById('dob').value,
-    summary: document.getElementById('summary').value,
-    skills: document.getElementById('skills').value,
-    template: document.getElementById('template').value,
+    fullName: document.getElementById('fullName')?.value || '',
+    jobTitle: document.getElementById('jobTitle')?.value || '',
+    phone: document.getElementById('phone')?.value || '',
+    email: document.getElementById('email')?.value || '',
+    github: document.getElementById('github')?.value || '',
+    website: document.getElementById('website')?.value || '',
+    location: document.getElementById('location')?.value || '',
+    dob: document.getElementById('dob')?.value || '',
+    summary: document.getElementById('summary')?.value || '',
+    skills: '',
     experience: [],
     education: [],
     projects: [],
@@ -251,125 +256,153 @@ function collectFormData() {
     languages: [],
     achievements: [],
     ratedSkills: [],
+    template: document.getElementById('template')?.value || 'classic',
     sectionOrder: []
   };
   
-  // Collect multi-item sections
-  // Experience
-  const experienceItems = document.querySelectorAll('.experience-item');
-  experienceItems.forEach(item => {
-    const expData = {
-      company_name: item.querySelector('.companyName').value,
-      job_title: item.querySelector('.jobTitle').value,
-      start_date: item.querySelector('.startDate').value,
-      end_date: item.querySelector('.endDate').value,
-      location: item.querySelector('.location').value,
-      description: item.querySelector('.description').value
-    };
-    
-    // Only add if at least company name or job title is provided
-    if (expData.company_name || expData.job_title) {
-      data.experience.push(expData);
-    }
-  });
+  // Collect skills
+  const technicalSkills = document.getElementById('technicalSkills')?.value || '';
+  const softSkills = document.getElementById('softSkills')?.value || '';
   
-  // Education
-  const educationItems = document.querySelectorAll('.education-item');
-  educationItems.forEach(item => {
-    const eduData = {
-      school_name: item.querySelector('.schoolName').value,
-      degree: item.querySelector('.degree').value,
-      education_start_date: item.querySelector('.educationStartDate')?.value || '',
-      education_end_date: item.querySelector('.educationEndDate')?.value || '',
-      education_location: item.querySelector('.educationLocation')?.value || '',
-      gpa: item.querySelector('.gpa')?.value || '',
-      score_type: item.querySelector('.scoreType')?.value || 'none'
-    };
-    
-    // Only add if at least school name or degree is provided
-    if (eduData.school_name || eduData.degree) {
-      data.education.push(eduData);
-    }
-  });
+  if (technicalSkills && softSkills) {
+    data.skills = `Technical Skills:\n${technicalSkills}\n\nSoft Skills:\n${softSkills}`;
+  } else if (technicalSkills) {
+    data.skills = `Technical Skills:\n${technicalSkills}`;
+  } else if (softSkills) {
+    data.skills = `Soft Skills:\n${softSkills}`;
+  }
   
-  // Projects
-  const projectItems = document.querySelectorAll('.project-item');
-  projectItems.forEach(item => {
-    const projData = {
-      project_name: item.querySelector('.projectName').value,
-      project_description: item.querySelector('.projectDescription').value,
-      project_technologies: item.querySelector('.projectTechnologies').value,
-      project_link: item.querySelector('.projectLink').value,
-      project_github: item.querySelector('.projectGithub').value
-    };
-    
-    // Only add if at least project name is provided
-    if (projData.project_name) {
-      data.projects.push(projData);
-    }
-  });
-  
-  // Certifications
-  const certificationItems = document.querySelectorAll('.certifications-item');
-  certificationItems.forEach(item => {
-    const certData = {
-      certification_name: item.querySelector('.certificationName')?.value || '',
-      certification_org: item.querySelector('.certificationOrg')?.value || '',
-      certification_date: item.querySelector('.certificationDate')?.value || '',
-      certification_expiration: item.querySelector('.certificationExpiration')?.value || '',
-      credential_id: item.querySelector('.credentialID')?.value || ''
-    };
-    
-    // Only add if at least certification name is provided
-    if (certData.certification_name) {
-      data.certifications.push(certData);
-    }
-  });
-  
-  // Languages
-  const languageItems = document.querySelectorAll('.languages-item');
-  languageItems.forEach(item => {
-    const langData = {
-      language: item.querySelector('.language')?.value || '',
-      proficiency: item.querySelector('.proficiency')?.value || ''
-    };
-    
-    // Only add if language is provided
-    if (langData.language) {
-      data.languages.push(langData);
-    }
-  });
-  
-  // Achievements
-  const achievementItems = document.querySelectorAll('.achievements-item');
-  achievementItems.forEach(item => {
-    const achieveData = {
-      achievement_title: item.querySelector('.achievementTitle')?.value || '',
-      achievement_date: item.querySelector('.achievementDate')?.value || '',
-      achievement_description: item.querySelector('.achievementDescription')?.value || ''
-    };
-    
-    // Only add if title or description is provided
-    if (achieveData.achievement_title || achieveData.achievement_description) {
-      data.achievements.push(achieveData);
-    }
-  });
-  
-  // Rated Skills
-  const ratedSkillItems = document.querySelectorAll('.rated-skill-item');
+  // Collect rated skills
+  const ratedSkillItems = document.querySelectorAll('#ratedSkillsContainer .rated-skill-item');
   ratedSkillItems.forEach(item => {
-    const skillData = {
-      skill_name: item.querySelector('.skillName')?.value || '',
-      skill_rating: item.querySelector('.skillRating')?.value || ''
-    };
+    const skillName = item.querySelector('.skillName')?.value || '';
+    const skillRating = item.querySelector('.skillRating')?.value || '';
     
-    // Only add if skill name is provided
-    if (skillData.skill_name) {
-      data.ratedSkills.push(skillData);
+    if (skillName) {
+      data.ratedSkills.push({
+        skill_name: skillName,
+        skill_rating: skillRating
+      });
     }
   });
   
-  // Section Order
+  // Collect experience items
+  const experienceItems = document.querySelectorAll('#experienceContainer .experience-item');
+  experienceItems.forEach(item => {
+    const company = item.querySelector('.company')?.value || '';
+    const title = item.querySelector('.title')?.value || '';
+    const startDate = item.querySelector('.startDate')?.value || '';
+    const endDate = item.querySelector('.endDate')?.value || '';
+    const description = item.querySelector('.description')?.value || '';
+    const location = item.querySelector('.experienceLocation')?.value || '';
+    
+    if (company || title || startDate || endDate || description) {
+      data.experience.push({
+        company_name: company,
+        job_title: title,
+        start_date: startDate,
+        end_date: endDate,
+        description: description,
+        location: location
+      });
+    }
+  });
+  
+  // Collect education items
+  const educationItems = document.querySelectorAll('#educationContainer .education-item');
+  educationItems.forEach(item => {
+    const institution = item.querySelector('.institution')?.value || '';
+    const degree = item.querySelector('.degree')?.value || '';
+    const startDate = item.querySelector('.educationStartDate')?.value || '';
+    const endDate = item.querySelector('.educationEndDate')?.value || '';
+    const gpa = item.querySelector('.gpa')?.value || '';
+    const scoreType = item.querySelector('.scoreType')?.value || '';
+    const location = item.querySelector('.educationLocation')?.value || '';
+    
+    if (institution || degree || startDate || endDate) {
+      data.education.push({
+        school_name: institution,
+        degree: degree,
+        education_start_date: startDate,
+        education_end_date: endDate,
+        gpa: gpa,
+        score_type: scoreType,
+        education_location: location
+      });
+    }
+  });
+  
+  // Collect project items
+  const projectItems = document.querySelectorAll('#projectsContainer .project-item');
+  projectItems.forEach(item => {
+    const name = item.querySelector('.projectName')?.value || '';
+    const description = item.querySelector('.projectDescription')?.value || '';
+    const technologies = item.querySelector('.projectTechnologies')?.value || '';
+    const link = item.querySelector('.projectLink')?.value || '';
+    const github = item.querySelector('.projectGithub')?.value || '';
+    
+    if (name || description || technologies) {
+      data.projects.push({
+        project_name: name,
+        project_description: description,
+        project_technologies: technologies,
+        project_link: link,
+        project_github: github
+      });
+    }
+  });
+  
+  // Collect certification items
+  const certificationItems = document.querySelectorAll('#certificationsContainer .certifications-item');
+  certificationItems.forEach(item => {
+    const name = item.querySelector('.certificationName')?.value || '';
+    const org = item.querySelector('.certificationOrg')?.value || '';
+    const date = item.querySelector('.certificationDate')?.value || '';
+    const expiration = item.querySelector('.certificationExpiration')?.value || '';
+    const credentialId = item.querySelector('.credentialID')?.value || '';
+    
+    if (name || org || date) {
+      data.certifications.push({
+        certification_name: name,
+        certification_org: org,
+        certification_date: date,
+        certification_expiration: expiration,
+        credential_id: credentialId
+      });
+    }
+  });
+  
+  // Collect language items
+  const languageItems = document.querySelectorAll('#languagesContainer .languages-item');
+  languageItems.forEach(item => {
+    const language = item.querySelector('.language')?.value || '';
+    const proficiency = item.querySelector('.proficiency')?.value || '';
+    
+    if (language) {
+      data.languages.push({
+        language: language,
+        proficiency: proficiency
+      });
+    }
+  });
+  
+  // Collect achievement items
+  const achievementItems = document.querySelectorAll('#achievementsContainer .achievements-item');
+  achievementItems.forEach(item => {
+    const title = item.querySelector('.achievementTitle')?.value || '';
+    const date = item.querySelector('.achievementDate')?.value || '';
+    const description = item.querySelector('.achievementDescription')?.value || '';
+    
+    if (title || description) {
+      data.achievements.push({
+        achievement_title: title,
+        achievement_date: date,
+        achievement_description: description
+      });
+    }
+  });
+  
+  // Collect section order
   const sectionOrderItems = document.querySelectorAll('#sectionOrder li');
   sectionOrderItems.forEach(item => {
     data.sectionOrder.push(item.dataset.section);
@@ -390,27 +423,38 @@ function getVersions() {
   return versionsJson ? JSON.parse(versionsJson) : [];
 }
 
-// Save a version with auto-generated name
+// Save a version of the current resume data
 function saveVersion(name) {
-  const data = collectFormData();
-  const versions = getVersions();
-  
-  const newVersion = {
-    id: Date.now().toString(),
-    name: name || `Resume - ${new Date().toLocaleString()}`,
-    date: new Date().toISOString(),
-    data: data
-  };
-  
-  versions.push(newVersion);
-  localStorage.setItem(VERSIONS_KEY, JSON.stringify(versions));
-  
-  // Track version save
-  if (typeof trackFeatureUsage === 'function') {
-    trackFeatureUsage('versionSave');
+  try {
+    // Get current data
+    const currentData = collectFormData();
+    
+    // Get existing versions
+    const versions = getVersions();
+    
+    // Create new version
+    const newVersion = {
+      id: Date.now().toString(),
+      name: name || `Version ${versions.length + 1}`,
+      date: new Date().toISOString(),
+      data: currentData
+    };
+    
+    // Add to versions array
+    versions.push(newVersion);
+    
+    // Save to localStorage
+    localStorage.setItem(VERSIONS_KEY, JSON.stringify(versions));
+    
+    // Show success message
+    showToast(`Version "${newVersion.name}" saved successfully!`);
+    
+    return newVersion.id;
+  } catch (error) {
+    console.error('Error saving version:', error);
+    showToast('Error saving version. Please try again.', 'error');
+    return null;
   }
-  
-  return newVersion;
 }
 
 // Save a named version

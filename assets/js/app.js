@@ -338,61 +338,11 @@ function removeProject(button) {
 // Add certification entry
 function addCertification() {
   const container = document.getElementById('certificationsContainer');
+  if (!container) return;
+  
   const template = container.querySelector('.certifications-item');
-  const newItem = template.cloneNode(true);
+  if (!template) return;
   
-  // Clear input values
-  newItem.querySelectorAll('input').forEach(input => {
-    input.value = '';
-  });
-  
-  container.appendChild(newItem);
-  saveCurrentData();
-}
-
-// Remove certification entry
-function removeCertification(button) {
-  const item = button.closest('.certifications-item');
-  const container = item.parentElement;
-  
-  // Don't remove if it's the only item
-  if (container.querySelectorAll('.certifications-item').length > 1) {
-    container.removeChild(item);
-    saveCurrentData();
-  }
-}
-
-// Add language entry
-function addLanguage() {
-  const container = document.getElementById('languagesContainer');
-  const template = container.querySelector('.languages-item');
-  const newItem = template.cloneNode(true);
-  
-  // Clear input values
-  newItem.querySelectorAll('input, select').forEach(input => {
-    input.value = '';
-  });
-  
-  container.appendChild(newItem);
-  saveCurrentData();
-}
-
-// Remove language entry
-function removeLanguage(button) {
-  const item = button.closest('.languages-item');
-  const container = item.parentElement;
-  
-  // Don't remove if it's the only item
-  if (container.querySelectorAll('.languages-item').length > 1) {
-    container.removeChild(item);
-    saveCurrentData();
-  }
-}
-
-// Add achievement entry
-function addAchievement() {
-  const container = document.getElementById('achievementsContainer');
-  const template = container.querySelector('.achievements-item');
   const newItem = template.cloneNode(true);
   
   // Clear input values
@@ -401,19 +351,117 @@ function addAchievement() {
   });
   
   container.appendChild(newItem);
+  setupSectionEventListeners();
+  saveCurrentData();
+}
+
+// Remove certification entry
+function removeCertification(button) {
+  const container = document.getElementById('certificationsContainer');
+  if (!container) return;
+  
+  const items = container.querySelectorAll('.certifications-item');
+  if (items.length <= 1) {
+    // Don't remove the last item, just clear it
+    const item = items[0];
+    item.querySelectorAll('input, textarea').forEach(input => {
+      input.value = '';
+    });
+  } else {
+    // Remove the item containing the clicked button
+    const item = button.closest('.certifications-item');
+    if (item) {
+      item.remove();
+    }
+  }
+  
+  saveCurrentData();
+}
+
+// Add language entry
+function addLanguage() {
+  const container = document.getElementById('languagesContainer');
+  if (!container) return;
+  
+  const template = container.querySelector('.languages-item');
+  if (!template) return;
+  
+  const newItem = template.cloneNode(true);
+  
+  // Clear input values
+  newItem.querySelectorAll('input, select').forEach(input => {
+    input.value = '';
+  });
+  
+  container.appendChild(newItem);
+  setupSectionEventListeners();
+  saveCurrentData();
+}
+
+// Remove language entry
+function removeLanguage(button) {
+  const container = document.getElementById('languagesContainer');
+  if (!container) return;
+  
+  const items = container.querySelectorAll('.languages-item');
+  if (items.length <= 1) {
+    // Don't remove the last item, just clear it
+    const item = items[0];
+    item.querySelectorAll('input, select').forEach(input => {
+      input.value = '';
+    });
+  } else {
+    // Remove the item containing the clicked button
+    const item = button.closest('.languages-item');
+    if (item) {
+      item.remove();
+    }
+  }
+  
+  saveCurrentData();
+}
+
+// Add achievement entry
+function addAchievement() {
+  const container = document.getElementById('achievementsContainer');
+  if (!container) return;
+  
+  const template = container.querySelector('.achievements-item');
+  if (!template) return;
+  
+  const newItem = template.cloneNode(true);
+  
+  // Clear input values
+  newItem.querySelectorAll('input, textarea').forEach(input => {
+    input.value = '';
+  });
+  
+  container.appendChild(newItem);
+  setupSectionEventListeners();
   saveCurrentData();
 }
 
 // Remove achievement entry
 function removeAchievement(button) {
-  const item = button.closest('.achievements-item');
-  const container = item.parentElement;
+  const container = document.getElementById('achievementsContainer');
+  if (!container) return;
   
-  // Don't remove if it's the only item
-  if (container.querySelectorAll('.achievements-item').length > 1) {
-    container.removeChild(item);
-    saveCurrentData();
+  const items = container.querySelectorAll('.achievements-item');
+  if (items.length <= 1) {
+    // Don't remove the last item, just clear it
+    const item = items[0];
+    item.querySelectorAll('input, textarea').forEach(input => {
+      input.value = '';
+    });
+  } else {
+    // Remove the item containing the clicked button
+    const item = button.closest('.achievements-item');
+    if (item) {
+      item.remove();
+    }
   }
+  
+  saveCurrentData();
 }
 
 // Add rated skill
