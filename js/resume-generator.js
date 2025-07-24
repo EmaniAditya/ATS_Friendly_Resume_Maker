@@ -309,6 +309,11 @@ function downloadPDF() {
     const versionName = `Resume - ${new Date().toLocaleString()}`;
     saveVersion(versionName);
     
+    // Track PDF download
+    if (typeof trackFeatureUsage === 'function') {
+      trackFeatureUsage('pdfDownload');
+    }
+    
     html2pdf().set(opt).from(element).save().then(() => {
       hideLoading();
       showToast('Resume version saved! You can access it later from "Manage Versions".');
@@ -538,6 +543,11 @@ function downloadPlainText() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  
+  // Track plain text download
+  if (typeof trackFeatureUsage === 'function') {
+    trackFeatureUsage('plainTextDownload');
+  }
   
   showToast('Plain text resume downloaded successfully');
 }

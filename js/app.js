@@ -52,7 +52,15 @@ function setupEventListeners() {
   // Template change
   const templateSelect = document.getElementById('template');
   if (templateSelect) {
-    templateSelect.addEventListener('change', generateResume);
+    templateSelect.addEventListener('change', function() {
+      generateResume();
+      
+      // Track template change
+      if (typeof trackTemplateUsage === 'function' && typeof trackFeatureUsage === 'function') {
+        trackTemplateUsage(this.value);
+        trackFeatureUsage('templateChange');
+      }
+    });
   }
   
   // Compact mode toggle
@@ -147,6 +155,95 @@ function setupEventListeners() {
       applyDensitySetting(index + 1);
     });
   });
+
+  // Analyze keywords button
+  const analyzeKeywordsButton = document.querySelector('button[onclick="analyzeJobDescription()"]');
+  if (analyzeKeywordsButton) {
+    analyzeKeywordsButton.addEventListener('click', function() {
+      analyzeJobDescription();
+      
+      // Track keyword analysis
+      if (typeof trackFeatureUsage === 'function') {
+        trackFeatureUsage('keywordAnalysis');
+      }
+    });
+  }
+  
+  // Add section event listeners
+  setupSectionEventListeners();
+}
+
+// Setup event listeners for section add buttons
+function setupSectionEventListeners() {
+  // Experience
+  const addExperienceButton = document.querySelector('button[onclick="addExperience()"]');
+  if (addExperienceButton) {
+    addExperienceButton.addEventListener('click', function() {
+      if (typeof trackSectionUsage === 'function') {
+        trackSectionUsage('experience');
+      }
+    });
+  }
+  
+  // Education
+  const addEducationButton = document.querySelector('button[onclick="addEducation()"]');
+  if (addEducationButton) {
+    addEducationButton.addEventListener('click', function() {
+      if (typeof trackSectionUsage === 'function') {
+        trackSectionUsage('education');
+      }
+    });
+  }
+  
+  // Projects
+  const addProjectButton = document.querySelector('button[onclick="addProject()"]');
+  if (addProjectButton) {
+    addProjectButton.addEventListener('click', function() {
+      if (typeof trackSectionUsage === 'function') {
+        trackSectionUsage('projects');
+      }
+    });
+  }
+  
+  // Certifications
+  const addCertificationButton = document.querySelector('button[onclick="addCertification()"]');
+  if (addCertificationButton) {
+    addCertificationButton.addEventListener('click', function() {
+      if (typeof trackSectionUsage === 'function') {
+        trackSectionUsage('certifications');
+      }
+    });
+  }
+  
+  // Languages
+  const addLanguageButton = document.querySelector('button[onclick="addLanguage()"]');
+  if (addLanguageButton) {
+    addLanguageButton.addEventListener('click', function() {
+      if (typeof trackSectionUsage === 'function') {
+        trackSectionUsage('languages');
+      }
+    });
+  }
+  
+  // Achievements
+  const addAchievementButton = document.querySelector('button[onclick="addAchievement()"]');
+  if (addAchievementButton) {
+    addAchievementButton.addEventListener('click', function() {
+      if (typeof trackSectionUsage === 'function') {
+        trackSectionUsage('achievements');
+      }
+    });
+  }
+  
+  // Rated Skills
+  const addRatedSkillButton = document.querySelector('button[onclick="addRatedSkill()"]');
+  if (addRatedSkillButton) {
+    addRatedSkillButton.addEventListener('click', function() {
+      if (typeof trackSectionUsage === 'function') {
+        trackSectionUsage('skills');
+      }
+    });
+  }
 }
 
 // Toggle mobile section collapse

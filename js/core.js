@@ -404,6 +404,12 @@ function saveVersion(name) {
   
   versions.push(newVersion);
   localStorage.setItem(VERSIONS_KEY, JSON.stringify(versions));
+  
+  // Track version save
+  if (typeof trackFeatureUsage === 'function') {
+    trackFeatureUsage('versionSave');
+  }
+  
   return newVersion;
 }
 
@@ -448,6 +454,11 @@ function loadVersion(versionId) {
     
     // Show success message
     showToast(`Loaded resume version: "${version.name}"`);
+    
+    // Track version load
+    if (typeof trackFeatureUsage === 'function') {
+      trackFeatureUsage('versionLoad');
+    }
     
     return true;
   }
