@@ -1,1 +1,58 @@
- 
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" fill="#f0f0f0"/>
+  <rect x="20" y="20" width="560" height="760" fill="#ffffff" stroke="#dddddd"/>
+  <rect x="620" y="20" width="560" height="760" fill="#ffffff" stroke="#dddddd"/>
+  
+  <!-- Form side -->
+  <rect x="40" y="40" width="520" height="50" fill="#f8f9fa"/>
+  <text x="300" y="70" font-family="Arial" font-size="20" text-anchor="middle" fill="#333333">Personal Information</text>
+  
+  <rect x="40" y="110" width="520" height="30" fill="#f8f9fa"/>
+  <rect x="40" y="150" width="520" height="30" fill="#f8f9fa"/>
+  <rect x="40" y="190" width="520" height="30" fill="#f8f9fa"/>
+  
+  <rect x="40" y="240" width="520" height="50" fill="#f8f9fa"/>
+  <text x="300" y="270" font-family="Arial" font-size="20" text-anchor="middle" fill="#333333">Experience</text>
+  
+  <rect x="40" y="310" width="520" height="30" fill="#f8f9fa"/>
+  <rect x="40" y="350" width="520" height="30" fill="#f8f9fa"/>
+  <rect x="40" y="390" width="520" height="80" fill="#f8f9fa"/>
+  
+  <rect x="40" y="490" width="520" height="50" fill="#f8f9fa"/>
+  <text x="300" y="520" font-family="Arial" font-size="20" text-anchor="middle" fill="#333333">Education</text>
+  
+  <rect x="40" y="560" width="520" height="30" fill="#f8f9fa"/>
+  <rect x="40" y="600" width="520" height="30" fill="#f8f9fa"/>
+  <rect x="40" y="640" width="520" height="30" fill="#f8f9fa"/>
+  
+  <!-- Preview side -->
+  <text x="900" y="70" font-family="Arial" font-size="24" text-anchor="middle" fill="#333333">JOHN DOE</text>
+  <text x="900" y="100" font-family="Arial" font-size="14" text-anchor="middle" fill="#666666">Software Developer | john@example.com | (123) 456-7890</text>
+  
+  <rect x="640" y="120" width="520" height="1" fill="#333333"/>
+  <text x="640" y="150" font-family="Arial" font-size="18" fill="#333333">SUMMARY</text>
+  <rect x="640" y="160" width="520" height="40" fill="#f8f9fa"/>
+  
+  <text x="640" y="230" font-family="Arial" font-size="18" fill="#333333">EXPERIENCE</text>
+  <text x="640" y="260" font-family="Arial" font-size="16" fill="#333333">Software Developer</text>
+  <text x="1100" y="260" font-family="Arial" font-size="14" text-anchor="end" fill="#666666">2020 - Present</text>
+  <text x="640" y="280" font-family="Arial" font-size="14" fill="#666666">ABC Company</text>
+  <rect x="640" y="290" width="520" height="60" fill="#f8f9fa"/>
+  
+  <text x="640" y="380" font-family="Arial" font-size="18" fill="#333333">EDUCATION</text>
+  <text x="640" y="410" font-family="Arial" font-size="16" fill="#333333">Bachelor of Science in Computer Science</text>
+  <text x="1100" y="410" font-family="Arial" font-size="14" text-anchor="end" fill="#666666">2016 - 2020</text>
+  <text x="640" y="430" font-family="Arial" font-size="14" fill="#666666">University of Technology</text>
+  
+  <text x="640" y="480" font-family="Arial" font-size="18" fill="#333333">SKILLS</text>
+  <rect x="640" y="490" width="520" height="40" fill="#f8f9fa"/>
+  
+  <text x="640" y="560" font-family="Arial" font-size="18" fill="#333333">PROJECTS</text>
+  <text x="640" y="590" font-family="Arial" font-size="16" fill="#333333">E-commerce Platform</text>
+  <rect x="640" y="600" width="520" height="40" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <rect x="0" y="0" width="1200" height="800" fill="rgba(255,255,255,0.7)" />
+  <text x="600" y="380" font-family="Arial" font-size="48" text-anchor="middle" fill="#333333">ATS-Friendly Resume Maker</text>
+  <text x="600" y="430" font-family="Arial" font-size="24" text-anchor="middle" fill="#666666">Screenshot Coming Soon</text>
+</svg> 
