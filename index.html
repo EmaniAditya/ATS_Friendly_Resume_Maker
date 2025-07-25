@@ -358,38 +358,29 @@
             </select>
             <div class="ats-tip">Classic template has the highest ATS compatibility</div>
           </div>
-          
+
           <div class="mb-3">
-            <label class="form-label">Resume Versions</label>
-            <div class="row">
-              <div class="col-md-6 mb-2">
-                <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#saveVersionModal">Save Version</button>
-              </div>
-              <div class="col-md-6 mb-2">
-                <button type="button" class="btn btn-outline-primary w-100" onclick="showVersionsModal()">Manage Versions</button>
-              </div>
+            <label class="form-label">Section Order</label>
+            <div class="ats-tip">Drag and drop sections to customize their order in your resume</div>
+            <div class="section-order-container">
+              <ul id="sectionOrder" class="list-group">
+                <li class="list-group-item" data-section="summary">Summary</li>
+                <li class="list-group-item" data-section="skills">Skills</li>
+                <li class="list-group-item" data-section="experience">Experience</li>
+                <li class="list-group-item" data-section="education">Education</li>
+                <li class="list-group-item" data-section="projects">Projects</li>
+                <li class="list-group-item" data-section="certifications">Certifications</li>
+                <li class="list-group-item" data-section="languages">Languages</li>
+                <li class="list-group-item" data-section="achievements">Achievements & Honors</li>
+              </ul>
             </div>
-            <div class="ats-tip">Your resume versions are saved locally in your browser</div>
           </div>
-          
-          <div class="mb-3">
-            <label class="form-label">Data Management</label>
-            <div class="row">
-              <div class="col-md-6 mb-2">
-                <button type="button" class="btn btn-outline-primary w-100" onclick="exportData()">Export Data</button>
-              </div>
-              <div class="col-md-6 mb-2">
-                <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#importModal">Import Data</button>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col-12">
-                <button type="button" class="btn btn-outline-danger w-100" onclick="clearForm()">Clear All Form Data</button>
-              </div>
-            </div>
-            <div class="ats-tip">Export your data for backup or transfer to another device</div>
+
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="compactMode" checked>
+            <label class="form-check-label" for="compactMode">Single-page mode (automatically fit content to one page)</label>
           </div>
-          
+
           <div class="mb-3">
             <label class="form-label">Export Options</label>
             <div class="row">
@@ -410,36 +401,43 @@
             </div>
             <div class="ats-tip">Plain text version is useful for copying into online application forms</div>
           </div>
-          
+
           <div class="mb-3">
-            <label class="form-label">Section Order</label>
-            <div class="ats-tip">Drag and drop sections to customize their order in your resume</div>
-            <div class="section-order-container">
-              <ul id="sectionOrder" class="list-group">
-                <li class="list-group-item" data-section="summary">Summary</li>
-                <li class="list-group-item" data-section="skills">Skills</li>
-                <li class="list-group-item" data-section="experience">Experience</li>
-                <li class="list-group-item" data-section="education">Education</li>
-                <li class="list-group-item" data-section="projects">Projects</li>
-                <li class="list-group-item" data-section="certifications">Certifications</li>
-                <li class="list-group-item" data-section="languages">Languages</li>
-                <li class="list-group-item" data-section="achievements">Achievements & Honors</li>
-              </ul>
+            <label class="form-label">Resume Versions</label>
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#saveVersionModal">Save Version</button>
+              </div>
+              <div class="col-md-6 mb-2">
+                <button type="button" class="btn btn-outline-primary w-100" onclick="showVersionsModal()">Manage Versions</button>
+              </div>
             </div>
+            <div class="ats-tip">Your resume versions are saved locally in your browser</div>
           </div>
-          
-          <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="compactMode" checked>
-            <label class="form-check-label" for="compactMode">Single-page mode (automatically fit content to one page)</label>
+
+          <div class="mb-3">
+            <label class="form-label">Data Management</label>
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <button type="button" class="btn btn-outline-primary w-100" onclick="exportData()">Export Data</button>
+              </div>
+              <div class="col-md-6 mb-2">
+                <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#importModal">Import Data</button>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-12">
+                <button type="button" class="btn btn-outline-danger w-100" onclick="clearForm()">Clear All Form Data</button>
+              </div>
+            </div>
+            <div class="ats-tip">Export your data for backup or transfer to another device</div>
           </div>
-          
+
           <div class="mb-3">
             <div id="pageWarning" class="page-warning">
               Content may exceed one page. Enable single-page mode to auto-fit.
             </div>
           </div>
-          
-          <!-- Section order and other settings already handled above -->
         </div>
       </div>
       
@@ -581,4 +579,6 @@
     </div>
   </footer>
 </body>
+</html>
+
 </html>
