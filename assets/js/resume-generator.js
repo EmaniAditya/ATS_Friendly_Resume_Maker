@@ -27,6 +27,7 @@ function generateResume() {
   if (data.phone) contactDetails.push(data.phone);
   if (data.email) contactDetails.push(data.email);
   if (data.github) contactDetails.push(data.github);
+  if (data.linkedin) contactDetails.push(data.linkedin);
   if (data.website) contactDetails.push(data.website);
   if (data.location) contactDetails.push(data.location);
   if (data.dob) contactDetails.push(`(DOB: ${data.dob})`);
@@ -298,84 +299,58 @@ function downloadPDF() {
   // Ensure the resume is generated first
   generateResume();
   
-  // Give more time for the resume to render completely
-  setTimeout(() => {
-    try {
-      // Get the resume preview element
-      const element = document.getElementById('resumePreview');
-      if (!element) {
-        throw new Error('Resume preview element not found');
+  try {
+    // Get the resume preview element
+    const element = document.getElementById('resumePreview');
+    if (!element) {
+      throw new Error('Resume preview element not found');
+    }
+    
+    // Check if preview is empty
+    if (element.innerHTML.trim() === '') {
+      showToast('Please preview your resume before downloading', 'warning');
+      hideLoading();
+      return;
+    }
+    
+    // Instead of creating a container, use the element directly with proper styling
+    // This approach works better based on the previous version
+    
+    // Get filename
+    const fullName = document.getElementById('fullName')?.value || 'Resume';
+    const fileName = `${fullName.replace(/\s+/g, '_')}_Resume.pdf`;
+    
+    // PDF options - simplified based on the previous working implementation
+    const opt = {
+      margin: 0,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        logging: false
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait'
       }
-      
-      // Create a container for proper PDF rendering
-      const container = document.createElement('div');
-      container.className = 'pdf-container';
-      container.style.padding = '20px';
-      container.style.backgroundColor = '#ffffff';
-      container.style.width = '210mm'; // A4 width
-      container.style.position = 'absolute';
-      container.style.left = '-9999px';
-      container.style.fontSize = '12pt';
-      
-      // Clone the element to avoid modifying the original
-      const clonedElement = element.cloneNode(true);
-      
-      // Make sure all content is visible and properly styled for PDF
-      clonedElement.style.padding = '20px';
-      clonedElement.style.maxWidth = '100%';
-      clonedElement.style.margin = '0';
-      clonedElement.style.display = 'block';
-      clonedElement.style.overflow = 'visible';
-      
-      // Add to container
-      container.appendChild(clonedElement);
-      document.body.appendChild(container);
-      
-      // Get filename
-      const fullName = document.getElementById('fullName')?.value || 'Resume';
-      const fileName = `${fullName.replace(/\s+/g, '_')}_Resume.pdf`;
-      
-      // PDF options
-      const opt = {
-        margin: [10, 10, 10, 10],
-        filename: fileName,
-        image: { type: 'jpeg', quality: 1.0 },
-        html2canvas: { 
-          scale: 2.5, // Increased scale for better quality
-          useCORS: true,
-          logging: true, // Enable logging for troubleshooting
-          allowTaint: true,
-          backgroundColor: '#ffffff'
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait',
-          compress: true
-        }
-      };
-      
-      // Generate PDF from the container
-      html2pdf().from(container).set(opt).save().then(() => {
-        // Clean up
-        document.body.removeChild(container);
-        hideLoading();
-        showToast('PDF downloaded successfully!');
-      }).catch(error => {
-        console.error('Error generating PDF:', error);
-        // Clean up
-        if (document.body.contains(container)) {
-          document.body.removeChild(container);
-        }
-        hideLoading();
-        showToast('Error generating PDF. Please try again.', 'error');
-      });
-    } catch (error) {
-      console.error('Error in PDF generation:', error);
+    };
+    
+    // Use the simpler, direct method from the previous version
+    html2pdf().set(opt).from(element).save().then(() => {
+      hideLoading();
+      showToast('PDF downloaded successfully!');
+    }).catch(error => {
+      console.error('Error generating PDF:', error);
       hideLoading();
       showToast('Error generating PDF. Please try again.', 'error');
-    }
-  }, 2000); // Increased wait time to ensure content is fully rendered
+    });
+  } catch (error) {
+    console.error('Error in PDF generation:', error);
+    hideLoading();
+    showToast('Error generating PDF. Please try again.', 'error');
+  }
 }
 
 // Generate plain text version of the resume
@@ -394,6 +369,7 @@ function generatePlainText() {
   if (data.phone) contactDetails.push(data.phone);
   if (data.email) contactDetails.push(data.email);
   if (data.github) contactDetails.push(data.github);
+  if (data.linkedin) contactDetails.push(data.linkedin);
   if (data.website) contactDetails.push(data.website);
   if (data.location) contactDetails.push(data.location);
   if (data.dob) contactDetails.push(`DOB: ${data.dob}`);

@@ -28,7 +28,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   } else {
     // No saved data, load sample data
-    loadSampleData();
+    console.log("No saved data found, loading sample data");
+    populateFormData(SAMPLE_RESUME_DATA);
+    generateResume();
+    // Save the sample data to localStorage for future visits
+    localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(SAMPLE_RESUME_DATA));
+    showToast("Sample resume loaded! Edit to customize your own resume.");
   }
   
   // Initialize sortable for section reordering

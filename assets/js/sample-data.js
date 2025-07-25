@@ -5,6 +5,7 @@ const SAMPLE_RESUME_DATA = {
   phone: "+91 7587202379",
   email: "esaadityareddy@gmail.com",
   github: "github.com/EmaniAditya",
+  linkedin: "linkedin.com/in/esaadityareddy",
   website: "emaniaditya.github.io",
   location: "Raipur, India",
   dob: "05 Nov 2004",

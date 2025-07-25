@@ -36,12 +36,12 @@ function showToast(message, type = 'success') {
 
 // Load sample data into the form
 function loadSampleData() {
-  // Only load sample if there's no existing data in localStorage
-  if (!localStorage.getItem(CURRENT_DATA_KEY)) {
-    populateFormData(SAMPLE_RESUME_DATA);
-    generateResume();
-    showToast("Sample resume loaded! Edit to customize your own resume.");
-  }
+  // Load sample data regardless of existing data (used as fallback)
+  populateFormData(SAMPLE_RESUME_DATA);
+  generateResume();
+  // Save to localStorage to ensure persistence
+  localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(SAMPLE_RESUME_DATA));
+  showToast("Sample resume loaded! Edit to customize your own resume.");
 }
 
 // Helper function to populate multi-item sections
@@ -154,6 +154,7 @@ function populateFormData(data) {
   document.getElementById('phone').value = data.phone || '';
   document.getElementById('email').value = data.email || '';
   document.getElementById('github').value = data.github || '';
+  document.getElementById('linkedin').value = data.linkedin || '';
   document.getElementById('website').value = data.website || '';
   document.getElementById('location').value = data.location || '';
   document.getElementById('dob').value = data.dob || '';
@@ -244,6 +245,7 @@ function collectFormData() {
     phone: document.getElementById('phone')?.value || '',
     email: document.getElementById('email')?.value || '',
     github: document.getElementById('github')?.value || '',
+    linkedin: document.getElementById('linkedin')?.value || '',
     website: document.getElementById('website')?.value || '',
     location: document.getElementById('location')?.value || '',
     dob: document.getElementById('dob')?.value || '',
