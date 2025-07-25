@@ -242,7 +242,6 @@ function checkPageOverflow() {
     // Single-page mode: restrict to A4 height
     preview.style.maxHeight = '1123px'; // 297mm at 96dpi
     preview.style.overflowY = 'auto';
-    // Show warning if content overflows
     if (preview.scrollHeight > 1123) {
       if (pageWarning) {
         pageWarning.style.display = 'block';
@@ -312,89 +311,19 @@ function downloadPDF() {
     // Create a clone of the element for PDF generation
     const clonedElement = element.cloneNode(true);
     
-    // Apply specific styles to ensure single-page output
-    clonedElement.style.width = '210mm'; // A4 width
-    clonedElement.style.margin = '0';
-    clonedElement.style.padding = '5mm'; // Reduced padding
-    clonedElement.style.boxSizing = 'border-box';
-    clonedElement.style.overflow = 'hidden';
-    clonedElement.style.maxHeight = '297mm'; // A4 height
+    // Remove all inline style overrides for both modes
+    clonedElement.style.maxHeight = '';
+    clonedElement.style.overflow = '';
+    clonedElement.style.fontSize = '';
+    clonedElement.style.lineHeight = '';
+    clonedElement.style.padding = '';
+    clonedElement.style.margin = '';
+    clonedElement.style.width = '';
+    clonedElement.style.boxSizing = '';
     
-    // Always apply some optimizations regardless of compact mode
-    clonedElement.style.fontSize = '11pt';
-    clonedElement.style.lineHeight = '1.3';
-    
-    // Apply compact mode styling to ensure content fits on one page
+    // PDF options
     const compactMode = document.getElementById('compactMode')?.checked;
-    if (compactMode) {
-      // More aggressive compact styling
-      clonedElement.style.fontSize = '9pt';
-      clonedElement.style.lineHeight = '1.1';
-      
-      // Reduce margins and padding for all elements
-      const allElements = clonedElement.querySelectorAll('*');
-      allElements.forEach(el => {
-        el.style.marginBottom = '0.15em';
-        el.style.marginTop = '0.15em';
-        el.style.paddingBottom = '0';
-        el.style.paddingTop = '0';
-      });
-      
-      // Adjust headings
-      const headings = clonedElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
-      headings.forEach(heading => {
-        heading.style.marginBottom = '0.2em';
-        heading.style.marginTop = '0.2em';
-        heading.style.lineHeight = '1.1';
-      });
-      
-      // Adjust paragraphs
-      const paragraphs = clonedElement.querySelectorAll('p');
-      paragraphs.forEach(p => {
-        p.style.marginBottom = '0.1em';
-        p.style.marginTop = '0.1em';
-      });
-    } else {
-      // Multi-page: remove maxHeight and overflow restrictions
-      clonedElement.style.maxHeight = '';
-      clonedElement.style.overflow = '';
-      // Use normal font size/line height
-      clonedElement.style.fontSize = '11pt';
-      clonedElement.style.lineHeight = '1.3';
-    }
-    
-    // Add CSS to force single page in PDF
-    const style = document.createElement('style');
-    style.textContent = `
-      @media print {
-        body, html {
-          width: 210mm;
-          height: 297mm;
-          margin: 0;
-          padding: 0;
-          overflow: hidden;
-        }
-        @page {
-          size: A4;
-          margin: 0;
-        }
-      }
-    `;
-    clonedElement.appendChild(style);
-    
-    // Create a temporary container to hold the element during PDF generation
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.top = '0';
-    container.appendChild(clonedElement);
-    document.body.appendChild(container);
-    
-    // Get filename
-    const fullName = document.getElementById('fullName')?.value || 'Resume';
-    const fileName = `${fullName.replace(/\s+/g, '_')}_Resume.pdf`;
-    
-    // PDF options optimized for single-page output
+    const fileName = (document.getElementById('fullName')?.value || 'Resume').replace(/\s+/g, '_') + '_Resume.pdf';
     const opt = compactMode ? {
       margin: 0,
       filename: fileName,
@@ -403,7 +332,7 @@ function downloadPDF() {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true, hotfixes: ['px_scaling'], putOnlyUsedFonts: true, precision: 16 },
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     } : {
-      margin: 10,
+      margin: 15,
       filename: fileName,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 1200 },
