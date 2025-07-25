@@ -14,7 +14,7 @@ function generateResume() {
   let html = '';
   
   // Header with name and contact info
-  html += `<h2>${data.fullName || 'Your Name'}</h2>`;
+  html += `<h2 class="text-center">${data.fullName || 'Your Name'}</h2>`;
   
   // Job title and contact info
   html += '<div class="contact-info">';
