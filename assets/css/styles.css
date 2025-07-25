@@ -25,72 +25,16 @@ body {
   text-align: center;
 }
 
-/* Compact mode styles */
-.compact-mode #resumePreview {
-  font-size: 11px;
-  line-height: 1.2;
-  padding: 15mm;
-}
-
-.compact-mode #resumePreview h2 {
-  font-size: 18px;
-  margin-bottom: 5px;
-}
-
-.compact-mode #resumePreview h4 {
-  font-size: 13px;
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
-
-.compact-mode #resumePreview p {
-  margin-bottom: 5px;
-}
-
-.compact-mode #resumePreview ul {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  padding-left: 20px;
-}
-
-.compact-mode #resumePreview li {
-  margin-bottom: 2px;
-}
-
-.compact-mode .experience-entry,
-.compact-mode .education-entry,
-.compact-mode .project-entry {
-  margin-bottom: 5px;
-}
-
-/* Extreme compact mode for very long content */
-.extreme-compact-mode #resumePreview {
-  font-size: 10px;
-  line-height: 1.1;
-  padding: 12mm;
-}
-
-.extreme-compact-mode #resumePreview h2 {
-  font-size: 16px;
-  margin-bottom: 3px;
-}
-
-.extreme-compact-mode #resumePreview h4 {
-  font-size: 12px;
-  margin-top: 8px;
-  margin-bottom: 3px;
-}
-
-.extreme-compact-mode #resumePreview p,
-.extreme-compact-mode #resumePreview ul,
-.extreme-compact-mode #resumePreview li {
-  margin-bottom: 2px;
-}
-
-.extreme-compact-mode .experience-entry,
-.extreme-compact-mode .education-entry,
-.extreme-compact-mode .project-entry {
-  margin-bottom: 3px;
+/* PDF/Print: Improve page breaks for multi-page output */
+@media print {
+  h4 {
+    page-break-after: avoid;
+  }
+  .experience-entry,
+  .education-entry,
+  .project-entry {
+    page-break-inside: avoid;
+  }
 }
 
 /* Toggle switch for compact mode */
