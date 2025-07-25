@@ -96,6 +96,8 @@ const SAMPLE_RESUME_DATA = {
     }
   ],
   skills: "Technical Skills:\nReact.js · Node.js · Express.js · MongoDB · MySQL · PostgreSQL · Redux · TypeScript · Java · Spring Boot · Camunda BPM · Docker · Kubernetes · AWS · CI/CD · REST API Design · GraphQL · WebSocket · React Native · Git · GitHub Actions · Webpack · Jest · Mocha · Chai · Material UI · Bootstrap · Tailwind CSS · HTML5 · CSS3 · SASS/SCSS · Redux Toolkit · NextJS\n\nSoft Skills:\nTeam Leadership · Problem Solving · Agile Methodology · Technical Documentation · Communication · Time Management · Critical Thinking · Adaptability · Client Collaboration · Project Planning · Knowledge Sharing",
+  technicalSkills: "React.js · Node.js · Express.js · MongoDB · MySQL · PostgreSQL · Redux · TypeScript · Java · Spring Boot · Camunda BPM · Docker · Kubernetes · AWS · CI/CD · REST API Design · GraphQL · WebSocket · React Native · Git · GitHub Actions · Webpack · Jest · Mocha · Chai · Material UI · Bootstrap · Tailwind CSS · HTML5 · CSS3 · SASS/SCSS · Redux Toolkit · NextJS",
+  softSkills: "Team Leadership · Problem Solving · Agile Methodology · Technical Documentation · Communication · Time Management · Critical Thinking · Adaptability · Client Collaboration · Project Planning · Knowledge Sharing",
   ratedSkills: [
     {
       skill_name: "JavaScript/TypeScript",

@@ -313,39 +313,88 @@ function downloadPDF() {
       return;
     }
     
-    // Instead of creating a container, use the element directly with proper styling
-    // This approach works better based on the previous version
+    // Create a clone of the element for PDF generation
+    const clonedElement = element.cloneNode(true);
+    
+    // Apply specific styles to ensure single-page output
+    clonedElement.style.width = '210mm';
+    clonedElement.style.margin = '0';
+    clonedElement.style.padding = '10mm';
+    clonedElement.style.boxSizing = 'border-box';
+    clonedElement.style.overflow = 'hidden';
+    
+    // Apply compact mode styling to ensure content fits on one page
+    const compactMode = document.getElementById('compactMode')?.checked;
+    if (compactMode) {
+      clonedElement.style.fontSize = '10pt';
+      clonedElement.style.lineHeight = '1.2';
+      
+      // Reduce margins and padding for all elements
+      const allElements = clonedElement.querySelectorAll('*');
+      allElements.forEach(el => {
+        el.style.marginBottom = '0.2em';
+        el.style.paddingBottom = '0.1em';
+      });
+      
+      // Adjust headings
+      const headings = clonedElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      headings.forEach(heading => {
+        heading.style.marginBottom = '0.3em';
+        heading.style.marginTop = '0.3em';
+      });
+    }
+    
+    // Create a temporary container to hold the element during PDF generation
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    container.appendChild(clonedElement);
+    document.body.appendChild(container);
     
     // Get filename
     const fullName = document.getElementById('fullName')?.value || 'Resume';
     const fileName = `${fullName.replace(/\s+/g, '_')}_Resume.pdf`;
     
-    // PDF options - simplified based on the previous working implementation
+    // PDF options optimized for single-page output
     const opt = {
-      margin: 0,
+      margin: [5, 5, 5, 5], // Minimal margins [top, right, bottom, left] in mm
       filename: fileName,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
         useCORS: true,
-        logging: false
+        logging: false,
+        windowWidth: 1200 // Fixed width for consistent rendering
       },
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
-        orientation: 'portrait'
-      }
+        orientation: 'portrait',
+        compress: true,
+        hotfixes: ['px_scaling'] // Fix for scaling issues
+      },
+      pagebreak: { mode: 'avoid-all' } // Avoid page breaks within elements
     };
     
-    // Use the simpler, direct method from the previous version
-    html2pdf().set(opt).from(element).save().then(() => {
-      hideLoading();
-      showToast('PDF downloaded successfully!');
-    }).catch(error => {
-      console.error('Error generating PDF:', error);
-      hideLoading();
-      showToast('Error generating PDF. Please try again.', 'error');
-    });
+    // Generate the PDF
+    html2pdf()
+      .from(clonedElement)
+      .set(opt)
+      .save()
+      .then(() => {
+        // Clean up
+        document.body.removeChild(container);
+        hideLoading();
+        showToast('PDF downloaded successfully!');
+      })
+      .catch(error => {
+        console.error('Error generating PDF:', error);
+        // Clean up
+        document.body.removeChild(container);
+        hideLoading();
+        showToast('Error generating PDF. Please try again.', 'error');
+      });
   } catch (error) {
     console.error('Error in PDF generation:', error);
     hideLoading();

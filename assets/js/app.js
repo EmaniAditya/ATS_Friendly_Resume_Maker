@@ -1,5 +1,13 @@
 // Initialize the application when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
+  console.log("DOM fully loaded, initializing application");
+  
+  // Ensure required global variables and functions exist
+  if (typeof CURRENT_DATA_KEY === 'undefined') {
+    console.error("CURRENT_DATA_KEY is not defined");
+    return;
+  }
+  
   // Initialize mobile sections
   if (window.innerWidth <= 768) {
     const sections = document.querySelectorAll('.mobile-collapsible');
@@ -11,45 +19,101 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Setup auto-save
-  setupAutoSave();
-  
-  // Try to load saved data
-  const savedData = localStorage.getItem(CURRENT_DATA_KEY);
-  if (savedData) {
+  // Setup auto-save if function exists
+  if (typeof setupAutoSave === 'function') {
     try {
-      const parsedData = JSON.parse(savedData);
-      populateFormData(parsedData);
-      generateResume();
-      console.log("Loaded saved data");
+      setupAutoSave();
     } catch (e) {
-      console.error("Error loading saved data:", e);
-      loadSampleData(); // Load sample data as fallback
+      console.error("Error setting up auto-save:", e);
     }
   } else {
-    // No saved data, load sample data
-    console.log("No saved data found, loading sample data");
-    populateFormData(SAMPLE_RESUME_DATA);
-    generateResume();
-    // Save the sample data to localStorage for future visits
-    localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(SAMPLE_RESUME_DATA));
-    showToast("Sample resume loaded! Edit to customize your own resume.");
+    console.warn("setupAutoSave function not available");
   }
   
-  // Initialize sortable for section reordering
-  if (document.getElementById('sectionOrder')) {
-    new Sortable(document.getElementById('sectionOrder'), {
-      animation: 150,
-      ghostClass: 'bg-light',
-      onEnd: function() {
-        saveCurrentData();
-        generateResume();
+  // Check for required functions
+  const canLoadData = typeof populateFormData === 'function';
+  const canGenerateResume = typeof generateResume === 'function';
+  const canLoadSample = typeof loadSampleData === 'function' && typeof SAMPLE_RESUME_DATA !== 'undefined';
+  
+  if (!canLoadData) {
+    console.error("populateFormData function not available");
+    return;
+  }
+  
+  // Try to load saved data
+  try {
+    const savedData = localStorage.getItem(CURRENT_DATA_KEY);
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        populateFormData(parsedData);
+        
+        if (canGenerateResume) {
+          generateResume();
+        } else {
+          console.warn("generateResume function not available");
+        }
+        
+        console.log("Loaded saved data");
+      } catch (e) {
+        console.error("Error loading saved data:", e);
+        
+        // Load sample data as fallback if available
+        if (canLoadSample) {
+          loadSampleData();
+        } else {
+          console.error("Cannot load sample data as fallback");
+          if (typeof showToast === 'function') {
+            showToast("Error loading saved data", "error");
+          }
+        }
       }
-    });
+    } else {
+      // No saved data, load sample data if available
+      console.log("No saved data found, loading sample data");
+      
+      if (canLoadSample) {
+        loadSampleData();
+      } else {
+        console.error("Sample data or loadSampleData function not available");
+      }
+    }
+  } catch (storageError) {
+    console.error("Error accessing localStorage:", storageError);
   }
   
-  // Add event listeners for form controls
-  setupEventListeners();
+  // Initialize sortable for section reordering if available
+  try {
+    const sectionOrder = document.getElementById('sectionOrder');
+    if (sectionOrder && typeof Sortable !== 'undefined') {
+      new Sortable(sectionOrder, {
+        animation: 150,
+        ghostClass: 'bg-light',
+        onEnd: function() {
+          if (typeof saveCurrentData === 'function') {
+            saveCurrentData();
+          }
+          
+          if (canGenerateResume) {
+            generateResume();
+          }
+        }
+      });
+    }
+  } catch (sortableError) {
+    console.error("Error initializing sortable:", sortableError);
+  }
+  
+  // Add event listeners for form controls if function exists
+  if (typeof setupEventListeners === 'function') {
+    try {
+      setupEventListeners();
+    } catch (e) {
+      console.error("Error setting up event listeners:", e);
+    }
+  } else {
+    console.warn("setupEventListeners function not available");
+  }
 });
 
 // Setup event listeners for form controls

@@ -36,136 +36,225 @@ function showToast(message, type = 'success') {
 
 // Load sample data into the form
 function loadSampleData() {
-  // Load sample data regardless of existing data (used as fallback)
-  populateFormData(SAMPLE_RESUME_DATA);
-  generateResume();
-  // Save to localStorage to ensure persistence
-  localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(SAMPLE_RESUME_DATA));
-  showToast("Sample resume loaded! Edit to customize your own resume.");
+  try {
+    // Check if SAMPLE_RESUME_DATA is available
+    if (typeof SAMPLE_RESUME_DATA === 'undefined') {
+      console.error('Sample resume data is not defined');
+      showToast('Error loading sample data', 'error');
+      return;
+    }
+    
+    // Load sample data regardless of existing data (used as fallback)
+    populateFormData(SAMPLE_RESUME_DATA);
+    
+    // Save to localStorage to ensure persistence
+    try {
+      localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(SAMPLE_RESUME_DATA));
+    } catch (storageError) {
+      console.warn('Error saving sample data to localStorage:', storageError);
+    }
+    
+    // Generate preview
+    if (typeof generateResume === 'function') {
+      generateResume();
+    }
+    
+    showToast("Sample resume loaded! Edit to customize your own resume.");
+  } catch (error) {
+    console.error('Error loading sample data:', error);
+    showToast('Error loading sample data. Please try again.', 'error');
+  }
 }
 
 // Helper function to populate multi-item sections
 function populateMultiItemSection(sectionType, items) {
   if (!items || !items.length) return;
   
-  // Get container
-  const container = document.getElementById(`${sectionType}Container`);
-  if (!container) return;
-  
-  // Get the first item template
-  let itemClass = `${sectionType}-item`;
-  // Handle plural forms for consistency
-  if (sectionType === 'certifications') itemClass = 'certifications-item';
-  if (sectionType === 'languages') itemClass = 'languages-item';
-  if (sectionType === 'achievements') itemClass = 'achievements-item';
-  
-  const firstItem = container.querySelector(`.${itemClass}`);
-  if (!firstItem) return;
-  
-  // Clear the container
-  container.innerHTML = '';
-  
-  // Add and populate items
-  items.forEach((itemData, index) => {
-    // For the first item, clone the template
-    if (index === 0) {
-      const clonedItem = firstItem.cloneNode(true);
-      container.appendChild(clonedItem);
-      populateItemFields(clonedItem, itemData);
-    } else {
-      // For additional items, use the appropriate add function
-      switch(sectionType) {
-        case 'experience':
-          addExperience();
-          break;
-        case 'education':
-          addEducation();
-          break;
-        case 'certifications':
-          addCertification();
-          break;
-        case 'projects':
-          addProject();
-          break;
-        case 'languages':
-          addLanguage();
-          break;
-        case 'achievements':
-          addAchievement();
-          break;
-        case 'ratedSkills':
-          addRatedSkill();
-          break;
-      }
-      
-      // Populate the newly added item
-      const newItem = container.lastElementChild;
-      populateItemFields(newItem, itemData);
+  try {
+    // Get container
+    const container = document.getElementById(`${sectionType}Container`);
+    if (!container) {
+      console.warn(`Container for section '${sectionType}' not found`);
+      return;
     }
-  });
+    
+    // Get the first item template
+    let itemClass = `${sectionType}-item`;
+    // Handle plural forms for consistency
+    if (sectionType === 'certifications') itemClass = 'certifications-item';
+    if (sectionType === 'languages') itemClass = 'languages-item';
+    if (sectionType === 'achievements') itemClass = 'achievements-item';
+    
+    const firstItem = container.querySelector(`.${itemClass}`);
+    if (!firstItem) {
+      console.warn(`Template item for section '${sectionType}' not found`);
+      return;
+    }
+    
+    // Clear the container
+    container.innerHTML = '';
+    
+    // Add and populate items
+    items.forEach((itemData, index) => {
+      try {
+        // For the first item, clone the template
+        if (index === 0) {
+          const clonedItem = firstItem.cloneNode(true);
+          container.appendChild(clonedItem);
+          populateItemFields(clonedItem, itemData);
+        } else {
+          // For additional items, use the appropriate add function
+          let addFunctionCalled = false;
+          
+          // Check if the add function exists in the global scope
+          switch(sectionType) {
+            case 'experience':
+              if (typeof addExperience === 'function') {
+                addExperience();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'education':
+              if (typeof addEducation === 'function') {
+                addEducation();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'certifications':
+              if (typeof addCertification === 'function') {
+                addCertification();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'projects':
+              if (typeof addProject === 'function') {
+                addProject();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'languages':
+              if (typeof addLanguage === 'function') {
+                addLanguage();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'achievements':
+              if (typeof addAchievement === 'function') {
+                addAchievement();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'ratedSkills':
+              if (typeof addRatedSkill === 'function') {
+                addRatedSkill();
+                addFunctionCalled = true;
+              }
+              break;
+          }
+          
+          if (!addFunctionCalled) {
+            // Fallback: manually clone and add the item
+            const clonedItem = firstItem.cloneNode(true);
+            container.appendChild(clonedItem);
+            populateItemFields(clonedItem, itemData);
+          } else {
+            // Populate the newly added item
+            const newItem = container.lastElementChild;
+            if (newItem) {
+              populateItemFields(newItem, itemData);
+            }
+          }
+        }
+      } catch (itemError) {
+        console.warn(`Error populating item ${index} in section ${sectionType}:`, itemError);
+      }
+    });
+  } catch (error) {
+    console.error(`Error in populateMultiItemSection for ${sectionType}:`, error);
+  }
 }
 
 // Helper function to populate fields in an item
 function populateItemFields(item, data) {
   if (!item || !data) return;
   
-  // Get all input, select, and textarea elements
-  const inputs = item.querySelectorAll('input, select, textarea');
-  
-  // For each input, find the corresponding data
-  inputs.forEach(input => {
-    const classList = input.className.split(' ');
+  try {
+    // Get all input, select, and textarea elements
+    const inputs = item.querySelectorAll('input, select, textarea');
     
-    // Find the relevant class name (not form-control, form-select, etc.)
-    const className = classList.find(cls => 
-      !cls.includes('form-') && 
-      cls !== 'input-group' && 
-      cls !== 'form-check-input'
-    );
-    
-    if (className) {
-      // Convert camelCase to snake_case for data lookup
-      const dataKey = className.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
-      
-      if (data[dataKey] !== undefined) {
-        if (input.tagName === 'SELECT') {
-          // For select elements, set the value and trigger change event
-          input.value = data[dataKey] || '';
+    // For each input, find the corresponding data
+    inputs.forEach(input => {
+      try {
+        const classList = input.className.split(' ');
+        
+        // Find the relevant class name (not form-control, form-select, etc.)
+        const className = classList.find(cls => 
+          !cls.includes('form-') && 
+          cls !== 'input-group' && 
+          cls !== 'form-check-input'
+        );
+        
+        if (className) {
+          // Convert camelCase to snake_case for data lookup
+          const dataKey = className.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
           
-          // Create and dispatch change event
-          const event = new Event('change', { bubbles: true });
-          input.dispatchEvent(event);
-        } else {
-          // For regular inputs and textareas
-          input.value = data[dataKey] || '';
+          if (data[dataKey] !== undefined) {
+            if (input.tagName === 'SELECT') {
+              // For select elements, set the value and trigger change event
+              input.value = data[dataKey] || '';
+              
+              try {
+                // Create and dispatch change event
+                const event = new Event('change', { bubbles: true });
+                input.dispatchEvent(event);
+              } catch (eventError) {
+                console.warn('Error dispatching change event:', eventError);
+              }
+            } else {
+              // For regular inputs and textareas
+              input.value = data[dataKey] || '';
+            }
+          }
         }
+      } catch (inputError) {
+        console.warn('Error populating field:', inputError);
       }
-    }
-  });
+    });
+  } catch (error) {
+    console.error('Error in populateItemFields:', error);
+  }
 }
 
 // Populate form data from object
 function populateFormData(data) {
   if (!data) return;
   
+  // Helper function to safely set element value
+  const safeSetValue = (elementId, value) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.value = value || '';
+    } else {
+      console.warn(`Element with ID '${elementId}' not found in the DOM`);
+    }
+  };
+  
   // Populate simple fields
-  document.getElementById('fullName').value = data.fullName || '';
-  document.getElementById('jobTitle').value = data.jobTitle || '';
-  document.getElementById('phone').value = data.phone || '';
-  document.getElementById('email').value = data.email || '';
-  document.getElementById('github').value = data.github || '';
-  document.getElementById('linkedin').value = data.linkedin || '';
-  document.getElementById('website').value = data.website || '';
-  document.getElementById('location').value = data.location || '';
-  document.getElementById('dob').value = data.dob || '';
-  document.getElementById('summary').value = data.summary || '';
-  document.getElementById('skills').value = data.skills || '';
+  safeSetValue('fullName', data.fullName);
+  safeSetValue('jobTitle', data.jobTitle);
+  safeSetValue('phone', data.phone);
+  safeSetValue('email', data.email);
+  safeSetValue('github', data.github);
+  safeSetValue('linkedin', data.linkedin);
+  safeSetValue('website', data.website);
+  safeSetValue('location', data.location);
+  safeSetValue('dob', data.dob);
+  safeSetValue('summary', data.summary);
+  safeSetValue('technicalSkills', data.technicalSkills);
+  safeSetValue('softSkills', data.softSkills);
   
   // Set template
-  const templateSelect = document.getElementById('template');
-  if (templateSelect) {
-    templateSelect.value = data.template || 'classic';
-  }
+  safeSetValue('template', data.template || 'classic');
   
   // Populate multi-item sections
   if (data.experience && data.experience.length > 0) {
@@ -198,43 +287,63 @@ function populateFormData(data) {
   
   // Populate section order
   if (data.sectionOrder && data.sectionOrder.length > 0) {
-    const sectionOrderList = document.getElementById('sectionOrder');
-    if (sectionOrderList) {
-      sectionOrderList.innerHTML = '';
-      data.sectionOrder.forEach(section => {
-        let sectionName = section;
-        switch (section) {
-          case 'summary': sectionName = 'Summary'; break;
-          case 'skills': sectionName = 'Skills'; break;
-          case 'experience': sectionName = 'Experience'; break;
-          case 'education': sectionName = 'Education'; break;
-          case 'projects': sectionName = 'Projects'; break;
-          case 'certifications': sectionName = 'Certifications'; break;
-          case 'languages': sectionName = 'Languages'; break;
-          case 'achievements': sectionName = 'Achievements & Honors'; break;
-        }
+    try {
+      const sectionOrderList = document.getElementById('sectionOrder');
+      if (sectionOrderList) {
+        sectionOrderList.innerHTML = '';
+        data.sectionOrder.forEach(section => {
+          let sectionName = section;
+          switch (section) {
+            case 'summary': sectionName = 'Summary'; break;
+            case 'skills': sectionName = 'Skills'; break;
+            case 'experience': sectionName = 'Experience'; break;
+            case 'education': sectionName = 'Education'; break;
+            case 'projects': sectionName = 'Projects'; break;
+            case 'certifications': sectionName = 'Certifications'; break;
+            case 'languages': sectionName = 'Languages'; break;
+            case 'achievements': sectionName = 'Achievements & Honors'; break;
+          }
+          
+          const li = document.createElement('li');
+          li.className = 'list-group-item';
+          li.dataset.section = section;
+          li.textContent = sectionName;
+          sectionOrderList.appendChild(li);
+        });
         
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.dataset.section = section;
-        li.textContent = sectionName;
-        sectionOrderList.appendChild(li);
-      });
-      
-      // Reinitialize sortable
-      new Sortable(sectionOrderList, {
-        animation: 150,
-        ghostClass: 'bg-light',
-        onEnd: function() {
-          saveCurrentData();
-          generateResume();
+        // Reinitialize sortable if the library is available
+        if (typeof Sortable !== 'undefined') {
+          try {
+            new Sortable(sectionOrderList, {
+              animation: 150,
+              ghostClass: 'bg-light',
+              onEnd: function() {
+                saveCurrentData();
+                generateResume();
+              }
+            });
+          } catch (sortableError) {
+            console.warn('Error initializing Sortable:', sortableError);
+          }
         }
-      });
+      } else {
+        console.warn('Section order list element not found');
+      }
+    } catch (sectionOrderError) {
+      console.error('Error populating section order:', sectionOrderError);
     }
   }
   
   // Generate resume preview
-  generateResume();
+  try {
+    if (typeof generateResume === 'function') {
+      generateResume();
+    } else {
+      console.warn('generateResume function not available');
+    }
+  } catch (previewError) {
+    console.error('Error generating preview:', previewError);
+  }
 }
 
 // Collect form data into object
@@ -721,9 +830,13 @@ function setupAutoSave() {
     };
   }
   
-  // Debounced save function
+  // Debounced save function with preview generation
   const debouncedSave = debounce(() => {
     saveCurrentData();
+    // Generate preview automatically when data changes
+    if (typeof generateResume === 'function') {
+      generateResume();
+    }
   }, 500); // 500ms delay
   
   // Add event listeners to all form inputs
@@ -732,6 +845,15 @@ function setupAutoSave() {
     input.addEventListener('input', debouncedSave);
     input.addEventListener('change', debouncedSave);
   });
+  
+  // Ensure initial preview is generated
+  if (typeof generateResume === 'function') {
+    // Use setTimeout to ensure this happens after all DOM elements are fully initialized
+    setTimeout(() => {
+      console.log("Generating initial preview");
+      generateResume();
+    }, 300);
+  }
 }
 
 // Clear all form data
