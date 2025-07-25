@@ -176,12 +176,6 @@ function setupEventListeners() {
     previewButton.addEventListener('click', generateResume);
   }
   
-  // PDF download button
-  const pdfButton = document.querySelector('button[onclick="downloadPDF()"]');
-  if (pdfButton) {
-    pdfButton.addEventListener('click', downloadPDF);
-  }
-  
   // Plain text buttons
   const viewPlainTextButton = document.querySelector('button[onclick="viewPlainText()"]');
   if (viewPlainTextButton) {
