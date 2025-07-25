@@ -230,36 +230,32 @@ function generateResume() {
 function checkPageOverflow() {
   const preview = document.getElementById('resumePreview');
   const pageWarning = document.getElementById('pageWarning');
-  
-  if (!preview) return;
-  
-  // Get the content height
-  const contentHeight = preview.scrollHeight;
-  // A4 height in pixels (assuming 96dpi)
-  const a4Height = 1123; // 297mm at 96dpi
-  
-  // Remove existing compact modes
-  document.body.classList.remove('compact-mode');
-  document.body.classList.remove('extreme-compact-mode');
-  
-  // Check if compactMode checkbox is checked
   const compactMode = document.getElementById('compactMode');
+
+  if (!preview) return;
+
+  // Remove any previous restriction
+  preview.style.maxHeight = '';
+  preview.style.overflowY = '';
+
   if (compactMode && compactMode.checked) {
-    if (contentHeight > a4Height * 1.2) { // If content is significantly larger
-      document.body.classList.add('extreme-compact-mode');
-    } else if (contentHeight > a4Height) { // If content is slightly larger
-      document.body.classList.add('compact-mode');
-    }
-  }
-  
-  // Show warning if content still overflows
-  if (pageWarning) {
-    if (preview.scrollHeight > preview.clientHeight) {
-      pageWarning.style.display = 'block';
-      pageWarning.textContent = 'Warning: Content exceeds one page. Enable compact mode or reduce content.';
+    // Single-page mode: restrict to A4 height
+    preview.style.maxHeight = '1123px'; // 297mm at 96dpi
+    preview.style.overflowY = 'auto';
+    // Show warning if content overflows
+    if (preview.scrollHeight > 1123) {
+      if (pageWarning) {
+        pageWarning.style.display = 'block';
+        pageWarning.textContent = 'Warning: Content exceeds one page. Enable compact mode or reduce content.';
+      }
     } else {
-      pageWarning.style.display = 'none';
+      if (pageWarning) pageWarning.style.display = 'none';
     }
+  } else {
+    // Multi-page mode: no restriction
+    preview.style.maxHeight = '';
+    preview.style.overflowY = '';
+    if (pageWarning) pageWarning.style.display = 'none';
   }
 }
 
@@ -359,19 +355,12 @@ function downloadPDF() {
         p.style.marginTop = '0.1em';
       });
     } else {
-      // Regular mode with some optimization
-      const allElements = clonedElement.querySelectorAll('*');
-      allElements.forEach(el => {
-        el.style.marginBottom = '0.3em';
-        el.style.paddingBottom = '0.1em';
-      });
-      
-      // Adjust headings
-      const headings = clonedElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
-      headings.forEach(heading => {
-        heading.style.marginBottom = '0.4em';
-        heading.style.marginTop = '0.4em';
-      });
+      // Multi-page: remove maxHeight and overflow restrictions
+      clonedElement.style.maxHeight = '';
+      clonedElement.style.overflow = '';
+      // Use normal font size/line height
+      clonedElement.style.fontSize = '11pt';
+      clonedElement.style.lineHeight = '1.3';
     }
     
     // Add CSS to force single page in PDF
@@ -406,27 +395,20 @@ function downloadPDF() {
     const fileName = `${fullName.replace(/\s+/g, '_')}_Resume.pdf`;
     
     // PDF options optimized for single-page output
-    const opt = {
-      margin: 0, // No margins for maximum space
+    const opt = compactMode ? {
+      margin: 0,
       filename: fileName,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        windowWidth: 1200, // Fixed width for consistent rendering
-        height: compactMode ? 1123 : undefined // Force A4 height in pixels if compact mode is enabled
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait',
-        compress: true,
-        hotfixes: ['px_scaling'], // Fix for scaling issues
-        putOnlyUsedFonts: true, // Optimize PDF size
-        precision: 16 // Higher precision for better text rendering
-      },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Use all available pagebreak prevention methods
+      html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 1200, height: 1123 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true, hotfixes: ['px_scaling'], putOnlyUsedFonts: true, precision: 16 },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    } : {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 1200 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true, hotfixes: ['px_scaling'], putOnlyUsedFonts: true, precision: 16 },
+      pagebreak: { mode: ['css', 'legacy'] }
     };
     
     // Generate the PDF
