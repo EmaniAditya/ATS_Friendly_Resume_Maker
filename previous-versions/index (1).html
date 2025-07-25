@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATS Friendly Resume Maker</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+
+    #resumePreview {
+      background: white;
+      width: 210mm;
+      min-height: 297mm;
+      padding: 25mm;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+    }
+
+    .template-classic h2 {
+      font-weight: bold;
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .template-classic h4 {
+      margin-top: 15px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .template-modern h2 {
+      font-weight: bold;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .template-modern h4 {
+      margin-top: 15px;
+      color: #2a5885;
+      font-weight: bold;
+      border-bottom: 2px solid #2a5885;
+      padding-bottom: 4px;
+    }
+
+    .template-minimalist h2 {
+      font-weight: bold;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .template-minimalist h4 {
+      margin-top: 15px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 14px;
+    }
+
+    .template-professional h2 {
+      font-weight: bold;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .template-professional h4 {
+      margin-top: 15px;
+      font-weight: bold;
+      background-color: #f8f9fa;
+      padding: 5px;
+    }
+
+    .form-label {
+      font-weight: bold;
+    }
+
+    .contact-info {
+      margin-bottom: 15px;
+    }
+
+    .skill-item {
+      display: inline-block;
+      margin-right: 10px;
+      margin-bottom: 5px;
+    }
+
+    .experience-item, .education-item, .project-item {
+      margin-bottom: 15px;
+    }
+
+    .btn-add {
+      margin-top: 5px;
+    }
+
+    .form-section {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-title {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+
+    .ats-tip {
+      font-size: 12px;
+      color: #6c757d;
+      margin-top: 5px;
+    }
+
+    @media (max-width: 768px) {
+      #resumePreview {
+        width: 100%;
+        padding: 15px;
+        font-size: 14px;
+      }
+
+      .container {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .form-label {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center mb-4">ATS Friendly Resume Maker</h1>
+    
+    <div class="row">
+      <div class="col-md-6">
+        <!-- Form Sections -->
+        <div class="form-section">
+          <h3 class="section-title">Personal Information</h3>
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Full Name" required />
+            <div class="ats-tip">Use your legal name as it appears on official documents</div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" placeholder="Email Address" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Phone Number</label>
+              <input type="text" class="form-control" id="phone" placeholder="Phone Number" />
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">LinkedIn</label>
+            <input type="text" class="form-control" id="linkedin" placeholder="LinkedIn URL" />
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Location</label>
+            <input type="text" class="form-control" id="location" placeholder="City, State" />
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Professional Summary</h3>
+          <div class="mb-3">
+            <textarea class="form-control" id="summary" rows="4" placeholder="Brief professional summary (3-4 sentences)"></textarea>
+            <div class="ats-tip">Include relevant keywords and highlight your expertise</div>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Skills</h3>
+          <div class="mb-3">
+            <div id="skillsContainer">
+              <div class="skill-group mb-2">
+                <label class="form-label">Technical Skills</label>
+                <input type="text" class="form-control" id="technicalSkills" placeholder="Technical skills (comma separated)" />
+              </div>
+              <div class="skill-group mb-2">
+                <label class="form-label">Soft Skills</label>
+                <input type="text" class="form-control" id="softSkills" placeholder="Soft skills (comma separated)" />
+              </div>
+            </div>
+            <div class="ats-tip">Include specific technologies, programming languages, and tools</div>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Work Experience</h3>
+          <div id="experienceContainer">
+            <div class="experience-item">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Company</label>
+                  <input type="text" class="form-control company" placeholder="Company Name" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Job Title</label>
+                  <input type="text" class="form-control title" placeholder="Job Title" />
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Start Date</label>
+                  <input type="text" class="form-control startDate" placeholder="MM/YYYY" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">End Date</label>
+                  <input type="text" class="form-control endDate" placeholder="MM/YYYY or Present" />
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Responsibilities & Achievements</label>
+                <textarea class="form-control description" rows="3" placeholder="• Use bullet points starting with action verbs&#10;• Quantify achievements when possible&#10;• Include relevant keywords"></textarea>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addExperience()">+ Add Another Experience</button>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Education</h3>
+          <div id="educationContainer">
+            <div class="education-item">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Institution</label>
+                  <input type="text" class="form-control institution" placeholder="University/College Name" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Degree</label>
+                  <input type="text" class="form-control degree" placeholder="Degree & Major" />
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Graduation Date</label>
+                  <input type="text" class="form-control gradDate" placeholder="MM/YYYY or Expected MM/YYYY" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">GPA (Optional)</label>
+                  <input type="text" class="form-control gpa" placeholder="GPA" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addEducation()">+ Add Another Education</button>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Projects</h3>
+          <div id="projectsContainer">
+            <div class="project-item">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Project Name</label>
+                  <input type="text" class="form-control projectName" placeholder="Project Name" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Technologies</label>
+                  <input type="text" class="form-control technologies" placeholder="Technologies Used" />
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Description</label>
+                <textarea class="form-control projectDescription" rows="3" placeholder="• Describe the project and your role&#10;• Highlight challenges overcome&#10;• Mention outcomes and impact"></textarea>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addProject()">+ Add Another Project</button>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title">Template & Export</h3>
+          <div class="mb-3">
+            <label class="form-label">Select Template</label>
+            <select class="form-select" id="template">
+              <option value="classic">Classic (Most ATS-Friendly)</option>
+              <option value="modern">Modern Professional</option>
+              <option value="minimalist">Minimalist</option>
+              <option value="professional">Professional</option>
+            </select>
+            <div class="ats-tip">Classic template has the highest ATS compatibility</div>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-primary" onclick="generateResume()">Preview Resume</button>
+            <button type="button" class="btn btn-success" onclick="downloadPDF()">Download PDF</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div id="resumePreview" class="mt-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script>
+    function addExperience() {
+      const container = document.getElementById('experienceContainer');
+      const newExperience = document.createElement('div');
+      newExperience.className = 'experience-item mt-3';
+      newExperience.innerHTML = `
+        <hr>
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label class="form-label">Company</label>
+            <input type="text" class="form-control company" placeholder="Company Name" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Job Title</label>
+            <input type="text" class="form-control title" placeholder="Job Title" />
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label class="form-label">Start Date</label>
+            <input type="text" class="form-control startDate" placeholder="MM/YYYY" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">End Date</label>
+            <input type="text" class="form-control endDate" placeholder="MM/YYYY or Present" />
+          </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Responsibilities & Achievements</label>
+          <textarea class="form-control description" rows="3" placeholder="• Use bullet points starting with action verbs&#10;• Quantify achievements when possible&#10;• Include relevant keywords"></textarea>
+        </div>
+      `;
+      container.appendChild(newExperience);
+    }
+
+    function addEducation() {
+      const container = document.getElementById('educationContainer');
+      const newEducation = document.createElement('div');
+      newEducation.className = 'education-item mt-3';
+      newEducation.innerHTML = `
+        <hr>
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label class="form-label">Institution</label>
+            <input type="text" class="form-control institution" placeholder="University/College Name" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Degree</label>
+            <input type="text" class="form-control degree" placeholder="Degree & Major" />
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label class="form-label">Graduation Date</label>
+            <input type="text" class="form-control gradDate" placeholder="MM/YYYY or Expected MM/YYYY" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">GPA (Optional)</label>
+            <input type="text" class="form-control gpa" placeholder="GPA" />
+          </div>
+        </div>
+      `;
+      container.appendChild(newEducation);
+    }
+
+    function addProject() {
+      const container = document.getElementById('projectsContainer');
+      const newProject = document.createElement('div');
+      newProject.className = 'project-item mt-3';
+      newProject.innerHTML = `
+        <hr>
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label class="form-label">Project Name</label>
+            <input type="text" class="form-control projectName" placeholder="Project Name" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Technologies</label>
+            <input type="text" class="form-control technologies" placeholder="Technologies Used" />
+          </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Description</label>
+          <textarea class="form-control projectDescription" rows="3" placeholder="• Describe the project and your role&#10;• Highlight challenges overcome&#10;• Mention outcomes and impact"></textarea>
+        </div>
+      `;
+      container.appendChild(newProject);
+    }
+
+    function formatBulletPoints(text) {
+      if (!text) return '';
+      
+      // Split by newlines and format as bullet points
+      const lines = text.split('\n');
+      const formattedLines = lines.map(line => {
+        line = line.trim();
+        if (line === '') return '';
+        if (line.startsWith('•')) return `<li>${line.substring(1).trim()}</li>`;
+        return `<li>${line}</li>`;
+      });
+      
+      return formattedLines.filter(line => line !== '').join('');
+    }
+
+    function generateResume() {
+      const name = document.getElementById("name").value || 'Your Name';
+      const email = document.getElementById("email").value || '';
+      const phone = document.getElementById("phone").value || '';
+      const linkedin = document.getElementById("linkedin").value || '';
+      const location = document.getElementById("location").value || '';
+      const summary = document.getElementById("summary").value || '';
+      const technicalSkills = document.getElementById("technicalSkills").value || '';
+      const softSkills = document.getElementById("softSkills").value || '';
+      const template = document.getElementById("template").value;
+      
+      // Get experience items
+      const experienceItems = document.querySelectorAll('.experience-item');
+      let experienceHTML = '';
+      
+      experienceItems.forEach(item => {
+        const company = item.querySelector('.company').value;
+        const title = item.querySelector('.title').value;
+        const startDate = item.querySelector('.startDate').value;
+        const endDate = item.querySelector('.endDate').value;
+        const description = item.querySelector('.description').value;
+        
+        if (company || title) {
+          experienceHTML += `
+            <div class="experience-entry">
+              <p><strong>${title || 'Position'}</strong> | ${company || 'Company'} | ${startDate || 'Start Date'} - ${endDate || 'End Date'}</p>
+              <ul>${formatBulletPoints(description)}</ul>
+            </div>
+          `;
+        }
+      });
+      
+      // Get education items
+      const educationItems = document.querySelectorAll('.education-item');
+      let educationHTML = '';
+      
+      educationItems.forEach(item => {
+        const institution = item.querySelector('.institution').value;
+        const degree = item.querySelector('.degree').value;
+        const gradDate = item.querySelector('.gradDate').value;
+        const gpa = item.querySelector('.gpa').value;
+        
+        if (institution || degree) {
+          educationHTML += `
+            <div class="education-entry">
+              <p><strong>${degree || 'Degree'}</strong> | ${institution || 'Institution'} | ${gradDate || 'Graduation Date'}</p>
+              ${gpa ? `<p>GPA: ${gpa}</p>` : ''}
+            </div>
+          `;
+        }
+      });
+      
+      // Get project items
+      const projectItems = document.querySelectorAll('.project-item');
+      let projectsHTML = '';
+      
+      projectItems.forEach(item => {
+        const projectName = item.querySelector('.projectName').value;
+        const technologies = item.querySelector('.technologies').value;
+        const projectDescription = item.querySelector('.projectDescription').value;
+        
+        if (projectName) {
+          projectsHTML += `
+            <div class="project-entry">
+              <p><strong>${projectName}</strong> ${technologies ? `| Technologies: ${technologies}` : ''}</p>
+              <ul>${formatBulletPoints(projectDescription)}</ul>
+            </div>
+          `;
+        }
+      });
+      
+      // Format technical skills as a list
+      let technicalSkillsHTML = '';
+      if (technicalSkills) {
+        const skillsList = technicalSkills.split(',').map(skill => skill.trim()).filter(skill => skill);
+        technicalSkillsHTML = skillsList.join(', ');
+      }
+      
+      // Format soft skills as a list
+      let softSkillsHTML = '';
+      if (softSkills) {
+        const skillsList = softSkills.split(',').map(skill => skill.trim()).filter(skill => skill);
+        softSkillsHTML = skillsList.join(', ');
+      }
+      
+      // Create resume HTML based on selected template
+      let resumeHTML = `<div class="template-${template}">`;
+      
+      // Header section (common for all templates)
+      resumeHTML += `<h2>${name}</h2>`;
+      
+      let contactInfo = [];
+      if (email) contactInfo.push(`${email}`);
+      if (phone) contactInfo.push(`${phone}`);
+      if (linkedin) contactInfo.push(`<a href="${linkedin}">${linkedin.replace(/^https?:\/\/(www\.)?/i, '')}</a>`);
+      if (location) contactInfo.push(`${location}`);
+      
+      resumeHTML += `<p class="contact-info">${contactInfo.join(' | ')}</p>`;
+      
+      // Summary section
+      if (summary) {
+        resumeHTML += `<h4>PROFESSIONAL SUMMARY</h4>`;
+        resumeHTML += `<p>${summary}</p>`;
+      }
+      
+      // Skills section
+      if (technicalSkillsHTML || softSkillsHTML) {
+        resumeHTML += `<h4>SKILLS</h4>`;
+        if (technicalSkillsHTML) {
+          resumeHTML += `<p><strong>Technical Skills:</strong> ${technicalSkillsHTML}</p>`;
+        }
+        if (softSkillsHTML) {
+          resumeHTML += `<p><strong>Soft Skills:</strong> ${softSkillsHTML}</p>`;
+        }
+      }
+      
+      // Experience section
+      if (experienceHTML) {
+        resumeHTML += `<h4>PROFESSIONAL EXPERIENCE</h4>`;
+        resumeHTML += experienceHTML;
+      }
+      
+      // Projects section
+      if (projectsHTML) {
+        resumeHTML += `<h4>PROJECTS</h4>`;
+        resumeHTML += projectsHTML;
+      }
+      
+      // Education section
+      if (educationHTML) {
+        resumeHTML += `<h4>EDUCATION</h4>`;
+        resumeHTML += educationHTML;
+      }
+      
+      resumeHTML += `</div>`;
+      
+      document.getElementById("resumePreview").innerHTML = resumeHTML;
+    }
+
+    function downloadPDF() {
+      const element = document.getElementById("resumePreview");
+      const opt = {
+        margin: 10,
+        filename: 'ATS_Friendly_Resume.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      // Check if preview is empty
+      if (element.innerHTML.trim() === '') {
+        alert('Please preview your resume before downloading');
+        return;
+      }
+      
+      html2pdf().set(opt).from(element).save();
+    }
+    
+    // Initialize with a preview
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        generateResume();
+      }, 500);
+    });
+  </script>
+</body>
+</html>
