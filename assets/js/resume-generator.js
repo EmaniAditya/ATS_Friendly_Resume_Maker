@@ -317,32 +317,81 @@ function downloadPDF() {
     const clonedElement = element.cloneNode(true);
     
     // Apply specific styles to ensure single-page output
-    clonedElement.style.width = '210mm';
+    clonedElement.style.width = '210mm'; // A4 width
     clonedElement.style.margin = '0';
-    clonedElement.style.padding = '10mm';
+    clonedElement.style.padding = '5mm'; // Reduced padding
     clonedElement.style.boxSizing = 'border-box';
     clonedElement.style.overflow = 'hidden';
+    clonedElement.style.maxHeight = '297mm'; // A4 height
+    
+    // Always apply some optimizations regardless of compact mode
+    clonedElement.style.fontSize = '11pt';
+    clonedElement.style.lineHeight = '1.3';
     
     // Apply compact mode styling to ensure content fits on one page
     const compactMode = document.getElementById('compactMode')?.checked;
     if (compactMode) {
-      clonedElement.style.fontSize = '10pt';
-      clonedElement.style.lineHeight = '1.2';
+      // More aggressive compact styling
+      clonedElement.style.fontSize = '9pt';
+      clonedElement.style.lineHeight = '1.1';
       
       // Reduce margins and padding for all elements
       const allElements = clonedElement.querySelectorAll('*');
       allElements.forEach(el => {
-        el.style.marginBottom = '0.2em';
+        el.style.marginBottom = '0.15em';
+        el.style.marginTop = '0.15em';
+        el.style.paddingBottom = '0';
+        el.style.paddingTop = '0';
+      });
+      
+      // Adjust headings
+      const headings = clonedElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      headings.forEach(heading => {
+        heading.style.marginBottom = '0.2em';
+        heading.style.marginTop = '0.2em';
+        heading.style.lineHeight = '1.1';
+      });
+      
+      // Adjust paragraphs
+      const paragraphs = clonedElement.querySelectorAll('p');
+      paragraphs.forEach(p => {
+        p.style.marginBottom = '0.1em';
+        p.style.marginTop = '0.1em';
+      });
+    } else {
+      // Regular mode with some optimization
+      const allElements = clonedElement.querySelectorAll('*');
+      allElements.forEach(el => {
+        el.style.marginBottom = '0.3em';
         el.style.paddingBottom = '0.1em';
       });
       
       // Adjust headings
       const headings = clonedElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
       headings.forEach(heading => {
-        heading.style.marginBottom = '0.3em';
-        heading.style.marginTop = '0.3em';
+        heading.style.marginBottom = '0.4em';
+        heading.style.marginTop = '0.4em';
       });
     }
+    
+    // Add CSS to force single page in PDF
+    const style = document.createElement('style');
+    style.textContent = `
+      @media print {
+        body, html {
+          width: 210mm;
+          height: 297mm;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+        }
+        @page {
+          size: A4;
+          margin: 0;
+        }
+      }
+    `;
+    clonedElement.appendChild(style);
     
     // Create a temporary container to hold the element during PDF generation
     const container = document.createElement('div');
@@ -358,23 +407,26 @@ function downloadPDF() {
     
     // PDF options optimized for single-page output
     const opt = {
-      margin: [5, 5, 5, 5], // Minimal margins [top, right, bottom, left] in mm
+      margin: 0, // No margins for maximum space
       filename: fileName,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
         useCORS: true,
         logging: false,
-        windowWidth: 1200 // Fixed width for consistent rendering
+        windowWidth: 1200, // Fixed width for consistent rendering
+        height: compactMode ? 1123 : undefined // Force A4 height in pixels if compact mode is enabled
       },
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
         orientation: 'portrait',
         compress: true,
-        hotfixes: ['px_scaling'] // Fix for scaling issues
+        hotfixes: ['px_scaling'], // Fix for scaling issues
+        putOnlyUsedFonts: true, // Optimize PDF size
+        precision: 16 // Higher precision for better text rendering
       },
-      pagebreak: { mode: 'avoid-all' } // Avoid page breaks within elements
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Use all available pagebreak prevention methods
     };
     
     // Generate the PDF
