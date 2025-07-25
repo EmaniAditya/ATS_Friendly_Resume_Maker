@@ -282,7 +282,7 @@ function populateFormData(data) {
   }
   
   if (data.ratedSkills && data.ratedSkills.length > 0) {
-    populateMultiItemSection('ratedSkill', data.ratedSkills);
+    populateMultiItemSection('ratedSkills', data.ratedSkills);
   }
   
   // Populate section order
