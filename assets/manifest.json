@@ -2,7 +2,7 @@
   "name": "ATS-Friendly Resume Maker",
   "short_name": "ATS Resume",
   "description": "Create professional, ATS-optimized resumes that stand out to both automated systems and human recruiters",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2a5885",

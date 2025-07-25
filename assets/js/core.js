@@ -36,11 +36,33 @@ function showToast(message, type = 'success') {
 
 // Load sample data into the form
 function loadSampleData() {
-  // Only load sample if there's no existing data in localStorage
-  if (!localStorage.getItem(CURRENT_DATA_KEY)) {
+  try {
+    // Check if SAMPLE_RESUME_DATA is available
+    if (typeof SAMPLE_RESUME_DATA === 'undefined') {
+      console.error('Sample resume data is not defined');
+      showToast('Error loading sample data', 'error');
+      return;
+    }
+    
+    // Load sample data regardless of existing data (used as fallback)
     populateFormData(SAMPLE_RESUME_DATA);
-    generateResume();
+    
+    // Save to localStorage to ensure persistence
+    try {
+      localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(SAMPLE_RESUME_DATA));
+    } catch (storageError) {
+      console.warn('Error saving sample data to localStorage:', storageError);
+    }
+    
+    // Generate preview
+    if (typeof generateResume === 'function') {
+      generateResume();
+    }
+    
     showToast("Sample resume loaded! Edit to customize your own resume.");
+  } catch (error) {
+    console.error('Error loading sample data:', error);
+    showToast('Error loading sample data. Please try again.', 'error');
   }
 }
 
@@ -48,117 +70,191 @@ function loadSampleData() {
 function populateMultiItemSection(sectionType, items) {
   if (!items || !items.length) return;
   
-  // Get container
-  const container = document.getElementById(`${sectionType}Container`);
-  if (!container) return;
-  
-  // Get the first item template
-  const firstItem = container.querySelector(`.${sectionType}-item`);
-  if (!firstItem) return;
-  
-  // Clear the container
-  container.innerHTML = '';
-  
-  // Add and populate items
-  items.forEach((itemData, index) => {
-    // For the first item, clone the template
-    if (index === 0) {
-      const clonedItem = firstItem.cloneNode(true);
-      container.appendChild(clonedItem);
-      populateItemFields(clonedItem, itemData);
-    } else {
-      // For additional items, use the appropriate add function
-      switch(sectionType) {
-        case 'experience':
-          addExperience();
-          break;
-        case 'education':
-          addEducation();
-          break;
-        case 'certifications':
-          addCertification();
-          break;
-        case 'projects':
-          addProject();
-          break;
-        case 'languages':
-          addLanguage();
-          break;
-        case 'achievements':
-          addAchievement();
-          break;
-        case 'ratedSkill':
-          addRatedSkill();
-          break;
-      }
-      
-      // Populate the newly added item
-      const newItem = container.lastElementChild;
-      populateItemFields(newItem, itemData);
+  try {
+    // Get container
+    const container = document.getElementById(`${sectionType}Container`);
+    if (!container) {
+      console.warn(`Container for section '${sectionType}' not found`);
+      return;
     }
-  });
+    
+    // Get the first item template
+    let itemClass = `${sectionType}-item`;
+    // Handle plural forms for consistency
+    if (sectionType === 'certifications') itemClass = 'certifications-item';
+    if (sectionType === 'languages') itemClass = 'languages-item';
+    if (sectionType === 'achievements') itemClass = 'achievements-item';
+    
+    const firstItem = container.querySelector(`.${itemClass}`);
+    if (!firstItem) {
+      console.warn(`Template item for section '${sectionType}' not found`);
+      return;
+    }
+    
+    // Clear the container
+    container.innerHTML = '';
+    
+    // Add and populate items
+    items.forEach((itemData, index) => {
+      try {
+        // For the first item, clone the template
+        if (index === 0) {
+          const clonedItem = firstItem.cloneNode(true);
+          container.appendChild(clonedItem);
+          populateItemFields(clonedItem, itemData);
+        } else {
+          // For additional items, use the appropriate add function
+          let addFunctionCalled = false;
+          
+          // Check if the add function exists in the global scope
+          switch(sectionType) {
+            case 'experience':
+              if (typeof addExperience === 'function') {
+                addExperience();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'education':
+              if (typeof addEducation === 'function') {
+                addEducation();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'certifications':
+              if (typeof addCertification === 'function') {
+                addCertification();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'projects':
+              if (typeof addProject === 'function') {
+                addProject();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'languages':
+              if (typeof addLanguage === 'function') {
+                addLanguage();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'achievements':
+              if (typeof addAchievement === 'function') {
+                addAchievement();
+                addFunctionCalled = true;
+              }
+              break;
+            case 'ratedSkills':
+              if (typeof addRatedSkill === 'function') {
+                addRatedSkill();
+                addFunctionCalled = true;
+              }
+              break;
+          }
+          
+          if (!addFunctionCalled) {
+            // Fallback: manually clone and add the item
+            const clonedItem = firstItem.cloneNode(true);
+            container.appendChild(clonedItem);
+            populateItemFields(clonedItem, itemData);
+          } else {
+            // Populate the newly added item
+            const newItem = container.lastElementChild;
+            if (newItem) {
+              populateItemFields(newItem, itemData);
+            }
+          }
+        }
+      } catch (itemError) {
+        console.warn(`Error populating item ${index} in section ${sectionType}:`, itemError);
+      }
+    });
+  } catch (error) {
+    console.error(`Error in populateMultiItemSection for ${sectionType}:`, error);
+  }
 }
 
 // Helper function to populate fields in an item
 function populateItemFields(item, data) {
   if (!item || !data) return;
   
-  // Get all input, select, and textarea elements
-  const inputs = item.querySelectorAll('input, select, textarea');
-  
-  // For each input, find the corresponding data
-  inputs.forEach(input => {
-    const classList = input.className.split(' ');
+  try {
+    // Get all input, select, and textarea elements
+    const inputs = item.querySelectorAll('input, select, textarea');
     
-    // Find the relevant class name (not form-control, form-select, etc.)
-    const className = classList.find(cls => 
-      !cls.includes('form-') && 
-      cls !== 'input-group' && 
-      cls !== 'form-check-input'
-    );
-    
-    if (className) {
-      // Convert camelCase to snake_case for data lookup
-      const dataKey = className.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
-      
-      if (data[dataKey] !== undefined) {
-        if (input.tagName === 'SELECT') {
-          // For select elements, set the value and trigger change event
-          input.value = data[dataKey] || '';
+    // For each input, find the corresponding data
+    inputs.forEach(input => {
+      try {
+        const classList = input.className.split(' ');
+        
+        // Find the relevant class name (not form-control, form-select, etc.)
+        const className = classList.find(cls => 
+          !cls.includes('form-') && 
+          cls !== 'input-group' && 
+          cls !== 'form-check-input'
+        );
+        
+        if (className) {
+          // Convert camelCase to snake_case for data lookup
+          const dataKey = className.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
           
-          // Create and dispatch change event
-          const event = new Event('change', { bubbles: true });
-          input.dispatchEvent(event);
-        } else {
-          // For regular inputs and textareas
-          input.value = data[dataKey] || '';
+          if (data[dataKey] !== undefined) {
+            if (input.tagName === 'SELECT') {
+              // For select elements, set the value and trigger change event
+              input.value = data[dataKey] || '';
+              
+              try {
+                // Create and dispatch change event
+                const event = new Event('change', { bubbles: true });
+                input.dispatchEvent(event);
+              } catch (eventError) {
+                console.warn('Error dispatching change event:', eventError);
+              }
+            } else {
+              // For regular inputs and textareas
+              input.value = data[dataKey] || '';
+            }
+          }
         }
+      } catch (inputError) {
+        console.warn('Error populating field:', inputError);
       }
-    }
-  });
+    });
+  } catch (error) {
+    console.error('Error in populateItemFields:', error);
+  }
 }
 
 // Populate form data from object
 function populateFormData(data) {
   if (!data) return;
   
+  // Helper function to safely set element value
+  const safeSetValue = (elementId, value) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.value = value || '';
+    } else {
+      console.warn(`Element with ID '${elementId}' not found in the DOM`);
+    }
+  };
+  
   // Populate simple fields
-  document.getElementById('fullName').value = data.fullName || '';
-  document.getElementById('jobTitle').value = data.jobTitle || '';
-  document.getElementById('phone').value = data.phone || '';
-  document.getElementById('email').value = data.email || '';
-  document.getElementById('github').value = data.github || '';
-  document.getElementById('website').value = data.website || '';
-  document.getElementById('location').value = data.location || '';
-  document.getElementById('dob').value = data.dob || '';
-  document.getElementById('summary').value = data.summary || '';
-  document.getElementById('skills').value = data.skills || '';
+  safeSetValue('fullName', data.fullName);
+  safeSetValue('jobTitle', data.jobTitle);
+  safeSetValue('phone', data.phone);
+  safeSetValue('email', data.email);
+  safeSetValue('github', data.github);
+  safeSetValue('linkedin', data.linkedin);
+  safeSetValue('website', data.website);
+  safeSetValue('location', data.location);
+  safeSetValue('dob', data.dob);
+  safeSetValue('summary', data.summary);
+  safeSetValue('technicalSkills', data.technicalSkills);
+  safeSetValue('softSkills', data.softSkills);
   
   // Set template
-  const templateSelect = document.getElementById('template');
-  if (templateSelect) {
-    templateSelect.value = data.template || 'classic';
-  }
+  safeSetValue('template', data.template || 'classic');
   
   // Populate multi-item sections
   if (data.experience && data.experience.length > 0) {
@@ -186,64 +282,84 @@ function populateFormData(data) {
   }
   
   if (data.ratedSkills && data.ratedSkills.length > 0) {
-    populateMultiItemSection('ratedSkill', data.ratedSkills);
+    populateMultiItemSection('ratedSkills', data.ratedSkills);
   }
   
   // Populate section order
   if (data.sectionOrder && data.sectionOrder.length > 0) {
-    const sectionOrderList = document.getElementById('sectionOrder');
-    if (sectionOrderList) {
-      sectionOrderList.innerHTML = '';
-      data.sectionOrder.forEach(section => {
-        let sectionName = section;
-        switch (section) {
-          case 'summary': sectionName = 'Summary'; break;
-          case 'skills': sectionName = 'Skills'; break;
-          case 'experience': sectionName = 'Experience'; break;
-          case 'education': sectionName = 'Education'; break;
-          case 'projects': sectionName = 'Projects'; break;
-          case 'certifications': sectionName = 'Certifications'; break;
-          case 'languages': sectionName = 'Languages'; break;
-          case 'achievements': sectionName = 'Achievements & Honors'; break;
-        }
+    try {
+      const sectionOrderList = document.getElementById('sectionOrder');
+      if (sectionOrderList) {
+        sectionOrderList.innerHTML = '';
+        data.sectionOrder.forEach(section => {
+          let sectionName = section;
+          switch (section) {
+            case 'summary': sectionName = 'Summary'; break;
+            case 'skills': sectionName = 'Skills'; break;
+            case 'experience': sectionName = 'Experience'; break;
+            case 'education': sectionName = 'Education'; break;
+            case 'projects': sectionName = 'Projects'; break;
+            case 'certifications': sectionName = 'Certifications'; break;
+            case 'languages': sectionName = 'Languages'; break;
+            case 'achievements': sectionName = 'Achievements & Honors'; break;
+          }
+          
+          const li = document.createElement('li');
+          li.className = 'list-group-item';
+          li.dataset.section = section;
+          li.textContent = sectionName;
+          sectionOrderList.appendChild(li);
+        });
         
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.dataset.section = section;
-        li.textContent = sectionName;
-        sectionOrderList.appendChild(li);
-      });
-      
-      // Reinitialize sortable
-      new Sortable(sectionOrderList, {
-        animation: 150,
-        ghostClass: 'bg-light',
-        onEnd: function() {
-          saveCurrentData();
-          generateResume();
+        // Reinitialize sortable if the library is available
+        if (typeof Sortable !== 'undefined') {
+          try {
+            new Sortable(sectionOrderList, {
+              animation: 150,
+              ghostClass: 'bg-light',
+              onEnd: function() {
+                saveCurrentData();
+                generateResume();
+              }
+            });
+          } catch (sortableError) {
+            console.warn('Error initializing Sortable:', sortableError);
+          }
         }
-      });
+      } else {
+        console.warn('Section order list element not found');
+      }
+    } catch (sectionOrderError) {
+      console.error('Error populating section order:', sectionOrderError);
     }
   }
   
   // Generate resume preview
-  generateResume();
+  try {
+    if (typeof generateResume === 'function') {
+      generateResume();
+    } else {
+      console.warn('generateResume function not available');
+    }
+  } catch (previewError) {
+    console.error('Error generating preview:', previewError);
+  }
 }
 
 // Collect form data into object
 function collectFormData() {
   const data = {
-    fullName: document.getElementById('fullName').value,
-    jobTitle: document.getElementById('jobTitle').value,
-    phone: document.getElementById('phone').value,
-    email: document.getElementById('email').value,
-    github: document.getElementById('github').value,
-    website: document.getElementById('website').value,
-    location: document.getElementById('location').value,
-    dob: document.getElementById('dob').value,
-    summary: document.getElementById('summary').value,
-    skills: document.getElementById('skills').value,
-    template: document.getElementById('template').value,
+    fullName: document.getElementById('fullName')?.value || '',
+    jobTitle: document.getElementById('jobTitle')?.value || '',
+    phone: document.getElementById('phone')?.value || '',
+    email: document.getElementById('email')?.value || '',
+    github: document.getElementById('github')?.value || '',
+    linkedin: document.getElementById('linkedin')?.value || '',
+    website: document.getElementById('website')?.value || '',
+    location: document.getElementById('location')?.value || '',
+    dob: document.getElementById('dob')?.value || '',
+    summary: document.getElementById('summary')?.value || '',
+    skills: '',
     experience: [],
     education: [],
     projects: [],
@@ -251,125 +367,153 @@ function collectFormData() {
     languages: [],
     achievements: [],
     ratedSkills: [],
+    template: document.getElementById('template')?.value || 'classic',
     sectionOrder: []
   };
   
-  // Collect multi-item sections
-  // Experience
-  const experienceItems = document.querySelectorAll('.experience-item');
-  experienceItems.forEach(item => {
-    const expData = {
-      company_name: item.querySelector('.companyName').value,
-      job_title: item.querySelector('.jobTitle').value,
-      start_date: item.querySelector('.startDate').value,
-      end_date: item.querySelector('.endDate').value,
-      location: item.querySelector('.location').value,
-      description: item.querySelector('.description').value
-    };
-    
-    // Only add if at least company name or job title is provided
-    if (expData.company_name || expData.job_title) {
-      data.experience.push(expData);
-    }
-  });
+  // Collect skills
+  const technicalSkills = document.getElementById('technicalSkills')?.value || '';
+  const softSkills = document.getElementById('softSkills')?.value || '';
   
-  // Education
-  const educationItems = document.querySelectorAll('.education-item');
-  educationItems.forEach(item => {
-    const eduData = {
-      school_name: item.querySelector('.schoolName').value,
-      degree: item.querySelector('.degree').value,
-      education_start_date: item.querySelector('.educationStartDate')?.value || '',
-      education_end_date: item.querySelector('.educationEndDate')?.value || '',
-      education_location: item.querySelector('.educationLocation')?.value || '',
-      gpa: item.querySelector('.gpa')?.value || '',
-      score_type: item.querySelector('.scoreType')?.value || 'none'
-    };
-    
-    // Only add if at least school name or degree is provided
-    if (eduData.school_name || eduData.degree) {
-      data.education.push(eduData);
-    }
-  });
+  if (technicalSkills && softSkills) {
+    data.skills = `Technical Skills:\n${technicalSkills}\n\nSoft Skills:\n${softSkills}`;
+  } else if (technicalSkills) {
+    data.skills = `Technical Skills:\n${technicalSkills}`;
+  } else if (softSkills) {
+    data.skills = `Soft Skills:\n${softSkills}`;
+  }
   
-  // Projects
-  const projectItems = document.querySelectorAll('.project-item');
-  projectItems.forEach(item => {
-    const projData = {
-      project_name: item.querySelector('.projectName').value,
-      project_description: item.querySelector('.projectDescription').value,
-      project_technologies: item.querySelector('.projectTechnologies').value,
-      project_link: item.querySelector('.projectLink').value,
-      project_github: item.querySelector('.projectGithub').value
-    };
-    
-    // Only add if at least project name is provided
-    if (projData.project_name) {
-      data.projects.push(projData);
-    }
-  });
-  
-  // Certifications
-  const certificationItems = document.querySelectorAll('.certifications-item');
-  certificationItems.forEach(item => {
-    const certData = {
-      certification_name: item.querySelector('.certificationName')?.value || '',
-      certification_org: item.querySelector('.certificationOrg')?.value || '',
-      certification_date: item.querySelector('.certificationDate')?.value || '',
-      certification_expiration: item.querySelector('.certificationExpiration')?.value || '',
-      credential_id: item.querySelector('.credentialID')?.value || ''
-    };
-    
-    // Only add if at least certification name is provided
-    if (certData.certification_name) {
-      data.certifications.push(certData);
-    }
-  });
-  
-  // Languages
-  const languageItems = document.querySelectorAll('.languages-item');
-  languageItems.forEach(item => {
-    const langData = {
-      language: item.querySelector('.language')?.value || '',
-      proficiency: item.querySelector('.proficiency')?.value || ''
-    };
-    
-    // Only add if language is provided
-    if (langData.language) {
-      data.languages.push(langData);
-    }
-  });
-  
-  // Achievements
-  const achievementItems = document.querySelectorAll('.achievements-item');
-  achievementItems.forEach(item => {
-    const achieveData = {
-      achievement_title: item.querySelector('.achievementTitle')?.value || '',
-      achievement_date: item.querySelector('.achievementDate')?.value || '',
-      achievement_description: item.querySelector('.achievementDescription')?.value || ''
-    };
-    
-    // Only add if title or description is provided
-    if (achieveData.achievement_title || achieveData.achievement_description) {
-      data.achievements.push(achieveData);
-    }
-  });
-  
-  // Rated Skills
-  const ratedSkillItems = document.querySelectorAll('.rated-skill-item');
+  // Collect rated skills
+  const ratedSkillItems = document.querySelectorAll('#ratedSkillsContainer .rated-skill-item');
   ratedSkillItems.forEach(item => {
-    const skillData = {
-      skill_name: item.querySelector('.skillName')?.value || '',
-      skill_rating: item.querySelector('.skillRating')?.value || ''
-    };
+    const skillName = item.querySelector('.skillName')?.value || '';
+    const skillRating = item.querySelector('.skillRating')?.value || '';
     
-    // Only add if skill name is provided
-    if (skillData.skill_name) {
-      data.ratedSkills.push(skillData);
+    if (skillName) {
+      data.ratedSkills.push({
+        skill_name: skillName,
+        skill_rating: skillRating
+      });
     }
   });
   
-  // Section Order
+  // Collect experience items
+  const experienceItems = document.querySelectorAll('#experienceContainer .experience-item');
+  experienceItems.forEach(item => {
+    const company = item.querySelector('.company')?.value || '';
+    const title = item.querySelector('.title')?.value || '';
+    const startDate = item.querySelector('.startDate')?.value || '';
+    const endDate = item.querySelector('.endDate')?.value || '';
+    const description = item.querySelector('.description')?.value || '';
+    const location = item.querySelector('.experienceLocation')?.value || '';
+    
+    if (company || title || startDate || endDate || description) {
+      data.experience.push({
+        company_name: company,
+        job_title: title,
+        start_date: startDate,
+        end_date: endDate,
+        description: description,
+        location: location
+      });
+    }
+  });
+  
+  // Collect education items
+  const educationItems = document.querySelectorAll('#educationContainer .education-item');
+  educationItems.forEach(item => {
+    const institution = item.querySelector('.institution')?.value || '';
+    const degree = item.querySelector('.degree')?.value || '';
+    const startDate = item.querySelector('.educationStartDate')?.value || '';
+    const endDate = item.querySelector('.educationEndDate')?.value || '';
+    const gpa = item.querySelector('.gpa')?.value || '';
+    const scoreType = item.querySelector('.scoreType')?.value || '';
+    const location = item.querySelector('.educationLocation')?.value || '';
+    
+    if (institution || degree || startDate || endDate) {
+      data.education.push({
+        school_name: institution,
+        degree: degree,
+        education_start_date: startDate,
+        education_end_date: endDate,
+        gpa: gpa,
+        score_type: scoreType,
+        education_location: location
+      });
+    }
+  });
+  
+  // Collect project items
+  const projectItems = document.querySelectorAll('#projectsContainer .project-item');
+  projectItems.forEach(item => {
+    const name = item.querySelector('.projectName')?.value || '';
+    const description = item.querySelector('.projectDescription')?.value || '';
+    const technologies = item.querySelector('.projectTechnologies')?.value || '';
+    const link = item.querySelector('.projectLink')?.value || '';
+    const github = item.querySelector('.projectGithub')?.value || '';
+    
+    if (name || description || technologies) {
+      data.projects.push({
+        project_name: name,
+        project_description: description,
+        project_technologies: technologies,
+        project_link: link,
+        project_github: github
+      });
+    }
+  });
+  
+  // Collect certification items
+  const certificationItems = document.querySelectorAll('#certificationsContainer .certifications-item');
+  certificationItems.forEach(item => {
+    const name = item.querySelector('.certificationName')?.value || '';
+    const org = item.querySelector('.certificationOrg')?.value || '';
+    const date = item.querySelector('.certificationDate')?.value || '';
+    const expiration = item.querySelector('.certificationExpiration')?.value || '';
+    const credentialId = item.querySelector('.credentialID')?.value || '';
+    
+    if (name || org || date) {
+      data.certifications.push({
+        certification_name: name,
+        certification_org: org,
+        certification_date: date,
+        certification_expiration: expiration,
+        credential_id: credentialId
+      });
+    }
+  });
+  
+  // Collect language items
+  const languageItems = document.querySelectorAll('#languagesContainer .languages-item');
+  languageItems.forEach(item => {
+    const language = item.querySelector('.language')?.value || '';
+    const proficiency = item.querySelector('.proficiency')?.value || '';
+    
+    if (language) {
+      data.languages.push({
+        language: language,
+        proficiency: proficiency
+      });
+    }
+  });
+  
+  // Collect achievement items
+  const achievementItems = document.querySelectorAll('#achievementsContainer .achievements-item');
+  achievementItems.forEach(item => {
+    const title = item.querySelector('.achievementTitle')?.value || '';
+    const date = item.querySelector('.achievementDate')?.value || '';
+    const description = item.querySelector('.achievementDescription')?.value || '';
+    
+    if (title || description) {
+      data.achievements.push({
+        achievement_title: title,
+        achievement_date: date,
+        achievement_description: description
+      });
+    }
+  });
+  
+  // Collect section order
   const sectionOrderItems = document.querySelectorAll('#sectionOrder li');
   sectionOrderItems.forEach(item => {
     data.sectionOrder.push(item.dataset.section);
@@ -390,52 +534,82 @@ function getVersions() {
   return versionsJson ? JSON.parse(versionsJson) : [];
 }
 
-// Save a version with auto-generated name
-function saveVersion(name) {
-  const data = collectFormData();
-  const versions = getVersions();
-  
-  const newVersion = {
-    id: Date.now().toString(),
-    name: name || `Resume - ${new Date().toLocaleString()}`,
-    date: new Date().toISOString(),
-    data: data
-  };
-  
-  versions.push(newVersion);
-  localStorage.setItem(VERSIONS_KEY, JSON.stringify(versions));
-  
-  // Track version save
-  if (typeof trackFeatureUsage === 'function') {
-    trackFeatureUsage('versionSave');
+// Save a version of the current resume data
+function saveVersion(name, showNotification = true) {
+  try {
+    // Get current data
+    const currentData = collectFormData();
+    
+    // Get existing versions
+    const versions = getVersions();
+    
+    // Create new version
+    const newVersion = {
+      id: Date.now().toString(),
+      name: name || `Version ${versions.length + 1}`,
+      date: new Date().toISOString(),
+      data: currentData
+    };
+    
+    // Add to versions array
+    versions.push(newVersion);
+    
+    // Save to localStorage
+    localStorage.setItem(VERSIONS_KEY, JSON.stringify(versions));
+    
+    // Show success message if requested
+    if (showNotification) {
+      showToast(`Version "${newVersion.name}" saved successfully!`);
+    }
+    
+    return newVersion.id;
+  } catch (error) {
+    console.error('Error saving version:', error);
+    showToast('Error saving version. Please try again.', 'error');
+    return null;
   }
-  
-  return newVersion;
 }
 
 // Save a named version
 function saveNamedVersion() {
   const nameInput = document.getElementById('versionName');
-  const name = nameInput.value.trim();
-  
-  if (!name) {
-    showToast('Please enter a version name', 'error');
+  if (!nameInput) {
+    console.error('Version name input not found');
+    showToast('Error saving version. Please try again.', 'error');
     return;
   }
   
-  const newVersion = saveVersion(name);
-  showToast(`Version "${name}" saved successfully`);
+  const name = nameInput.value.trim();
   
-  // Close modal
-  const saveVersionModal = bootstrap.Modal.getInstance(document.getElementById('saveVersionModal'));
-  if (saveVersionModal) {
-    saveVersionModal.hide();
+  if (!name) {
+    showToast('Please enter a version name', 'warning');
+    return;
   }
   
-  // Clear input
-  nameInput.value = '';
-  
-  return newVersion;
+  try {
+    // Save the version without showing notification (we'll show our own)
+    const versionId = saveVersion(name, false);
+    
+    if (versionId) {
+      // Show success message
+      showToast(`Version "${name}" saved successfully!`);
+      
+      // Clear input
+      nameInput.value = '';
+      
+      // Close modal
+      const saveVersionModal = document.getElementById('saveVersionModal');
+      if (saveVersionModal) {
+        const bsModal = bootstrap.Modal.getInstance(saveVersionModal);
+        if (bsModal) {
+          bsModal.hide();
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error in saveNamedVersion:', error);
+    showToast('Error saving version. Please try again.', 'error');
+  }
 }
 
 // Load a specific version
@@ -444,54 +618,107 @@ function loadVersion(versionId) {
   const version = versions.find(v => v.id === versionId);
   
   if (version) {
-    populateFormData(version.data);
-    
-    // Close the modal
-    const versionsModal = bootstrap.Modal.getInstance(document.getElementById('versionsModal'));
-    if (versionsModal) {
-      versionsModal.hide();
+    try {
+      // Populate form with version data
+      populateFormData(version.data);
+      
+      // Generate the resume preview
+      if (typeof generateResume === 'function') {
+        generateResume();
+      }
+      
+      // Close the modal
+      const versionsModal = document.getElementById('versionsModal');
+      if (versionsModal) {
+        const modal = bootstrap.Modal.getInstance(versionsModal);
+        if (modal) {
+          modal.hide();
+        } else {
+          // If we can't get the instance, try to use the data API
+          const bsModal = new bootstrap.Modal(versionsModal);
+          bsModal.hide();
+        }
+      }
+      
+      // Show success message
+      showToast(`Loaded resume version: "${version.name}"`);
+      
+      return true;
+    } catch (error) {
+      console.error('Error loading version:', error);
+      // Don't show error toast here as the data was already populated successfully
+      // If we get here, the version loaded but there was a minor error elsewhere
+      return true;
     }
-    
-    // Show success message
-    showToast(`Loaded resume version: "${version.name}"`);
-    
-    // Track version load
-    if (typeof trackFeatureUsage === 'function') {
-      trackFeatureUsage('versionLoad');
-    }
-    
-    return true;
+  } else {
+    showToast('Version not found', 'error');
+    return false;
   }
-  
-  return false;
 }
 
 // Delete a version
 function deleteVersion(versionId) {
-  if (confirm('Are you sure you want to delete this version?')) {
+  try {
     const versions = getVersions();
+    const versionToDelete = versions.find(v => v.id === versionId);
+    
+    if (!versionToDelete) {
+      showToast('Version not found', 'error');
+      return;
+    }
+    
+    const versionName = versionToDelete.name;
     const updatedVersions = versions.filter(v => v.id !== versionId);
     localStorage.setItem(VERSIONS_KEY, JSON.stringify(updatedVersions));
     
     // Show success message
-    showToast('Version deleted successfully');
+    showToast(`Version "${versionName}" deleted successfully`);
     
     // Refresh versions list
-    showVersionsModal();
+    if (updatedVersions.length === 0) {
+      // If no versions left, close the modal
+      const versionsModal = document.getElementById('versionsModal');
+      if (versionsModal) {
+        const modal = bootstrap.Modal.getInstance(versionsModal);
+        if (modal) {
+          modal.hide();
+        }
+      }
+    } else {
+      // Otherwise refresh the list
+      showVersionsModal();
+    }
+  } catch (error) {
+    console.error('Error deleting version:', error);
+    showToast('Error deleting version. Please try again.', 'error');
   }
 }
 
 // Show versions modal with current versions
 function showVersionsModal() {
-  const versions = getVersions();
-  const versionsBody = document.getElementById('versionsBody');
-  
-  if (versionsBody) {
+  try {
+    // Get the modal element
+    const versionsModalElement = document.getElementById('versionsModal');
+    if (!versionsModalElement) {
+      console.error('Versions modal element not found');
+      return;
+    }
+    
+    // Get the content container
+    const versionsModalContent = document.getElementById('versionsModalContent');
+    if (!versionsModalContent) {
+      console.error('Versions modal content element not found');
+      return;
+    }
+    
+    // Get versions from localStorage
+    const versions = getVersions();
+    
     // Clear previous content
-    versionsBody.innerHTML = '';
+    versionsModalContent.innerHTML = '';
     
     if (versions.length === 0) {
-      versionsBody.innerHTML = '<p class="text-center text-muted">No saved versions yet</p>';
+      versionsModalContent.innerHTML = '<p class="text-center text-muted">No saved versions yet</p>';
     } else {
       // Create table
       const table = document.createElement('table');
@@ -524,10 +751,10 @@ function showVersionsModal() {
         tbody.appendChild(tr);
       });
       table.appendChild(tbody);
-      versionsBody.appendChild(table);
+      versionsModalContent.appendChild(table);
       
       // Add event listeners
-      const loadButtons = versionsBody.querySelectorAll('.load-version');
+      const loadButtons = versionsModalContent.querySelectorAll('.load-version');
       loadButtons.forEach(button => {
         button.addEventListener('click', () => {
           const versionId = button.dataset.versionId;
@@ -535,7 +762,7 @@ function showVersionsModal() {
         });
       });
       
-      const deleteButtons = versionsBody.querySelectorAll('.delete-version');
+      const deleteButtons = versionsModalContent.querySelectorAll('.delete-version');
       deleteButtons.forEach(button => {
         button.addEventListener('click', () => {
           const versionId = button.dataset.versionId;
@@ -543,11 +770,49 @@ function showVersionsModal() {
         });
       });
     }
+    
+    // Close any existing modal first
+    const existingModal = bootstrap.Modal.getInstance(versionsModalElement);
+    if (existingModal) {
+      existingModal.dispose();
+    }
+    
+    // Create and show new modal
+    const versionsModal = new bootstrap.Modal(versionsModalElement);
+    versionsModal.show();
+  } catch (error) {
+    console.error('Error showing versions modal:', error);
+    showToast('Error showing versions. Please try again.', 'error');
   }
-  
-  // Show modal
-  const versionsModal = new bootstrap.Modal(document.getElementById('versionsModal'));
-  versionsModal.show();
+}
+
+// Open the save version modal, closing any other modals first
+function openSaveVersionModal() {
+  try {
+    // First, close the versions modal if it's open
+    const versionsModalElement = document.getElementById('versionsModal');
+    if (versionsModalElement) {
+      const versionsModal = bootstrap.Modal.getInstance(versionsModalElement);
+      if (versionsModal) {
+        versionsModal.hide();
+      }
+    }
+    
+    // Wait a bit for the modal to close
+    setTimeout(() => {
+      // Then open the save version modal
+      const saveVersionModalElement = document.getElementById('saveVersionModal');
+      if (saveVersionModalElement) {
+        const saveVersionModal = new bootstrap.Modal(saveVersionModalElement);
+        saveVersionModal.show();
+      } else {
+        console.error('Save version modal element not found');
+      }
+    }, 300); // Short delay to allow the first modal to close
+  } catch (error) {
+    console.error('Error opening save version modal:', error);
+    showToast('Error opening save version modal. Please try again.', 'error');
+  }
 }
 
 // Setup auto-save functionality
@@ -565,9 +830,13 @@ function setupAutoSave() {
     };
   }
   
-  // Debounced save function
+  // Debounced save function with preview generation
   const debouncedSave = debounce(() => {
     saveCurrentData();
+    // Generate preview automatically when data changes
+    if (typeof generateResume === 'function') {
+      generateResume();
+    }
   }, 500); // 500ms delay
   
   // Add event listeners to all form inputs
@@ -576,6 +845,15 @@ function setupAutoSave() {
     input.addEventListener('input', debouncedSave);
     input.addEventListener('change', debouncedSave);
   });
+  
+  // Ensure initial preview is generated
+  if (typeof generateResume === 'function') {
+    // Use setTimeout to ensure this happens after all DOM elements are fully initialized
+    setTimeout(() => {
+      console.log("Generating initial preview");
+      generateResume();
+    }, 300);
+  }
 }
 
 // Clear all form data
@@ -723,34 +1001,58 @@ function importData() {
   reader.onload = function(e) {
     try {
       const importedData = JSON.parse(e.target.result);
+      let isValidFormat = false;
       
       // Validate imported data
-      if (!importedData.versions && !importedData.currentData) {
+      // Check if the file has either versions or currentData
+      if (importedData.versions || importedData.currentData) {
+        isValidFormat = true;
+      } else {
+        // Check if the file is just a resume data object itself
+        // Look for common properties that would be in resume data
+        if (importedData.fullName !== undefined || 
+            importedData.experience !== undefined || 
+            importedData.education !== undefined) {
+          // Treat the entire JSON as currentData
+          isValidFormat = true;
+          importedData.currentData = importedData;
+        }
+      }
+      
+      if (!isValidFormat) {
         throw new Error('Invalid import file format');
       }
       
       // Confirm before overwriting
       if (confirm('Importing will overwrite your current data. Continue?')) {
-        // Import versions
-        if (importedData.versions && Array.isArray(importedData.versions)) {
-          localStorage.setItem(VERSIONS_KEY, JSON.stringify(importedData.versions));
-        }
-        
-        // Import current data
-        if (importedData.currentData) {
-          localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(importedData.currentData));
-          populateFormData(importedData.currentData);
-        }
-        
-        // Generate resume preview
-        generateResume();
-        
-        showToast('Data imported successfully');
-        
-        // Close the modal
-        const importModal = bootstrap.Modal.getInstance(document.getElementById('importModal'));
-        if (importModal) {
-          importModal.hide();
+        try {
+          // Import versions
+          if (importedData.versions && Array.isArray(importedData.versions)) {
+            localStorage.setItem(VERSIONS_KEY, JSON.stringify(importedData.versions));
+          }
+          
+          // Import current data
+          if (importedData.currentData) {
+            localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(importedData.currentData));
+            populateFormData(importedData.currentData);
+          }
+          
+          // Generate resume preview
+          generateResume();
+          
+          showToast('Data imported successfully');
+          
+          // Close the modal
+          const importModal = bootstrap.Modal.getInstance(document.getElementById('importModal'));
+          if (importModal) {
+            importModal.hide();
+          }
+          
+          return; // Successfully imported, exit the function
+        } catch (innerError) {
+          console.error('Error during import process:', innerError);
+          // Don't show error here, will be handled in outer catch
+          throw innerError;
         }
       }
     } catch (error) {

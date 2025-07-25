@@ -14,7 +14,7 @@ function generateResume() {
   let html = '';
   
   // Header with name and contact info
-  html += `<h2>${data.fullName || 'Your Name'}</h2>`;
+  html += `<h2 class="text-center">${data.fullName || 'Your Name'}</h2>`;
   
   // Job title and contact info
   html += '<div class="contact-info">';
@@ -27,6 +27,7 @@ function generateResume() {
   if (data.phone) contactDetails.push(data.phone);
   if (data.email) contactDetails.push(data.email);
   if (data.github) contactDetails.push(data.github);
+  if (data.linkedin) contactDetails.push(data.linkedin);
   if (data.website) contactDetails.push(data.website);
   if (data.location) contactDetails.push(data.location);
   if (data.dob) contactDetails.push(`(DOB: ${data.dob})`);
@@ -229,36 +230,31 @@ function generateResume() {
 function checkPageOverflow() {
   const preview = document.getElementById('resumePreview');
   const pageWarning = document.getElementById('pageWarning');
-  
-  if (!preview) return;
-  
-  // Get the content height
-  const contentHeight = preview.scrollHeight;
-  // A4 height in pixels (assuming 96dpi)
-  const a4Height = 1123; // 297mm at 96dpi
-  
-  // Remove existing compact modes
-  document.body.classList.remove('compact-mode');
-  document.body.classList.remove('extreme-compact-mode');
-  
-  // Check if compactMode checkbox is checked
   const compactMode = document.getElementById('compactMode');
+
+  if (!preview) return;
+
+  // Remove any previous restriction
+  preview.style.maxHeight = '';
+  preview.style.overflowY = '';
+
   if (compactMode && compactMode.checked) {
-    if (contentHeight > a4Height * 1.2) { // If content is significantly larger
-      document.body.classList.add('extreme-compact-mode');
-    } else if (contentHeight > a4Height) { // If content is slightly larger
-      document.body.classList.add('compact-mode');
-    }
-  }
-  
-  // Show warning if content still overflows
-  if (pageWarning) {
-    if (preview.scrollHeight > preview.clientHeight) {
-      pageWarning.style.display = 'block';
-      pageWarning.textContent = 'Warning: Content exceeds one page. Enable compact mode or reduce content.';
+    // Single-page mode: restrict to A4 height
+    preview.style.maxHeight = '1123px'; // 297mm at 96dpi
+    preview.style.overflowY = 'auto';
+    if (preview.scrollHeight > 1123) {
+      if (pageWarning) {
+        pageWarning.style.display = 'block';
+        pageWarning.textContent = 'Warning: Content exceeds one page. Enable compact mode or reduce content.';
+      }
     } else {
-      pageWarning.style.display = 'none';
+      if (pageWarning) pageWarning.style.display = 'none';
     }
+  } else {
+    // Multi-page mode: no restriction
+    preview.style.maxHeight = '';
+    preview.style.overflowY = '';
+    if (pageWarning) pageWarning.style.display = 'none';
   }
 }
 
@@ -291,37 +287,82 @@ function applyDensitySetting(densityValue) {
   setTimeout(checkPageOverflow, 100);
 }
 
-// Download PDF
+// Download resume as PDF
 function downloadPDF() {
   showLoading();
   
-  setTimeout(() => {
-    const element = document.getElementById("resumePreview");
-    const opt = {
-      margin: 0,
-      filename: 'ATS_Friendly_Resume.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    
-    // Save a version when downloading PDF
-    const versionName = `Resume - ${new Date().toLocaleString()}`;
-    saveVersion(versionName);
-    
-    // Track PDF download
-    if (typeof trackFeatureUsage === 'function') {
-      trackFeatureUsage('pdfDownload');
+  // Ensure the resume is generated first
+  generateResume();
+  
+  try {
+    // Get the resume preview element
+    const element = document.getElementById('resumePreview');
+    if (!element) {
+      throw new Error('Resume preview element not found');
     }
     
-    html2pdf().set(opt).from(element).save().then(() => {
+    // Check if preview is empty
+    if (element.innerHTML.trim() === '') {
+      showToast('Please preview your resume before downloading', 'warning');
       hideLoading();
-      showToast('Resume version saved! You can access it later from "Manage Versions".');
-    }).catch(error => {
-      hideLoading();
-      showToast('Error generating PDF: ' + error.message, 'error');
-    });
-  }, 100); // Small delay to ensure loading spinner appears
+      return;
+    }
+    
+    // Create a clone of the element for PDF generation
+    const clonedElement = element.cloneNode(true);
+    
+    // Remove all inline style overrides for both modes
+    clonedElement.style.maxHeight = '';
+    clonedElement.style.overflow = '';
+    clonedElement.style.fontSize = '';
+    clonedElement.style.lineHeight = '';
+    clonedElement.style.padding = '';
+    clonedElement.style.margin = '';
+    clonedElement.style.width = '';
+    clonedElement.style.boxSizing = '';
+    
+    // PDF options
+    const compactMode = document.getElementById('compactMode')?.checked;
+    const fileName = (document.getElementById('fullName')?.value || 'Resume').replace(/\s+/g, '_') + '_Resume.pdf';
+    const opt = compactMode ? {
+      margin: 0,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 1200, height: 1123 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true, hotfixes: ['px_scaling'], putOnlyUsedFonts: true, precision: 16 },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    } : {
+      margin: 15,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 1200 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true, hotfixes: ['px_scaling'], putOnlyUsedFonts: true, precision: 16 },
+      pagebreak: { mode: ['css', 'legacy'] }
+    };
+    
+    // Generate the PDF
+    html2pdf()
+      .from(clonedElement)
+      .set(opt)
+      .save()
+      .then(() => {
+        // Clean up
+        document.body.removeChild(container);
+        hideLoading();
+        showToast('PDF downloaded successfully!');
+      })
+      .catch(error => {
+        console.error('Error generating PDF:', error);
+        // Clean up
+        document.body.removeChild(container);
+        hideLoading();
+        showToast('Error generating PDF. Please try again.', 'error');
+      });
+  } catch (error) {
+    console.error('Error in PDF generation:', error);
+    hideLoading();
+    showToast('Error generating PDF. Please try again.', 'error');
+  }
 }
 
 // Generate plain text version of the resume
@@ -340,6 +381,7 @@ function generatePlainText() {
   if (data.phone) contactDetails.push(data.phone);
   if (data.email) contactDetails.push(data.email);
   if (data.github) contactDetails.push(data.github);
+  if (data.linkedin) contactDetails.push(data.linkedin);
   if (data.website) contactDetails.push(data.website);
   if (data.location) contactDetails.push(data.location);
   if (data.dob) contactDetails.push(`DOB: ${data.dob}`);
@@ -525,8 +567,11 @@ function generatePlainText() {
 // View plain text version
 function viewPlainText() {
   const plainText = generatePlainText();
+  const plainTextContent = document.getElementById('plainTextContent');
+  if (plainTextContent) {
+    plainTextContent.textContent = plainText;
+  }
   const plainTextModal = new bootstrap.Modal(document.getElementById('plainTextModal'));
-  document.getElementById('plainTextContent').value = plainText;
   plainTextModal.show();
 }
 
@@ -555,7 +600,50 @@ function downloadPlainText() {
 // Copy plain text to clipboard
 function copyPlainText() {
   const plainTextContent = document.getElementById('plainTextContent');
-  plainTextContent.select();
-  document.execCommand('copy');
-  showToast('Plain text copied to clipboard');
+  if (!plainTextContent) {
+    showToast('Error copying text. Please try again.', 'error');
+    return;
+  }
+  
+  const text = plainTextContent.textContent;
+  
+  // Use modern Clipboard API if available
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        showToast('Plain text copied to clipboard');
+      })
+      .catch(err => {
+        console.error('Failed to copy text: ', err);
+        // Fallback to older method
+        fallbackCopyTextToClipboard(plainTextContent);
+      });
+  } else {
+    // Fallback for browsers that don't support Clipboard API
+    fallbackCopyTextToClipboard(plainTextContent);
+  }
+}
+
+// Fallback method for copying text
+function fallbackCopyTextToClipboard(element) {
+  try {
+    // Create a range and selection
+    const range = document.createRange();
+    range.selectNode(element);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    
+    // Execute copy command
+    const successful = document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    
+    if (successful) {
+      showToast('Plain text copied to clipboard');
+    } else {
+      showToast('Failed to copy text. Please try manually.', 'warning');
+    }
+  } catch (err) {
+    console.error('Failed to copy text: ', err);
+    showToast('Failed to copy text. Please try manually.', 'warning');
+  }
 } 
