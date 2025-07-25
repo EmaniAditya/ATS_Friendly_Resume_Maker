@@ -49,11 +49,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Setup event listeners for form controls
 function setupEventListeners() {
+  // Live preview update function - debounced to avoid too many updates
+  const debouncedPreviewUpdate = debounce(function() {
+    generateResume();
+  }, 300); // 300ms delay
+  
+  // Add live preview listeners to all form inputs
+  const formInputs = document.querySelectorAll('input, textarea, select');
+  formInputs.forEach(input => {
+    // For text inputs and textareas, use input event
+    if (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA') {
+      input.addEventListener('input', debouncedPreviewUpdate);
+    }
+    // For select elements, use change event
+    else if (input.tagName === 'SELECT') {
+      input.addEventListener('change', debouncedPreviewUpdate);
+    }
+  });
+  
   // Template change
   const templateSelect = document.getElementById('template');
   if (templateSelect) {
     templateSelect.addEventListener('change', function() {
-      generateResume();
+      generateResume(); // Immediate update for template changes
       
       // Track template change
       if (typeof trackTemplateUsage === 'function' && typeof trackFeatureUsage === 'function') {
@@ -69,6 +87,7 @@ function setupEventListeners() {
     compactMode.addEventListener('change', function() {
       checkPageOverflow();
       saveCurrentData();
+      generateResume(); // Update preview when compact mode changes
     });
   }
   
@@ -78,10 +97,11 @@ function setupEventListeners() {
     densitySlider.addEventListener('input', function() {
       const value = parseInt(this.value);
       applyDensitySetting(value);
+      generateResume(); // Update preview when density changes
     });
   }
   
-  // Preview button
+  // Preview button (keep for manual refresh)
   const previewButton = document.querySelector('button[onclick="generateResume()"]');
   if (previewButton) {
     previewButton.addEventListener('click', generateResume);
@@ -153,6 +173,7 @@ function setupEventListeners() {
   densityButtons.forEach((btn, index) => {
     btn.addEventListener('click', function() {
       applyDensitySetting(index + 1);
+      generateResume(); // Update preview when density changes
     });
   });
 
@@ -169,8 +190,34 @@ function setupEventListeners() {
     });
   }
   
+  // Setup section order updates
+  const sectionOrder = document.getElementById('sectionOrder');
+  if (sectionOrder) {
+    new Sortable(sectionOrder, {
+      animation: 150,
+      ghostClass: 'bg-light',
+      onEnd: function() {
+        saveCurrentData();
+        generateResume(); // Update preview when sections are reordered
+      }
+    });
+  }
+  
   // Add section event listeners
   setupSectionEventListeners();
+}
+
+// Debounce helper function to limit how often the resume preview is updated
+function debounce(func, delay) {
+  let timeoutId;
+  return function() {
+    const context = this;
+    const args = arguments;
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(context, args);
+    }, delay);
+  };
 }
 
 // Setup event listeners for section add buttons
@@ -263,10 +310,17 @@ function addExperience() {
   // Clear input values
   newItem.querySelectorAll('input, textarea').forEach(input => {
     input.value = '';
+    
+    // Add live preview event listeners to new inputs
+    input.addEventListener('input', function() {
+      saveCurrentData();
+      generateResume(); // Update preview when field changes
+    });
   });
   
   container.appendChild(newItem);
   saveCurrentData();
+  generateResume(); // Update preview after adding section
 }
 
 // Remove experience entry
@@ -278,6 +332,7 @@ function removeExperience(button) {
   if (container.querySelectorAll('.experience-item').length > 1) {
     container.removeChild(item);
     saveCurrentData();
+    generateResume(); // Update preview after removing section
   }
 }
 
@@ -290,10 +345,24 @@ function addEducation() {
   // Clear input values
   newItem.querySelectorAll('input, select').forEach(input => {
     input.value = '';
+    
+    // Add live preview event listeners to new inputs
+    input.addEventListener('input', function() {
+      saveCurrentData();
+      generateResume();
+    });
+    
+    if (input.tagName === 'SELECT') {
+      input.addEventListener('change', function() {
+        saveCurrentData();
+        generateResume();
+      });
+    }
   });
   
   container.appendChild(newItem);
   saveCurrentData();
+  generateResume();
 }
 
 // Remove education entry
@@ -305,6 +374,7 @@ function removeEducation(button) {
   if (container.querySelectorAll('.education-item').length > 1) {
     container.removeChild(item);
     saveCurrentData();
+    generateResume();
   }
 }
 
@@ -317,10 +387,17 @@ function addProject() {
   // Clear input values
   newItem.querySelectorAll('input, textarea').forEach(input => {
     input.value = '';
+    
+    // Add live preview event listeners
+    input.addEventListener('input', function() {
+      saveCurrentData();
+      generateResume();
+    });
   });
   
   container.appendChild(newItem);
   saveCurrentData();
+  generateResume();
 }
 
 // Remove project entry
@@ -332,6 +409,7 @@ function removeProject(button) {
   if (container.querySelectorAll('.project-item').length > 1) {
     container.removeChild(item);
     saveCurrentData();
+    generateResume();
   }
 }
 
@@ -348,11 +426,18 @@ function addCertification() {
   // Clear input values
   newItem.querySelectorAll('input, textarea').forEach(input => {
     input.value = '';
+    
+    // Add live preview event listeners
+    input.addEventListener('input', function() {
+      saveCurrentData();
+      generateResume();
+    });
   });
   
   container.appendChild(newItem);
   setupSectionEventListeners();
   saveCurrentData();
+  generateResume();
 }
 
 // Remove certification entry
@@ -376,6 +461,7 @@ function removeCertification(button) {
   }
   
   saveCurrentData();
+  generateResume();
 }
 
 // Add language entry
@@ -391,11 +477,25 @@ function addLanguage() {
   // Clear input values
   newItem.querySelectorAll('input, select').forEach(input => {
     input.value = '';
+    
+    // Add live preview event listeners
+    input.addEventListener('input', function() {
+      saveCurrentData();
+      generateResume();
+    });
+    
+    if (input.tagName === 'SELECT') {
+      input.addEventListener('change', function() {
+        saveCurrentData();
+        generateResume();
+      });
+    }
   });
   
   container.appendChild(newItem);
   setupSectionEventListeners();
   saveCurrentData();
+  generateResume();
 }
 
 // Remove language entry
@@ -419,6 +519,7 @@ function removeLanguage(button) {
   }
   
   saveCurrentData();
+  generateResume();
 }
 
 // Add achievement entry
@@ -434,11 +535,18 @@ function addAchievement() {
   // Clear input values
   newItem.querySelectorAll('input, textarea').forEach(input => {
     input.value = '';
+    
+    // Add live preview event listeners
+    input.addEventListener('input', function() {
+      saveCurrentData();
+      generateResume();
+    });
   });
   
   container.appendChild(newItem);
   setupSectionEventListeners();
   saveCurrentData();
+  generateResume();
 }
 
 // Remove achievement entry
@@ -462,6 +570,7 @@ function removeAchievement(button) {
   }
   
   saveCurrentData();
+  generateResume();
 }
 
 // Add rated skill
@@ -473,10 +582,24 @@ function addRatedSkill() {
   // Clear input values
   newItem.querySelectorAll('input, select').forEach(input => {
     input.value = '';
+    
+    // Add live preview event listeners
+    input.addEventListener('input', function() {
+      saveCurrentData();
+      generateResume();
+    });
+    
+    if (input.tagName === 'SELECT') {
+      input.addEventListener('change', function() {
+        saveCurrentData();
+        generateResume();
+      });
+    }
   });
   
   container.appendChild(newItem);
   saveCurrentData();
+  generateResume();
 }
 
 // Remove rated skill
@@ -488,5 +611,6 @@ function removeRatedSkill(button) {
   if (container.querySelectorAll('.rated-skill-item').length > 1) {
     container.removeChild(item);
     saveCurrentData();
+    generateResume();
   }
 } 

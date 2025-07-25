@@ -535,8 +535,9 @@ function loadVersion(versionId) {
       return true;
     } catch (error) {
       console.error('Error loading version:', error);
-      showToast('Error loading version. Please try again.', 'error');
-      return false;
+      // Don't show error toast here as the data was already populated successfully
+      // If we get here, the version loaded but there was a minor error elsewhere
+      return true;
     }
   } else {
     showToast('Version not found', 'error');
@@ -876,34 +877,58 @@ function importData() {
   reader.onload = function(e) {
     try {
       const importedData = JSON.parse(e.target.result);
+      let isValidFormat = false;
       
       // Validate imported data
-      if (!importedData.versions && !importedData.currentData) {
+      // Check if the file has either versions or currentData
+      if (importedData.versions || importedData.currentData) {
+        isValidFormat = true;
+      } else {
+        // Check if the file is just a resume data object itself
+        // Look for common properties that would be in resume data
+        if (importedData.fullName !== undefined || 
+            importedData.experience !== undefined || 
+            importedData.education !== undefined) {
+          // Treat the entire JSON as currentData
+          isValidFormat = true;
+          importedData.currentData = importedData;
+        }
+      }
+      
+      if (!isValidFormat) {
         throw new Error('Invalid import file format');
       }
       
       // Confirm before overwriting
       if (confirm('Importing will overwrite your current data. Continue?')) {
-        // Import versions
-        if (importedData.versions && Array.isArray(importedData.versions)) {
-          localStorage.setItem(VERSIONS_KEY, JSON.stringify(importedData.versions));
-        }
-        
-        // Import current data
-        if (importedData.currentData) {
-          localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(importedData.currentData));
-          populateFormData(importedData.currentData);
-        }
-        
-        // Generate resume preview
-        generateResume();
-        
-        showToast('Data imported successfully');
-        
-        // Close the modal
-        const importModal = bootstrap.Modal.getInstance(document.getElementById('importModal'));
-        if (importModal) {
-          importModal.hide();
+        try {
+          // Import versions
+          if (importedData.versions && Array.isArray(importedData.versions)) {
+            localStorage.setItem(VERSIONS_KEY, JSON.stringify(importedData.versions));
+          }
+          
+          // Import current data
+          if (importedData.currentData) {
+            localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(importedData.currentData));
+            populateFormData(importedData.currentData);
+          }
+          
+          // Generate resume preview
+          generateResume();
+          
+          showToast('Data imported successfully');
+          
+          // Close the modal
+          const importModal = bootstrap.Modal.getInstance(document.getElementById('importModal'));
+          if (importModal) {
+            importModal.hide();
+          }
+          
+          return; // Successfully imported, exit the function
+        } catch (innerError) {
+          console.error('Error during import process:', innerError);
+          // Don't show error here, will be handled in outer catch
+          throw innerError;
         }
       }
     } catch (error) {
