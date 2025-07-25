@@ -210,6 +210,7 @@
                 <label class="form-label">Responsibilities & Achievements</label>
                 <textarea class="form-control description" rows="3" placeholder="• Use bullet points starting with action verbs&#10;• Quantify achievements when possible&#10;• Include relevant keywords"></textarea>
               </div>
+              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeExperience(this)">Remove</button>
             </div>
           </div>
           <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addExperience()">+ Add Another Experience</button>
@@ -256,6 +257,7 @@
                   <input type="text" class="form-control educationLocation" placeholder="City, State/Country" />
                 </div>
               </div>
+              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeEducation(this)">Remove</button>
             </div>
           </div>
           <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addEducation()">+ Add Another Education</button>
@@ -313,11 +315,37 @@
                 <label class="form-label">Description</label>
                 <textarea class="form-control projectDescription" rows="3" placeholder="• Describe the project and your role&#10;• Highlight challenges overcome&#10;• Mention outcomes and impact"></textarea>
               </div>
+              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeProject(this)">Remove</button>
             </div>
           </div>
           <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addProject()">+ Add Another Project</button>
         </div>
         
+        <div class="form-section">
+          <h3 class="section-title">ATS Optimization</h3>
+          <div class="mb-3">
+            <label class="form-label">Job Description Analysis</label>
+            <textarea class="form-control" id="jobDescription" rows="4" placeholder="Paste job description here to analyze keyword matches and optimize your resume"></textarea>
+            <div class="ats-tip">Paste the job description to highlight matching keywords and optimize your resume</div>
+          </div>
+          <div class="mb-3">
+            <button type="button" class="btn btn-outline-primary w-100" onclick="analyzeJobDescription()">Analyze Keywords</button>
+          </div>
+          <div id="keywordResults" class="mb-3" style="display: none;">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Keyword Analysis</span>
+                <span class="badge bg-primary" id="matchScore">0%</span>
+              </div>
+              <div class="card-body">
+                <h6>Matched Keywords:</h6>
+                <div id="matchedKeywords" class="mb-2"></div>
+                <h6>Missing Keywords:</h6>
+                <div id="missingKeywords"></div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="form-section">
           <h3 class="section-title">Template & Export</h3>
           <div class="mb-3">
@@ -412,31 +440,6 @@
           </div>
           
           <!-- Section order and other settings already handled above -->
-        </div>
-        <div class="form-section">
-          <h3 class="section-title">ATS Optimization</h3>
-          <div class="mb-3">
-            <label class="form-label">Job Description Analysis</label>
-            <textarea class="form-control" id="jobDescription" rows="4" placeholder="Paste job description here to analyze keyword matches and optimize your resume"></textarea>
-            <div class="ats-tip">Paste the job description to highlight matching keywords and optimize your resume</div>
-          </div>
-          <div class="mb-3">
-            <button type="button" class="btn btn-outline-primary w-100" onclick="analyzeJobDescription()">Analyze Keywords</button>
-          </div>
-          <div id="keywordResults" class="mb-3" style="display: none;">
-            <div class="card">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Keyword Analysis</span>
-                <span class="badge bg-primary" id="matchScore">0%</span>
-              </div>
-              <div class="card-body">
-                <h6>Matched Keywords:</h6>
-                <div id="matchedKeywords" class="mb-2"></div>
-                <h6>Missing Keywords:</h6>
-                <div id="missingKeywords"></div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       
