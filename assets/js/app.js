@@ -191,10 +191,11 @@ function setupEventListeners() {
     viewPlainTextButton.addEventListener('click', viewPlainText);
   }
   
-  const downloadPlainTextButton = document.querySelector('button[onclick="downloadPlainText()"]');
-  if (downloadPlainTextButton) {
-    downloadPlainTextButton.addEventListener('click', downloadPlainText);
-  }
+  // Removed duplicate listener to prevent double download triggering; inline onclick already handles it.
+  // const downloadPlainTextButton = document.querySelector('button[onclick="downloadPlainText()"]');
+  // if (downloadPlainTextButton) {
+  //   downloadPlainTextButton.addEventListener('click', downloadPlainText);
+  // }
   
   // Versions button
   const versionsButton = document.querySelector('button[onclick="showVersionsModal()"]');

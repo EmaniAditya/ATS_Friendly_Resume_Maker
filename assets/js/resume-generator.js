@@ -1,3 +1,26 @@
+// Helper: Normalize rating values (string descriptors or numbers) to 1-5 scale
+function getRatingNumber(raw) {
+  if (raw === undefined || raw === null) return 0;
+  // If already a number or numeric string, clamp between 0-5
+  const num = parseInt(raw);
+  if (!isNaN(num)) {
+    return Math.max(0, Math.min(5, num));
+  }
+  // Otherwise map common descriptors
+  const mapping = {
+    'novice': 1,
+    'beginner': 1,
+    'basic': 2,
+    'intermediate': 3,
+    'proficient': 4,
+    'advanced': 5,
+    'expert': 5,
+    'master': 5
+  };
+  const key = String(raw).toLowerCase();
+  return mapping[key] || 3; // default to mid-level if unknown
+}
+
 // Generate resume preview based on form data
 function generateResume() {
   console.log('🔄 generateResume() called');
@@ -83,11 +106,11 @@ function generateResume() {
           html += '<div class="rated-skills">';
           data.ratedSkills.forEach(skill => {
             if (skill.name) {
-              let stars = '';
-              const rating = parseInt(skill.rating) || 0;
-              for (let i = 0; i < 5; i++) {
-                stars += i < rating ? '★' : '☆';
-              }
+              // Generate star rating string
+              const rating = getRatingNumber(skill.rating);
+              const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+              
+              stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
               html += `<div class="rated-skill"><span class="skill-name">${skill.name}</span> ${stars}</div>`;
             }
           });
@@ -466,8 +489,8 @@ function createPDFDocumentDefinition(data) {
           if (data.ratedSkills && data.ratedSkills.length) {
             data.ratedSkills.forEach(skill => {
               if (skill.name) {
-                const ratingNum = parseInt(skill.rating) || 0;
-                const stars = '★★★★★☆☆☆☆☆'.substring(5 - ratingNum, 10 - ratingNum);
+                const ratingNum = getRatingNumber(skill.rating);
+                const stars = '★'.repeat(ratingNum) + '☆'.repeat(5 - ratingNum);
                 content.push({ text: `${skill.name} ${stars}`, style: 'body', margin: [0, 0, 0, 3] });
               }
             });
@@ -878,11 +901,8 @@ function generatePlainText() {
           if (data.ratedSkills && data.ratedSkills.length > 0) {
             data.ratedSkills.forEach(skill => {
               if (skill.name) {
-                let stars = '';
-                const rating = parseInt(skill.rating) || 0;
-                for (let i = 0; i < 5; i++) {
-                  stars += i < rating ? '★' : '☆';
-                }
+                const rating = getRatingNumber(skill.rating);
+                const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
                 plainText += `${skill.name} ${stars}\n`;
               }
             });
