@@ -363,6 +363,340 @@ function downloadPDF() {
   }
 }
 
+// Download resume as text-based PDF using pdfmake
+function downloadTextBasedPDF() {
+  showLoading();
+  
+  try {
+    // Use existing data collection function
+    const data = collectFormData();
+    
+    if (!data.fullName.trim()) {
+      showToast('Please enter your name before generating PDF', 'warning');
+      hideLoading();
+      return;
+    }
+    
+    // Create PDF document definition
+    const docDefinition = createPDFDocumentDefinition(data);
+    
+    // Generate filename
+    const fileName = (data.fullName || 'Resume').replace(/\s+/g, '_') + '_Resume.pdf';
+    
+    // Generate and download PDF
+    pdfMake.createPdf(docDefinition).download(fileName);
+    
+    hideLoading();
+    showToast('Text-based PDF downloaded successfully!');
+    
+  } catch (error) {
+    console.error('Error generating text-based PDF:', error);
+    hideLoading();
+    showToast('Error generating PDF. Please try again.', 'error');
+  }
+}
+
+// Create PDF document definition for pdfmake
+function createPDFDocumentDefinition(data) {
+  const content = [];
+  
+  // Header with name
+  if (data.fullName) {
+    content.push({
+      text: data.fullName,
+      style: 'name',
+      alignment: 'center',
+      margin: [0, 0, 0, 10]
+    });
+  }
+  
+  // Contact information
+  const contactInfo = [];
+  if (data.email) contactInfo.push(data.email);
+  if (data.phone) contactInfo.push(data.phone);
+  if (data.location) contactInfo.push(data.location);
+  if (data.linkedin) contactInfo.push(data.linkedin);
+  if (data.github) contactInfo.push(data.github);
+  if (data.website) contactInfo.push(data.website);
+  
+  if (contactInfo.length > 0) {
+    content.push({
+      text: contactInfo.join(' | '),
+      style: 'contact',
+      alignment: 'center',
+      margin: [0, 0, 0, 15]
+    });
+  }
+  
+  // Professional Summary
+  if (data.summary) {
+    content.push({ text: 'PROFESSIONAL SUMMARY', style: 'sectionHeader' });
+    content.push({ text: data.summary, style: 'body', margin: [0, 0, 0, 10] });
+  }
+  
+  // Skills
+  if (data.skills) {
+    content.push({ text: 'SKILLS', style: 'sectionHeader' });
+    // Handle skills as a formatted string
+    const skillLines = data.skills.split('\n').filter(line => line.trim());
+    skillLines.forEach(line => {
+      content.push({
+        text: line,
+        style: 'body',
+        margin: [0, 0, 0, 3]
+      });
+    });
+    content.push({ text: '', margin: [0, 0, 0, 10] });
+  }
+  
+  // Rated Skills
+  if (data.ratedSkills && data.ratedSkills.length > 0) {
+    content.push({ text: 'TECHNICAL PROFICIENCY', style: 'sectionHeader' });
+    data.ratedSkills.forEach(skill => {
+      if (skill.skill_name) {
+        const rating = skill.skill_rating ? ` (${skill.skill_rating}/5)` : '';
+        content.push({
+          text: `${skill.skill_name}${rating}`,
+          style: 'body',
+          margin: [0, 0, 0, 3]
+        });
+      }
+    });
+    content.push({ text: '', margin: [0, 0, 0, 10] });
+  }
+  
+  // Experience
+  if (data.experience && data.experience.length > 0) {
+    content.push({ text: 'PROFESSIONAL EXPERIENCE', style: 'sectionHeader' });
+    data.experience.forEach(exp => {
+      if (exp.job_title && exp.company_name) {
+        content.push({
+          text: `${exp.job_title} | ${exp.company_name}`,
+          style: 'jobTitle',
+          margin: [0, 0, 0, 2]
+        });
+      }
+      // Format date range
+      if (exp.start_date || exp.end_date) {
+        const startDate = exp.start_date || '';
+        const endDate = exp.end_date || 'Present';
+        const dateRange = startDate && endDate ? `${startDate} - ${endDate}` : (startDate || endDate);
+        content.push({
+          text: dateRange,
+          style: 'duration',
+          margin: [0, 0, 0, 5]
+        });
+      }
+      if (exp.location) {
+        content.push({
+          text: exp.location,
+          style: 'duration',
+          margin: [0, 0, 0, 5]
+        });
+      }
+      if (exp.description) {
+        const bullets = exp.description.split('\n').filter(line => line.trim());
+        bullets.forEach(bullet => {
+          content.push({
+            text: `• ${bullet.replace(/^[•\-\*]\s*/, '')}`,
+            style: 'body',
+            margin: [10, 0, 0, 3]
+          });
+        });
+      }
+      content.push({ text: '', margin: [0, 0, 0, 8] });
+    });
+  }
+  
+  // Education
+  if (data.education && data.education.length > 0) {
+    content.push({ text: 'EDUCATION', style: 'sectionHeader' });
+    data.education.forEach(edu => {
+      if (edu.degree && edu.school_name) {
+        content.push({
+          text: `${edu.degree} | ${edu.school_name}`,
+          style: 'jobTitle',
+          margin: [0, 0, 0, 2]
+        });
+      }
+      // Format education date range
+      if (edu.education_start_date || edu.education_end_date) {
+        const startDate = edu.education_start_date || '';
+        const endDate = edu.education_end_date || 'Present';
+        const dateRange = startDate && endDate ? `${startDate} - ${endDate}` : (startDate || endDate);
+        content.push({
+          text: dateRange,
+          style: 'duration',
+          margin: [0, 0, 0, 5]
+        });
+      }
+      if (edu.education_location) {
+        content.push({
+          text: edu.education_location,
+          style: 'duration',
+          margin: [0, 0, 0, 5]
+        });
+      }
+      if (edu.gpa && edu.score_type) {
+        content.push({
+          text: `${edu.score_type}: ${edu.gpa}`,
+          style: 'body',
+          margin: [0, 0, 0, 8]
+        });
+      }
+    });
+  }
+  
+  // Projects
+  if (data.projects && data.projects.length > 0) {
+    content.push({ text: 'PROJECTS', style: 'sectionHeader' });
+    data.projects.forEach(project => {
+      if (project.project_name) {
+        content.push({
+          text: project.project_name,
+          style: 'jobTitle',
+          margin: [0, 0, 0, 2]
+        });
+      }
+      if (project.project_technologies) {
+        content.push({
+          text: `Technologies: ${project.project_technologies}`,
+          style: 'duration',
+          margin: [0, 0, 0, 5]
+        });
+      }
+      if (project.project_link || project.project_github) {
+        const links = [];
+        if (project.project_link) links.push(`Link: ${project.project_link}`);
+        if (project.project_github) links.push(`GitHub: ${project.project_github}`);
+        content.push({
+          text: links.join(' | '),
+          style: 'duration',
+          margin: [0, 0, 0, 5]
+        });
+      }
+      if (project.project_description) {
+        const bullets = project.project_description.split('\n').filter(line => line.trim());
+        bullets.forEach(bullet => {
+          content.push({
+            text: `• ${bullet.replace(/^[•\-\*]\s*/, '')}`,
+            style: 'body',
+            margin: [10, 0, 0, 3]
+          });
+        });
+      }
+      content.push({ text: '', margin: [0, 0, 0, 8] });
+    });
+  }
+  
+  // Languages
+  if (data.languages && data.languages.length > 0) {
+    content.push({ text: 'LANGUAGES', style: 'sectionHeader' });
+    const langText = data.languages.map(lang => 
+      `${lang.language}${lang.proficiency ? ` (${lang.proficiency})` : ''}`
+    ).join(', ');
+    content.push({ text: langText, style: 'body', margin: [0, 0, 0, 10] });
+  }
+  
+  // Certifications
+  if (data.certifications && data.certifications.length > 0) {
+    content.push({ text: 'CERTIFICATIONS', style: 'sectionHeader' });
+    data.certifications.forEach(cert => {
+      if (cert.certification_name) {
+        let certText = cert.certification_name;
+        if (cert.certification_org) {
+          certText += ` | ${cert.certification_org}`;
+        }
+        content.push({
+          text: certText,
+          style: 'jobTitle',
+          margin: [0, 0, 0, 2]
+        });
+      }
+      if (cert.certification_date) {
+        content.push({
+          text: cert.certification_date,
+          style: 'duration',
+          margin: [0, 0, 0, 5]
+        });
+      }
+      if (cert.credential_id) {
+        content.push({
+          text: `Credential ID: ${cert.credential_id}`,
+          style: 'body',
+          margin: [0, 0, 0, 8]
+        });
+      }
+    });
+  }
+  
+  // Achievements
+  if (data.achievements && data.achievements.length > 0) {
+    content.push({ text: 'ACHIEVEMENTS', style: 'sectionHeader' });
+    data.achievements.forEach(achievement => {
+      if (achievement.achievement_title) {
+        content.push({
+          text: achievement.achievement_title,
+          style: 'jobTitle',
+          margin: [0, 0, 0, 2]
+        });
+      }
+      if (achievement.achievement_date) {
+        content.push({
+          text: achievement.achievement_date,
+          style: 'duration',
+          margin: [0, 0, 0, 5]
+        });
+      }
+      if (achievement.achievement_description) {
+        content.push({
+          text: achievement.achievement_description,
+          style: 'body',
+          margin: [0, 0, 0, 8]
+        });
+      }
+    });
+  }
+  
+  return {
+    content: content,
+    styles: {
+      name: {
+        fontSize: 20,
+        bold: true,
+        color: '#2c3e50'
+      },
+      contact: {
+        fontSize: 10,
+        color: '#5a6c7d'
+      },
+      sectionHeader: {
+        fontSize: 12,
+        bold: true,
+        color: '#2c3e50',
+        margin: [0, 15, 0, 8],
+        decoration: 'underline'
+      },
+      jobTitle: {
+        fontSize: 11,
+        bold: true,
+        color: '#34495e'
+      },
+      duration: {
+        fontSize: 9,
+        color: '#7f8c8d',
+        italics: true
+      },
+      body: {
+        fontSize: 10,
+        color: '#2c3e50',
+        lineHeight: 1.3
+      }
+    },
+    pageMargins: [40, 40, 40, 40]
+  };
+}
+
 // Generate plain text version of the resume
 function generatePlainText() {
   const data = collectFormData();
