@@ -35,7 +35,7 @@ const SAMPLE_RESUME_DATA = {
       educationStartDate: "08/2022",
       educationEndDate: "Present",
       educationLocation: "Raipur, India",
-      gpa: "",
+      gpa: "8.9",
       scoreType: "gpa"
     },
     {
@@ -44,7 +44,7 @@ const SAMPLE_RESUME_DATA = {
       educationStartDate: "07/2015",
       educationEndDate: "07/2022",
       educationLocation: "Kodagu, Karnataka",
-      gpa: "",
+      gpa: "92.5",
       scoreType: "percentage"
     }
   ],
@@ -67,7 +67,7 @@ const SAMPLE_RESUME_DATA = {
       project_name: "Front Page Maker",
       project_description: "PDF Generator Tool.\nCreated a tool to help students build project front pages with customizable text and logos.\nSupports one-click PDF generation and works across devices.",
       project_technologies: "JavaScript, HTML5, CSS3",
-      project_link: "click here",
+      project_link: "",
       project_github: ""
     }
   ],
@@ -110,11 +110,50 @@ const SAMPLE_RESUME_DATA = {
     {
       achievement_title: "🚀 Deployed Student Utility Tool",
       achievement_date: "2024",
-      achievement_description: "Front Page Maker (click here) helped 750 students generate curated project front pages instantly."
+      achievement_description: "Front Page Maker helped 750 students generate curated project front pages instantly."
     }
   ],
-  certifications: [],
-  languages: [],
+  certifications: [
+    {
+      certification_name: "AWS Certified Cloud Practitioner",
+      certification_org: "Amazon Web Services",
+      certification_date: "03/2025",
+      certification_expiration: "03/2028",
+      credential_id: "AWS-CCP-2025-001"
+    },
+    {
+      certification_name: "MongoDB Certified Developer Associate",
+      certification_org: "MongoDB University",
+      certification_date: "12/2024",
+      certification_expiration: "12/2027",
+      credential_id: "MDB-DEV-2024-456"
+    },
+    {
+      certification_name: "JavaScript Algorithms and Data Structures",
+      certification_org: "freeCodeCamp",
+      certification_date: "10/2024",
+      certification_expiration: "N/A",
+      credential_id: "FCC-JS-2024-789"
+    }
+  ],
+  languages: [
+    {
+      language: "English",
+      proficiency: "Fluent"
+    },
+    {
+      language: "Hindi",
+      proficiency: "Native"
+    },
+    {
+      language: "Telugu",
+      proficiency: "Conversational"
+    },
+    {
+      language: "Kannada",
+      proficiency: "Basic"
+    }
+  ],
   template: "professional",
-  sectionOrder: ["summary", "skills", "experience", "projects", "education", "achievements"]
+  sectionOrder: ["summary", "experience", "projects", "skills", "education", "certifications", "languages", "achievements"]
 }; 
