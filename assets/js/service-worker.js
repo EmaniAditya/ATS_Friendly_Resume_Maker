@@ -12,7 +12,7 @@ const ASSETS_TO_CACHE = [
   './assets/images/favicon.svg',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
+
   'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js'
 ];
 

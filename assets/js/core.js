@@ -548,6 +548,8 @@ function populateFormData(data) {
 
 // Collect form data into object
 function collectFormData() {
+  console.log('🔍 DEBUG: collectFormData() called - analyzing what data is being collected...');
+  
   const data = {
     fullName: document.getElementById('fullName')?.value || '',
     jobTitle: document.getElementById('jobTitle')?.value || '',
@@ -599,13 +601,19 @@ function collectFormData() {
   
   // Collect experience items
   const experienceItems = document.querySelectorAll('#experienceContainer .experience-item');
-  experienceItems.forEach(item => {
+  console.log(`🔍 DEBUG: Found ${experienceItems.length} experience items in DOM`);
+  
+  experienceItems.forEach((item, index) => {
     const company = item.querySelector('.company')?.value || '';
     const title = item.querySelector('.title')?.value || '';
     const startDate = item.querySelector('.startDate')?.value || '';
     const endDate = item.querySelector('.endDate')?.value || '';
     const description = item.querySelector('.description')?.value || '';
     const location = item.querySelector('.experienceLocation')?.value || '';
+    
+    console.log(`🔍 DEBUG: Experience item ${index + 1}:`, {
+      company, title, startDate, endDate, description, location
+    });
     
     if (company || title || startDate || endDate || description) {
       data.experience.push({
@@ -645,10 +653,16 @@ function collectFormData() {
   
   // Collect project items
   const projectItems = document.querySelectorAll('#projectsContainer .project-item');
-  projectItems.forEach(item => {
+  console.log(`🔍 DEBUG: Found ${projectItems.length} project items in DOM`);
+  
+  projectItems.forEach((item, index) => {
     const name = item.querySelector('.projectName')?.value || '';
     const description = item.querySelector('.projectDescription')?.value || '';
     const technologies = item.querySelector('.technologies')?.value || '';  // Fixed: was .projectTechnologies
+    
+    console.log(`🔍 DEBUG: Project item ${index + 1}:`, {
+      name, description, technologies
+    });
     
     if (name || description || technologies) {
       data.projects.push({
@@ -656,6 +670,9 @@ function collectFormData() {
         description: description,
         technologies: technologies
       });
+      console.log(`✅ DEBUG: Added project ${index + 1} to data.projects`);
+    } else {
+      console.log(`❌ DEBUG: Skipped project ${index + 1} - no data found`);
     }
   });
   
