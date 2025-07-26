@@ -239,6 +239,15 @@ function populateFormData(data) {
     }
   };
   
+  // Debug: Log what data we're trying to populate
+  console.log('🔧 populateFormData called with:', {
+    fullName: data.fullName,
+    hasSkills: !!data.skills,
+    hasTechnicalSkills: !!data.technicalSkills,
+    hasSoftSkills: !!data.softSkills,
+    skills: data.skills
+  });
+  
   // Populate simple fields
   safeSetValue('fullName', data.fullName);
   safeSetValue('jobTitle', data.jobTitle);
@@ -250,8 +259,31 @@ function populateFormData(data) {
   safeSetValue('location', data.location);
   safeSetValue('dob', data.dob);
   safeSetValue('summary', data.summary);
-  safeSetValue('technicalSkills', data.technicalSkills);
-  safeSetValue('softSkills', data.softSkills);
+  
+  // Handle skills - sample data uses unified 'skills' field
+  if (data.skills) {
+    // Split skills into technical and soft skills if possible
+    const skillsText = data.skills;
+    if (skillsText.includes('Technical Skills:') && skillsText.includes('Soft Skills:')) {
+      const parts = skillsText.split('\n\nSoft Skills:');
+      const technicalPart = parts[0].replace('Technical Skills:\n', '');
+      const softPart = parts[1] || '';
+      safeSetValue('technicalSkills', technicalPart);
+      safeSetValue('softSkills', softPart);
+    } else if (skillsText.includes('Technical Skills:')) {
+      const technicalPart = skillsText.replace('Technical Skills:\n', '');
+      safeSetValue('technicalSkills', technicalPart);
+      safeSetValue('softSkills', '');
+    } else {
+      // Treat as technical skills if no specific categorization
+      safeSetValue('technicalSkills', skillsText);
+      safeSetValue('softSkills', '');
+    }
+  } else {
+    // Fallback to individual fields if they exist
+    safeSetValue('technicalSkills', data.technicalSkills || '');
+    safeSetValue('softSkills', data.softSkills || '');
+  }
   
   // Set template
   safeSetValue('template', data.template || 'classic');
@@ -528,6 +560,56 @@ function saveCurrentData() {
   localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(data));
 }
 
+// Initialize sample data as version "sample" if it doesn't exist
+function initializeSampleDataVersion() {
+  try {
+    const versions = getVersions();
+    
+    // Check if "sample" version already exists
+    const sampleVersionExists = versions.some(version => version.name === 'sample');
+    
+    if (!sampleVersionExists) {
+      console.log('📋 Initializing sample data as version "sample"');
+      
+      // Save sample data as version "sample"
+      const versionId = saveVersion('sample', false, SAMPLE_RESUME_DATA);
+      
+      if (versionId) {
+        console.log('✅ Sample data version "sample" created successfully');
+      }
+    }
+    
+    // Check if user has any current data, if not, load sample data
+    const currentData = localStorage.getItem(CURRENT_DATA_KEY);
+    if (!currentData || currentData === '{}' || JSON.parse(currentData || '{}').fullName === undefined) {
+      console.log('🚀 Loading sample data for first-time user');
+      loadSampleData();
+    }
+  } catch (error) {
+    console.error('Error initializing sample data version:', error);
+    // Fallback to regular sample data loading
+    loadSampleData();
+  }
+}
+
+// Auto-serve sample data on domain hit
+function autoServeSampleData() {
+  try {
+    // Initialize sample version if needed
+    initializeSampleDataVersion();
+    
+    // Always ensure sample data is available in versions
+    const versions = getVersions();
+    const sampleVersion = versions.find(version => version.name === 'sample');
+    
+    if (sampleVersion) {
+      console.log('📦 Sample data version available:', sampleVersion.id);
+    }
+  } catch (error) {
+    console.error('Error in auto-serving sample data:', error);
+  }
+}
+
 // Get saved versions from localStorage
 function getVersions() {
   const versionsJson = localStorage.getItem(VERSIONS_KEY);
@@ -535,37 +617,51 @@ function getVersions() {
 }
 
 // Save a version of the current resume data
-function saveVersion(name, showNotification = true) {
+function saveVersion(name, showNotification = true, customData = null) {
   try {
-    // Get current data
-    const currentData = collectFormData();
+    // Get current data or use custom data if provided
+    const currentData = customData || collectFormData();
     
     // Get existing versions
     const versions = getVersions();
     
-    // Create new version
-    const newVersion = {
-      id: Date.now().toString(),
-      name: name || `Version ${versions.length + 1}`,
-      date: new Date().toISOString(),
-      data: currentData
-    };
+    // Check if version with this name already exists
+    const existingVersionIndex = versions.findIndex(v => v.name === name);
     
-    // Add to versions array
-    versions.push(newVersion);
+    if (existingVersionIndex !== -1) {
+      // Update existing version
+      versions[existingVersionIndex] = {
+        ...versions[existingVersionIndex],
+        date: new Date().toISOString(),
+        data: currentData
+      };
+    } else {
+      // Create new version
+      const newVersion = {
+        id: Date.now().toString(),
+        name: name || `Version ${versions.length + 1}`,
+        date: new Date().toISOString(),
+        data: currentData
+      };
+      
+      // Add to versions array
+      versions.push(newVersion);
+    }
     
     // Save to localStorage
     localStorage.setItem(VERSIONS_KEY, JSON.stringify(versions));
     
     // Show success message if requested
     if (showNotification) {
-      showToast(`Version "${newVersion.name}" saved successfully!`);
+      showToast(`Version "${name}" saved successfully!`);
     }
     
-    return newVersion.id;
+    return existingVersionIndex !== -1 ? versions[existingVersionIndex].id : versions[versions.length - 1].id;
   } catch (error) {
     console.error('Error saving version:', error);
-    showToast('Error saving version. Please try again.', 'error');
+    if (showNotification) {
+      showToast('Error saving version. Please try again.', 'error');
+    }
     return null;
   }
 }
@@ -1054,6 +1150,10 @@ function importData() {
           // Don't show error here, will be handled in outer catch
           throw innerError;
         }
+      } else {
+        // User cancelled the import - hide loading and exit
+        hideLoading();
+        return;
       }
     } catch (error) {
       console.error('Import error:', error);

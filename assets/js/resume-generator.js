@@ -6,13 +6,25 @@ function generateResume() {
   
   // Debug: Log the collected data structure
   console.log('📊 Collected form data:', {
+    fullName: data.fullName,
+    jobTitle: data.jobTitle,
     hasProjects: !!(data.projects && data.projects.length > 0),
     projectsCount: data.projects ? data.projects.length : 0,
     hasRatedSkills: !!(data.ratedSkills && data.ratedSkills.length > 0),
     ratedSkillsCount: data.ratedSkills ? data.ratedSkills.length : 0,
+    experienceCount: data.experience ? data.experience.length : 0,
+    educationCount: data.education ? data.education.length : 0,
     sectionOrder: data.sectionOrder,
     projects: data.projects,
-    ratedSkills: data.ratedSkills
+    ratedSkills: data.ratedSkills,
+    experience: data.experience
+  });
+  
+  // Debug: Check if we're getting user's sample data
+  console.log('🔍 Data source check:', {
+    isUserSampleData: data.fullName === 'E S AADITYA REDDY',
+    actualFullName: data.fullName,
+    expectedFullName: 'E S AADITYA REDDY'
   });
   
   // Save current data
@@ -59,40 +71,36 @@ function generateResume() {
   sectionOrder.forEach(section => {
     switch (section) {
       case 'summary':
-        if (data.summary) {
-          html += '<h4>SUMMARY</h4>';
-          html += `<p>${data.summary}</p>`;
-        }
+        html += '<h4>SUMMARY</h4>';
+        html += `<p>${data.summary || 'Professional summary goes here...'}</p>`;
         break;
         
       case 'skills':
-        if (data.skills) {
-          html += '<h4>SKILLS</h4>';
-          
-          // Check if there are rated skills
-          if (data.ratedSkills && data.ratedSkills.length > 0) {
-            html += '<div class="rated-skills">';
-            data.ratedSkills.forEach(skill => {
-              if (skill.name) {
-                let stars = '';
-                const rating = parseInt(skill.rating) || 0;
-                for (let i = 0; i < 5; i++) {
-                  stars += i < rating ? '★' : '☆';
-                }
-                html += `<div class="rated-skill"><span class="skill-name">${skill.name}</span> ${stars}</div>`;
+        html += '<h4>SKILLS</h4>';
+        
+        // Check if there are rated skills
+        if (data.ratedSkills && data.ratedSkills.length > 0) {
+          html += '<div class="rated-skills">';
+          data.ratedSkills.forEach(skill => {
+            if (skill.name) {
+              let stars = '';
+              const rating = parseInt(skill.rating) || 0;
+              for (let i = 0; i < 5; i++) {
+                stars += i < rating ? '★' : '☆';
               }
-            });
-            html += '</div>';
-          }
-          
-          // Regular skills
-          html += `<p>${data.skills.replace(/\n/g, '<br>')}</p>`;
+              html += `<div class="rated-skill"><span class="skill-name">${skill.name}</span> ${stars}</div>`;
+            }
+          });
+          html += '</div>';
         }
+        
+        // Regular skills
+        html += `<p>${data.skills ? data.skills.replace(/\n/g, '<br>') : 'Technical and soft skills go here...'}</p>`;
         break;
         
       case 'experience':
+        html += '<h4>EXPERIENCE</h4>';
         if (data.experience && data.experience.length > 0) {
-          html += '<h4>EXPERIENCE</h4>';
           data.experience.forEach(exp => {
             html += '<div class="experience-entry">';
             html += '<div class="d-flex justify-content-between">';
@@ -112,12 +120,14 @@ function generateResume() {
             }
             html += '</div>';
           });
+        } else {
+          html += '<p>No work experience added yet.</p>';
         }
         break;
         
       case 'education':
+        html += '<h4>EDUCATION</h4>';
         if (data.education && data.education.length > 0) {
-          html += '<h4>EDUCATION</h4>';
           data.education.forEach(edu => {
             html += '<div class="education-entry">';
             html += '<div class="d-flex justify-content-between">';
@@ -137,12 +147,14 @@ function generateResume() {
             }
             html += '</div>';
           });
+        } else {
+          html += '<p>No education information added yet.</p>';
         }
         break;
         
       case 'projects':
+        html += '<h4>PROJECTS</h4>';
         if (data.projects && data.projects.length > 0) {
-          html += '<h4>PROJECTS</h4>';
           data.projects.forEach(proj => {
             html += '<div class="project-entry">';
             html += '<div class="d-flex justify-content-between">';
@@ -165,12 +177,14 @@ function generateResume() {
             }
             html += '</div>';
           });
+        } else {
+          html += '<p>No projects added yet.</p>';
         }
         break;
         
       case 'certifications':
+        html += '<h4>CERTIFICATIONS</h4>';
         if (data.certifications && data.certifications.length > 0) {
-          html += '<h4>CERTIFICATIONS</h4>';
           data.certifications.forEach(cert => {
             html += '<div class="certification-entry">';
             html += '<div class="d-flex justify-content-between">';
@@ -190,29 +204,28 @@ function generateResume() {
             html += '</p>';
             html += '</div>';
           });
+        } else {
+          html += '<p>No certifications added yet.</p>';
         }
         break;
         
       case 'languages':
+        html += '<h4>LANGUAGES</h4>';
         if (data.languages && data.languages.length > 0) {
-          html += '<h4>LANGUAGES</h4>';
           html += '<div class="languages-entry">';
           const languageList = data.languages.map(lang => {
-            if (lang.proficiency) {
-              return `${lang.language} (${lang.proficiency})`;
-            } else {
-              return lang.language;
-            }
-          }).filter(Boolean);
-          
-          html += `<p>${languageList.join(' • ')}</p>`;
+            return `${lang.language} (${lang.proficiency})`;
+          }).join(', ');
+          html += `<p>${languageList}</p>`;
           html += '</div>';
+        } else {
+          html += '<p>No languages added yet.</p>';
         }
         break;
         
       case 'achievements':
+        html += '<h4>ACHIEVEMENTS & HONORS</h4>';
         if (data.achievements && data.achievements.length > 0) {
-          html += '<h4>ACHIEVEMENTS & HONORS</h4>';
           data.achievements.forEach(achieve => {
             html += '<div class="achievement-entry">';
             html += '<div class="d-flex justify-content-between">';
@@ -226,6 +239,8 @@ function generateResume() {
             }
             html += '</div>';
           });
+        } else {
+          html += '<p>No achievements added yet.</p>';
         }
         break;
     }
@@ -307,69 +322,275 @@ function downloadPDF() {
   generateResume();
   
   try {
-    // Get the resume preview element
-    const element = document.getElementById('resumePreview');
-    if (!element) {
-      throw new Error('Resume preview element not found');
-    }
+    // Get current data for text-based PDF generation
+    const data = collectFormData();
     
-    // Check if preview is empty
-    if (element.innerHTML.trim() === '') {
-      showToast('Please preview your resume before downloading', 'warning');
+    if (!data.fullName && !data.summary && (!data.experience || data.experience.length === 0)) {
+      showToast('Please add some content to your resume before downloading', 'warning');
       hideLoading();
       return;
     }
     
-    // Create a clone of the element for PDF generation
-    const clonedElement = element.cloneNode(true);
+    // Generate text-based PDF using jsPDF
+    generateTextPDF(data);
     
-    // Remove all inline style overrides for both modes
-    clonedElement.style.maxHeight = '';
-    clonedElement.style.overflow = '';
-    clonedElement.style.fontSize = '';
-    clonedElement.style.lineHeight = '';
-    clonedElement.style.padding = '';
-    clonedElement.style.margin = '';
-    clonedElement.style.width = '';
-    clonedElement.style.boxSizing = '';
-    
-    // PDF options
-    const compactMode = document.getElementById('compactMode')?.checked;
-    const fileName = (document.getElementById('fullName')?.value || 'Resume').replace(/\s+/g, '_') + '_Resume.pdf';
-    const opt = compactMode ? {
-      margin: 0,
-      filename: fileName,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 1200, height: 1123 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true, hotfixes: ['px_scaling'], putOnlyUsedFonts: true, precision: 16 },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    } : {
-      margin: 15,
-      filename: fileName,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 1200 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true, hotfixes: ['px_scaling'], putOnlyUsedFonts: true, precision: 16 },
-      pagebreak: { mode: ['css', 'legacy'] }
-    };
-    
-    // Generate the PDF
-    html2pdf()
-      .from(clonedElement)
-      .set(opt)
-      .save()
-      .then(() => {
-        // Clean up
-        hideLoading();
-        showToast('PDF downloaded successfully!');
-      })
-      .catch(error => {
-        console.error('Error generating PDF:', error);
-        // Clean up
-        hideLoading();
-        showToast('Error generating PDF. Please try again.', 'error');
-      });
   } catch (error) {
     console.error('Error in PDF generation:', error);
+    hideLoading();
+    showToast('Error generating PDF. Please try again.', 'error');
+  }
+}
+
+// Text-based PDF generation function
+function generateTextPDF(data) {
+  try {
+    // Import jsPDF if not already available
+    if (typeof window.jsPDF === 'undefined') {
+      throw new Error('jsPDF library not loaded');
+    }
+    
+    const { jsPDF } = window.jsPDF;
+    const doc = new jsPDF();
+    
+    // PDF settings
+    let yPosition = 20;
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 15;
+    const maxWidth = pageWidth - (margin * 2);
+    
+    // Helper function to add text with wrapping
+    function addText(text, fontSize = 12, isBold = false, isCenter = false) {
+      if (!text) return yPosition;
+      
+      doc.setFontSize(fontSize);
+      doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+      
+      const lines = doc.splitTextToSize(text, maxWidth);
+      
+      lines.forEach(line => {
+        if (yPosition > pageHeight - 20) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        const xPosition = isCenter ? (pageWidth - doc.getTextWidth(line)) / 2 : margin;
+        doc.text(line, xPosition, yPosition);
+        yPosition += fontSize * 0.5;
+      });
+      
+      return yPosition;
+    }
+    
+    // Header Section
+    if (data.fullName) {
+      yPosition = addText(data.fullName, 18, true, true);
+      yPosition += 5;
+    }
+    
+    if (data.jobTitle) {
+      yPosition = addText(data.jobTitle, 14, false, true);
+      yPosition += 5;
+    }
+    
+    // Contact Information
+    let contactInfo = [];
+    if (data.phone) contactInfo.push(data.phone);
+    if (data.email) contactInfo.push(data.email);
+    if (data.website) contactInfo.push(data.website);
+    if (data.location) contactInfo.push(data.location);
+    
+    if (contactInfo.length > 0) {
+      yPosition = addText(contactInfo.join(' | '), 10, false, true);
+      yPosition += 10;
+    }
+    
+    // Get section order
+    const sectionOrder = data.sectionOrder && data.sectionOrder.length > 0 ? data.sectionOrder : [
+      'summary', 'experience', 'projects', 'skills', 'education', 'certifications', 'achievements', 'languages'
+    ];
+    
+    // Generate sections
+    sectionOrder.forEach(section => {
+      switch (section) {
+        case 'summary':
+          if (data.summary) {
+            yPosition += 5;
+            yPosition = addText('SUMMARY', 14, true);
+            yPosition += 2;
+            yPosition = addText(data.summary, 11);
+            yPosition += 5;
+          }
+          break;
+          
+        case 'experience':
+          if (data.experience && data.experience.length > 0) {
+            yPosition += 5;
+            yPosition = addText('EXPERIENCE', 14, true);
+            yPosition += 2;
+            
+            data.experience.forEach(exp => {
+              yPosition = addText(exp.title || 'Position', 12, true);
+              yPosition += 1;
+              
+              let companyLine = exp.company || 'Company';
+              if (exp.startDate || exp.endDate) {
+                companyLine += ` | ${exp.startDate || ''} - ${exp.endDate || ''}`;
+              }
+              if (exp.location) {
+                companyLine += ` | ${exp.location}`;
+              }
+              yPosition = addText(companyLine, 10);
+              yPosition += 1;
+              
+              if (exp.description) {
+                yPosition = addText(exp.description, 10);
+              }
+              yPosition += 3;
+            });
+          }
+          break;
+          
+        case 'projects':
+          if (data.projects && data.projects.length > 0) {
+            yPosition += 5;
+            yPosition = addText('PROJECTS', 14, true);
+            yPosition += 2;
+            
+            data.projects.forEach(proj => {
+              yPosition = addText(proj.name || 'Project', 12, true);
+              yPosition += 1;
+              
+              if (proj.technologies) {
+                yPosition = addText(`Technologies: ${proj.technologies}`, 10);
+                yPosition += 1;
+              }
+              
+              if (proj.description) {
+                yPosition = addText(proj.description, 10);
+              }
+              yPosition += 3;
+            });
+          }
+          break;
+          
+        case 'skills':
+          yPosition += 5;
+          yPosition = addText('SKILLS', 14, true);
+          yPosition += 2;
+          
+          if (data.ratedSkills && data.ratedSkills.length > 0) {
+            data.ratedSkills.forEach(skill => {
+              if (skill.name) {
+                yPosition = addText(`${skill.name}: ${skill.rating || 'N/A'}`, 10);
+                yPosition += 1;
+              }
+            });
+          }
+          
+          if (data.skills) {
+            yPosition = addText(data.skills, 10);
+          }
+          yPosition += 5;
+          break;
+          
+        case 'education':
+          if (data.education && data.education.length > 0) {
+            yPosition += 5;
+            yPosition = addText('EDUCATION', 14, true);
+            yPosition += 2;
+            
+            data.education.forEach(edu => {
+              yPosition = addText(edu.degree || 'Degree', 12, true);
+              yPosition += 1;
+              
+              let eduLine = edu.institution || 'School';
+              if (edu.educationStartDate || edu.educationEndDate) {
+                eduLine += ` | ${edu.educationStartDate || ''} - ${edu.educationEndDate || ''}`;
+              }
+              if (edu.educationLocation) {
+                eduLine += ` | ${edu.educationLocation}`;
+              }
+              yPosition = addText(eduLine, 10);
+              
+              if (edu.gpa && edu.scoreType !== 'none') {
+                const scoreLabel = edu.scoreType === 'percentage' ? 'Percentage' : 'GPA';
+                yPosition = addText(`${scoreLabel}: ${edu.gpa}`, 10);
+              }
+              yPosition += 3;
+            });
+          }
+          break;
+          
+        case 'certifications':
+          if (data.certifications && data.certifications.length > 0) {
+            yPosition += 5;
+            yPosition = addText('CERTIFICATIONS', 14, true);
+            yPosition += 2;
+            
+            data.certifications.forEach(cert => {
+              yPosition = addText(cert.name || 'Certification', 12, true);
+              yPosition += 1;
+              
+              let certLine = cert.organization || '';
+              if (cert.date) {
+                certLine += cert.organization ? ` | ${cert.date}` : cert.date;
+              }
+              if (certLine) {
+                yPosition = addText(certLine, 10);
+              }
+              yPosition += 3;
+            });
+          }
+          break;
+          
+        case 'achievements':
+          if (data.achievements && data.achievements.length > 0) {
+            yPosition += 5;
+            yPosition = addText('ACHIEVEMENTS & HONORS', 14, true);
+            yPosition += 2;
+            
+            data.achievements.forEach(achievement => {
+              let achievementLine = achievement.title || 'Achievement';
+              if (achievement.date) {
+                achievementLine += ` | ${achievement.date}`;
+              }
+              yPosition = addText(achievementLine, 12, true);
+              yPosition += 1;
+              
+              if (achievement.description) {
+                yPosition = addText(achievement.description, 10);
+              }
+              yPosition += 3;
+            });
+          }
+          break;
+          
+        case 'languages':
+          if (data.languages && data.languages.length > 0) {
+            yPosition += 5;
+            yPosition = addText('LANGUAGES', 14, true);
+            yPosition += 2;
+            
+            const languageList = data.languages.map(lang => 
+              `${lang.language} (${lang.proficiency})`
+            ).join(', ');
+            yPosition = addText(languageList, 10);
+            yPosition += 5;
+          }
+          break;
+      }
+    });
+    
+    // Save the PDF
+    const fileName = (data.fullName || 'Resume').replace(/\s+/g, '_') + '_Resume.pdf';
+    doc.save(fileName);
+    
+    hideLoading();
+    showToast('Text-based PDF downloaded successfully!');
+    
+  } catch (error) {
+    console.error('Error generating text PDF:', error);
     hideLoading();
     showToast('Error generating PDF. Please try again.', 'error');
   }

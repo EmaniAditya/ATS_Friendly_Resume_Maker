@@ -8,6 +8,15 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
+  // Auto-serve sample data as version "sample" on domain hit
+  if (typeof autoServeSampleData === 'function') {
+    try {
+      autoServeSampleData();
+    } catch (e) {
+      console.error("Error auto-serving sample data:", e);
+    }
+  }
+  
   // Initialize mobile sections
   if (window.innerWidth <= 768) {
     const sections = document.querySelectorAll('.mobile-collapsible');
@@ -199,11 +208,7 @@ function setupEventListeners() {
     saveNamedVersionButton.addEventListener('click', saveNamedVersion);
   }
   
-  // Export data button
-  const exportDataButton = document.querySelector('button[onclick="exportData()"]');
-  if (exportDataButton) {
-    exportDataButton.addEventListener('click', exportData);
-  }
+  // Export data button - using onclick attribute, no need for addEventListener to prevent double execution
   
   // Import data button
   const importDataButton = document.querySelector('button[onclick="importData()"]');
