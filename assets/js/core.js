@@ -258,6 +258,17 @@ function populateItemFields(item, data) {
               case 'skillRating':
                 value = data.rating;
                 break;
+                
+              // Projects field mappings
+              case 'projectName':
+                value = data.name;
+                break;
+              case 'projectDescription':
+                value = data.description;
+                break;
+              case 'technologies':
+                value = data.technologies;
+                break;
             }
           }
           
