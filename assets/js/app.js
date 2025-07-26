@@ -145,20 +145,6 @@ function setupEventListeners() {
     }
   });
   
-  // Template change
-  const templateSelect = document.getElementById('template');
-  if (templateSelect) {
-    templateSelect.addEventListener('change', function() {
-      generateResume(); // Immediate update for template changes
-      
-      // Track template change
-      if (typeof trackTemplateUsage === 'function' && typeof trackFeatureUsage === 'function') {
-        trackTemplateUsage(this.value);
-        trackFeatureUsage('templateChange');
-      }
-    });
-  }
-  
   // Compact mode toggle
   const compactMode = document.getElementById('compactMode');
   if (compactMode) {
@@ -236,7 +222,7 @@ function setupEventListeners() {
   densityButtons.forEach((btn, index) => {
     btn.addEventListener('click', function() {
       applyDensitySetting(index + 1);
-      generateResume(); // Update preview when density changes
+      generateResume();
     });
   });
 

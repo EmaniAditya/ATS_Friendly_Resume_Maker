@@ -53,9 +53,24 @@ function generateResume() {
   // Save current data
   saveCurrentData();
   
-  // Set template class
+  // Set template class (map default → classic for existing CSS)
   preview.className = '';
-  preview.classList.add(`template-${data.template}`);
+  if (data.template === 'default') {
+    preview.classList.add('template-classic');
+  } else if (data.template === 'custom') {
+    preview.classList.add('template-custom'); // optional; mainly for future css hooks
+  } else {
+    preview.classList.add(`template-${data.template}`);
+  }
+
+  // ----- Dynamic color override for custom template -----
+  let customStyles = '';
+  if (data.template === 'custom') {
+    const header = data.headerColor || '#000000';
+    const sub = data.subColor || header;
+    customStyles = `<style>#resumePreview h2{color:${header}} #resumePreview h4{color:${header};border-bottom:2px solid ${header}}</style>`;
+  }
+
   
   // Start building HTML
   let html = '';
@@ -268,6 +283,10 @@ function generateResume() {
   });
   
   // Set the HTML
+  // Prepend dynamic style overrides if custom template is selected
+  if (customStyles) {
+    html = customStyles + html;
+  }
   preview.innerHTML = html;
   
   // Check if content fits on one page
@@ -569,6 +588,8 @@ function createPDFDocumentDefinition(data) {
 
   // ----- PDF STYLE MAPPING BASED ON SELECTED TEMPLATE -----
   const stylePalettes = {
+    default:      { primary: '#000000', secondary: '#000000', headerFill: null },
+    custom:       { primary: data.headerColor || '#000000', secondary: data.subColor || (data.headerColor || '#000000'), headerFill: null },
     classic:      { primary: '#000000', secondary: '#000000', headerFill: null },
     professional: { primary: '#2c3e50', secondary: '#34495e', headerFill: '#f8f9fa' },
     modern:       { primary: '#1a5276', secondary: '#1a5276', headerFill: '#e8f6f3' },

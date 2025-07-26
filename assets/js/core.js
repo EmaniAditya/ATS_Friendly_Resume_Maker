@@ -569,7 +569,9 @@ function collectFormData() {
     languages: [],
     achievements: [],
     ratedSkills: [],
-    template: document.getElementById('template')?.value || 'classic',
+    template: document.getElementById('template')?.value || 'default',
+    headerColor: document.getElementById('headerColor')?.value || '#000000',
+    subColor: document.getElementById('subColor')?.value || '#000000',
     sectionOrder: []
   };
   

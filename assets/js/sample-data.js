@@ -35,7 +35,7 @@ const SAMPLE_RESUME_DATA = {
       "degree": "Bachelor of Technology, Computer Science and Engineering",
       "educationStartDate": "07/2022",
       "educationEndDate": "07/2026",
-      "gpa": "5.5",
+      "gpa": "5",
       "scoreType": "gpa",
       "educationLocation": "Raipur, India"
     },
