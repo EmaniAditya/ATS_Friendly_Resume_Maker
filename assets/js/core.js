@@ -648,17 +648,13 @@ function collectFormData() {
   projectItems.forEach(item => {
     const name = item.querySelector('.projectName')?.value || '';
     const description = item.querySelector('.projectDescription')?.value || '';
-    const technologies = item.querySelector('.projectTechnologies')?.value || '';
-    const link = item.querySelector('.projectLink')?.value || '';
-    const github = item.querySelector('.projectGithub')?.value || '';
+    const technologies = item.querySelector('.technologies')?.value || '';  // Fixed: was .projectTechnologies
     
     if (name || description || technologies) {
       data.projects.push({
         name: name,
         description: description,
-        technologies: technologies,
-        link: link,
-        github: github
+        technologies: technologies
       });
     }
   });

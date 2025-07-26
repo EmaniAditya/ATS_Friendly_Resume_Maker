@@ -325,6 +325,21 @@ function downloadPDF() {
     // Get current data for text-based PDF generation
     const data = collectFormData();
     
+    // Debug: Log collected data for PDF generation
+    console.log('📄 PDF Generation - Collected Data Debug:', {
+      fullName: data.fullName,
+      hasProjects: !!(data.projects && data.projects.length > 0),
+      projectsCount: data.projects ? data.projects.length : 0,
+      hasCertifications: !!(data.certifications && data.certifications.length > 0),
+      certificationsCount: data.certifications ? data.certifications.length : 0,
+      hasAchievements: !!(data.achievements && data.achievements.length > 0),
+      achievementsCount: data.achievements ? data.achievements.length : 0,
+      hasExperience: !!(data.experience && data.experience.length > 0),
+      experienceCount: data.experience ? data.experience.length : 0,
+      projectsData: data.projects,
+      experienceData: data.experience
+    });
+    
     if (!data.fullName && !data.summary && (!data.experience || data.experience.length === 0)) {
       showToast('Please add some content to your resume before downloading', 'warning');
       hideLoading();
