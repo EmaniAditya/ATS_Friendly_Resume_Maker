@@ -74,122 +74,113 @@ function loadSampleData() {
 
 // Helper function to populate multi-item sections
 function populateMultiItemSection(sectionType, items) {
-  if (!items || !items.length) return;
+  if (!items || !items.length) {
+    console.log(`🚫 No items to populate for ${sectionType}`);
+    return;
+  }
+  
+  console.log(`📝 Populating ${sectionType} with ${items.length} items:`, items);
   
   try {
     // Get container
     const container = document.getElementById(`${sectionType}Container`);
     if (!container) {
-      console.warn(`Container for section '${sectionType}' not found`);
+      console.warn(`⚠️ Container for section '${sectionType}' not found`);
       return;
     }
     
-    // Get the first item template
+    // Get the first item template - try multiple class name patterns
     let itemClass = `${sectionType}-item`;
-    // Handle plural forms for consistency
+    if (sectionType === 'projects') itemClass = 'project-item';
     if (sectionType === 'certifications') itemClass = 'certifications-item';
     if (sectionType === 'languages') itemClass = 'languages-item';
     if (sectionType === 'achievements') itemClass = 'achievements-item';
+    if (sectionType === 'ratedSkills') itemClass = 'rated-skill-item';
     
-    const firstItem = container.querySelector(`.${itemClass}`);
+    let firstItem = container.querySelector(`.${itemClass}`);
+    
+    // Try alternative class name patterns if first attempt fails
     if (!firstItem) {
-      console.warn(`Template item for section '${sectionType}' not found`);
+      const alternativeClasses = [];
+      
+      switch(sectionType) {
+        case 'projects':
+          alternativeClasses.push('project-item', 'projects-section-item');
+          break;
+        case 'ratedSkills':
+          alternativeClasses.push('rated-skills-item', 'skill-item', 'skills-item');
+          break;
+        case 'certifications':
+          alternativeClasses.push('certification-item', 'cert-item');
+          break;
+        case 'achievements':
+          alternativeClasses.push('achievement-item', 'honor-item');
+          break;
+      }
+      
+      for (const altClass of alternativeClasses) {
+        firstItem = container.querySelector(`.${altClass}`);
+        if (firstItem) {
+          console.log(`✅ Found template using alternative class: ${altClass}`);
+          break;
+        }
+      }
+    }
+    
+    if (!firstItem) {
+      console.warn(`⚠️ Template item for section '${sectionType}' not found with class '${itemClass}' or alternatives`);
+      console.log(`🔍 Available elements in container:`, container.innerHTML);
       return;
     }
+    
+    // Store the template before clearing
+    const template = firstItem.cloneNode(true);
     
     // Clear the container
     container.innerHTML = '';
     
-    // Add and populate items
+    // Add and populate all items by cloning the template
     items.forEach((itemData, index) => {
       try {
-        // For the first item, clone the template
-        if (index === 0) {
-          const clonedItem = firstItem.cloneNode(true);
-          container.appendChild(clonedItem);
-          populateItemFields(clonedItem, itemData);
-        } else {
-          // For additional items, use the appropriate add function
-          let addFunctionCalled = false;
-          
-          // Check if the add function exists in the global scope
-          switch(sectionType) {
-            case 'experience':
-              if (typeof addExperience === 'function') {
-                addExperience();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'education':
-              if (typeof addEducation === 'function') {
-                addEducation();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'certifications':
-              if (typeof addCertification === 'function') {
-                addCertification();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'projects':
-              if (typeof addProject === 'function') {
-                addProject();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'languages':
-              if (typeof addLanguage === 'function') {
-                addLanguage();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'achievements':
-              if (typeof addAchievement === 'function') {
-                addAchievement();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'ratedSkills':
-              if (typeof addRatedSkill === 'function') {
-                addRatedSkill();
-                addFunctionCalled = true;
-              }
-              break;
-          }
-          
-          if (!addFunctionCalled) {
-            // Fallback: manually clone and add the item
-            const clonedItem = firstItem.cloneNode(true);
-            container.appendChild(clonedItem);
-            populateItemFields(clonedItem, itemData);
-          } else {
-            // Populate the newly added item
-            const newItem = container.lastElementChild;
-            if (newItem) {
-              populateItemFields(newItem, itemData);
-            }
-          }
-        }
+        console.log(`🔄 Adding item ${index + 1}/${items.length} for ${sectionType}:`, itemData);
+        
+        // Clone the template for each item
+        const clonedItem = template.cloneNode(true);
+        container.appendChild(clonedItem);
+        
+        // Populate the cloned item with data
+        populateItemFields(clonedItem, itemData);
+        
+        console.log(`✅ Successfully populated item ${index + 1} for ${sectionType}`);
       } catch (itemError) {
-        console.warn(`Error populating item ${index} in section ${sectionType}:`, itemError);
+        console.error(`❌ Error populating item ${index + 1} in section ${sectionType}:`, itemError);
       }
     });
+    
+    console.log(`✅ Successfully populated all ${items.length} items for ${sectionType}`);
   } catch (error) {
-    console.error(`Error in populateMultiItemSection for ${sectionType}:`, error);
+    console.error(`❌ Error in populateMultiItemSection for ${sectionType}:`, error);
   }
 }
 
 // Helper function to populate fields in an item
 function populateItemFields(item, data) {
-  if (!item || !data) return;
+  if (!item || !data) {
+    console.warn('⚠️ populateItemFields: Missing item or data');
+    return;
+  }
+  
+  console.log('🔧 populateItemFields called with data:', data);
   
   try {
     // Get all input, select, and textarea elements
     const inputs = item.querySelectorAll('input, select, textarea');
+    console.log(`🎯 Found ${inputs.length} input fields to populate`);
+    
+    let populatedCount = 0;
     
     // For each input, find the corresponding data
-    inputs.forEach(input => {
+    inputs.forEach((input, index) => {
       try {
         const classList = input.className.split(' ');
         
@@ -197,17 +188,83 @@ function populateItemFields(item, data) {
         const className = classList.find(cls => 
           !cls.includes('form-') && 
           cls !== 'input-group' && 
-          cls !== 'form-check-input'
+          cls !== 'form-check-input' &&
+          cls !== 'btn' &&
+          cls !== 'w-100'
         );
         
         if (className) {
-          // Convert camelCase to snake_case for data lookup
-          const dataKey = className.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+          // Try direct mapping first (most common case)
+          let value = data[className];
           
-          if (data[dataKey] !== undefined) {
+          // If direct mapping fails, try camelCase to snake_case conversion
+          if (value === undefined) {
+            const dataKey = className.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+            value = data[dataKey];
+          }
+          
+          // Special handling for common field mappings
+          if (value === undefined) {
+            switch(className) {
+              // Generic field mappings
+              case 'name':
+                value = data.name || data.title || data.language;
+                break;
+              case 'title':
+                value = data.title || data.name;
+                break;
+              case 'organization':
+                value = data.organization || data.company;
+                break;
+              case 'date':
+                value = data.date || data.startDate;
+                break;
+              case 'credentialId':
+                value = data.credentialId || data.link;
+                break;
+                
+              // Certification-specific field mappings
+              case 'certificationName':
+                value = data.name;
+                break;
+              case 'certificationOrg':
+                value = data.organization;
+                break;
+              case 'certificationDate':
+                value = data.date;
+                break;
+              case 'certificationExpiration':
+                value = data.expiration;
+                break;
+              case 'credentialID':
+                value = data.credentialId;
+                break;
+                
+              // Achievement-specific field mappings
+              case 'achievementTitle':
+                value = data.title;
+                break;
+              case 'achievementDate':
+                value = data.date;
+                break;
+              case 'achievementDescription':
+                value = data.description;
+                break;
+                
+              // Rated skills field mappings
+              case 'skillName':
+                value = data.name;
+                break;
+              case 'skillRating':
+                value = data.rating;
+                break;
+            }
+          }
+          
+          if (value !== undefined) {
             if (input.tagName === 'SELECT') {
               // For select elements, set the value and trigger change event
-              input.value = data[dataKey] || '';
+              input.value = value || '';
               
               try {
                 // Create and dispatch change event
@@ -218,16 +275,25 @@ function populateItemFields(item, data) {
               }
             } else {
               // For regular inputs and textareas
-              input.value = data[dataKey] || '';
+              input.value = value || '';
             }
+            
+            populatedCount++;
+            console.log(`✅ Populated field ${className} with:`, value);
+          } else {
+            console.log(`⚠️ No data found for field ${className} in:`, Object.keys(data));
           }
+        } else {
+          console.log(`⚠️ No relevant class found for input ${index} with classes:`, classList);
         }
       } catch (inputError) {
-        console.warn('Error populating field:', inputError);
+        console.warn('❌ Error populating field:', inputError);
       }
     });
+    
+    console.log(`✅ populateItemFields completed: ${populatedCount}/${inputs.length} fields populated`);
   } catch (error) {
-    console.error('Error in populateItemFields:', error);
+    console.error('❌ Error in populateItemFields:', error);
   }
 }
 
@@ -251,8 +317,10 @@ function populateFormData(data) {
     }
   };
   
-  // Debug: Log what data we're trying to populate
-  console.log('🔧 populateFormData called with:', {
+  // Debug: Log COMPLETE data structure to identify missing sections
+  console.log('🔧 populateFormData called with FULL DATA:', data);
+  
+  console.log('🔧 populateFormData DATA ANALYSIS:', {
     fullName: data.fullName,
     jobTitle: data.jobTitle,
     hasSkills: !!data.skills,
@@ -261,10 +329,17 @@ function populateFormData(data) {
     hasExperience: !!(data.experience && data.experience.length > 0),
     hasEducation: !!(data.education && data.education.length > 0),
     hasProjects: !!(data.projects && data.projects.length > 0),
+    hasCertifications: !!(data.certifications && data.certifications.length > 0),
+    hasAchievements: !!(data.achievements && data.achievements.length > 0),
+    hasRatedSkills: !!(data.ratedSkills && data.ratedSkills.length > 0),
     skills: data.skills,
     experienceCount: data.experience ? data.experience.length : 0,
     educationCount: data.education ? data.education.length : 0,
-    projectsCount: data.projects ? data.projects.length : 0
+    projectsCount: data.projects ? data.projects.length : 0,
+    certificationsCount: data.certifications ? data.certifications.length : 0,
+    achievementsCount: data.achievements ? data.achievements.length : 0,
+    ratedSkillsCount: data.ratedSkills ? data.ratedSkills.length : 0,
+    allKeys: Object.keys(data)
   });
   
   // Track which fields are successfully populated
@@ -323,33 +398,80 @@ function populateFormData(data) {
     console.warn('⚠️ Some fields failed to populate:', failedFields);
   }
   
-  // Populate multi-item sections
+  // Populate multi-item sections with debugging
+  console.log('🔍 Checking multi-item sections for population:', {
+    hasExperience: !!(data.experience && data.experience.length > 0),
+    hasEducation: !!(data.education && data.education.length > 0),
+    hasProjects: !!(data.projects && data.projects.length > 0),
+    hasCertifications: !!(data.certifications && data.certifications.length > 0),
+    hasLanguages: !!(data.languages && data.languages.length > 0),
+    hasAchievements: !!(data.achievements && data.achievements.length > 0),
+    hasRatedSkills: !!(data.ratedSkills && data.ratedSkills.length > 0),
+    projectsData: data.projects,
+    certificationsData: data.certifications,
+    achievementsData: data.achievements,
+    ratedSkillsData: data.ratedSkills
+  });
+  
   if (data.experience && data.experience.length > 0) {
+    console.log('✅ Populating experience section');
     populateMultiItemSection('experience', data.experience);
+  } else {
+    console.log('⚠️ Skipping experience: no data');
   }
   
   if (data.education && data.education.length > 0) {
+    console.log('✅ Populating education section');
     populateMultiItemSection('education', data.education);
+  } else {
+    console.log('⚠️ Skipping education: no data');
   }
   
+  console.log('🔍 Projects section check:', {
+    hasProjects: !!(data.projects),
+    projectsLength: data.projects ? data.projects.length : 'undefined',
+    projectsData: data.projects
+  });
+  
   if (data.projects && data.projects.length > 0) {
+    console.log('✅ Populating projects section');
     populateMultiItemSection('projects', data.projects);
+  } else {
+    console.log('⚠️ Skipping projects: no data or empty array');
   }
   
   if (data.certifications && data.certifications.length > 0) {
+    console.log('✅ Populating certifications section');
     populateMultiItemSection('certifications', data.certifications);
+  } else {
+    console.log('⚠️ Skipping certifications: no data or empty array');
   }
   
   if (data.languages && data.languages.length > 0) {
+    console.log('✅ Populating languages section');
     populateMultiItemSection('languages', data.languages);
+  } else {
+    console.log('⚠️ Skipping languages: no data');
   }
   
   if (data.achievements && data.achievements.length > 0) {
+    console.log('✅ Populating achievements section');
     populateMultiItemSection('achievements', data.achievements);
+  } else {
+    console.log('⚠️ Skipping achievements: no data or empty array');
   }
   
+  console.log('🔍 RatedSkills section check:', {
+    hasRatedSkills: !!(data.ratedSkills),
+    ratedSkillsLength: data.ratedSkills ? data.ratedSkills.length : 'undefined',
+    ratedSkillsData: data.ratedSkills
+  });
+  
   if (data.ratedSkills && data.ratedSkills.length > 0) {
+    console.log('✅ Populating ratedSkills section');
     populateMultiItemSection('ratedSkills', data.ratedSkills);
+  } else {
+    console.log('⚠️ Skipping ratedSkills: no data or empty array');
   }
   
   // Populate section order
@@ -639,6 +761,16 @@ function autoServeSampleData() {
     
     if (sampleVersion) {
       console.log('📦 Sample data version available:', sampleVersion.id);
+      console.log('🔄 Auto-loading sample data into form fields...');
+      
+      // Actually populate the form fields with sample data
+      populateFormData(SAMPLE_RESUME_DATA);
+      
+      // Generate preview after population (with small delay to ensure DOM updates)
+      setTimeout(() => {
+        console.log('📋 Generating preview from populated form data...');
+        generateResume();
+      }, 300);
     }
   } catch (error) {
     console.error('Error in auto-serving sample data:', error);
