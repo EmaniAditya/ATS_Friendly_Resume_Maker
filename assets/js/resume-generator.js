@@ -109,8 +109,6 @@ function generateResume() {
               // Generate star rating string
               const rating = getRatingNumber(skill.rating);
               const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
-              
-              stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
               html += `<div class="rated-skill"><span class="skill-name">${skill.name}</span> ${stars}</div>`;
             }
           });
@@ -1049,13 +1047,24 @@ function generatePlainText() {
 
 // View plain text version
 function viewPlainText() {
+  // Generate latest text every time the button is clicked
   const plainText = generatePlainText();
-  const plainTextContent = document.getElementById('plainTextContent');
-  if (plainTextContent) {
-    plainTextContent.textContent = plainText;
+  const modalEl = document.getElementById('plainTextModal');
+  if (!modalEl) {
+    showToast('Plain-text modal not found', 'error');
+    return;
   }
-  const plainTextModal = new bootstrap.Modal(document.getElementById('plainTextModal'));
-  plainTextModal.show();
+  // When the modal is fully shown, populate content (ensures the element is in the DOM)
+  const handler = () => {
+    const pre = document.getElementById('plainTextContent');
+    if (pre) {
+      pre.textContent = plainText;
+    }
+    modalEl.removeEventListener('shown.bs.modal', handler);
+  };
+  modalEl.addEventListener('shown.bs.modal', handler);
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  modal.show();
 }
 
 // Download plain text version
