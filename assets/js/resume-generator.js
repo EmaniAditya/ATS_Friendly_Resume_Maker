@@ -347,14 +347,12 @@ function downloadPDF() {
       .save()
       .then(() => {
         // Clean up
-        document.body.removeChild(container);
         hideLoading();
         showToast('PDF downloaded successfully!');
       })
       .catch(error => {
         console.error('Error generating PDF:', error);
         // Clean up
-        document.body.removeChild(container);
         hideLoading();
         showToast('Error generating PDF. Please try again.', 'error');
       });
