@@ -406,10 +406,10 @@ function createPDFDocumentDefinition(data) {
   if (data.ratedSkills && data.ratedSkills.length > 0) {
     content.push({ text: 'TECHNICAL PROFICIENCY', style: 'sectionHeader' });
     data.ratedSkills.forEach(skill => {
-      if (skill.skill_name) {
-        const rating = skill.skill_rating ? ` (${skill.skill_rating}/5)` : '';
+      if (skill.name) {
+        const rating = skill.rating ? ` (${skill.rating}/5)` : '';
         content.push({
-          text: `${skill.skill_name}${rating}`,
+          text: `${skill.name}${rating}`,
           style: 'body',
           margin: [0, 0, 0, 3]
         });
@@ -422,17 +422,17 @@ function createPDFDocumentDefinition(data) {
   if (data.experience && data.experience.length > 0) {
     content.push({ text: 'PROFESSIONAL EXPERIENCE', style: 'sectionHeader' });
     data.experience.forEach(exp => {
-      if (exp.job_title && exp.company_name) {
+      if (exp.title && exp.company) {
         content.push({
-          text: `${exp.job_title} | ${exp.company_name}`,
+          text: `${exp.title} | ${exp.company}`,
           style: 'jobTitle',
           margin: [0, 0, 0, 2]
         });
       }
       // Format date range
-      if (exp.start_date || exp.end_date) {
-        const startDate = exp.start_date || '';
-        const endDate = exp.end_date || 'Present';
+      if (exp.startDate || exp.endDate) {
+        const startDate = exp.startDate || '';
+        const endDate = exp.endDate || 'Present';
         const dateRange = startDate && endDate ? `${startDate} - ${endDate}` : (startDate || endDate);
         content.push({
           text: dateRange,
@@ -465,17 +465,17 @@ function createPDFDocumentDefinition(data) {
   if (data.education && data.education.length > 0) {
     content.push({ text: 'EDUCATION', style: 'sectionHeader' });
     data.education.forEach(edu => {
-      if (edu.degree && edu.school_name) {
+      if (edu.degree && edu.institution) {
         content.push({
-          text: `${edu.degree} | ${edu.school_name}`,
+          text: `${edu.degree} | ${edu.institution}`,
           style: 'jobTitle',
           margin: [0, 0, 0, 2]
         });
       }
       // Format education date range
-      if (edu.education_start_date || edu.education_end_date) {
-        const startDate = edu.education_start_date || '';
-        const endDate = edu.education_end_date || 'Present';
+      if (edu.educationStartDate || edu.educationEndDate) {
+        const startDate = edu.educationStartDate || '';
+        const endDate = edu.educationEndDate || 'Present';
         const dateRange = startDate && endDate ? `${startDate} - ${endDate}` : (startDate || endDate);
         content.push({
           text: dateRange,
@@ -483,16 +483,16 @@ function createPDFDocumentDefinition(data) {
           margin: [0, 0, 0, 5]
         });
       }
-      if (edu.education_location) {
+      if (edu.educationLocation) {
         content.push({
-          text: edu.education_location,
+          text: edu.educationLocation,
           style: 'duration',
           margin: [0, 0, 0, 5]
         });
       }
-      if (edu.gpa && edu.score_type) {
+      if (edu.gpa && edu.scoreType) {
         content.push({
-          text: `${edu.score_type}: ${edu.gpa}`,
+          text: `${edu.scoreType}: ${edu.gpa}`,
           style: 'body',
           margin: [0, 0, 0, 8]
         });
@@ -504,32 +504,32 @@ function createPDFDocumentDefinition(data) {
   if (data.projects && data.projects.length > 0) {
     content.push({ text: 'PROJECTS', style: 'sectionHeader' });
     data.projects.forEach(project => {
-      if (project.project_name) {
+      if (project.name) {
         content.push({
-          text: project.project_name,
+          text: project.name,
           style: 'jobTitle',
           margin: [0, 0, 0, 2]
         });
       }
-      if (project.project_technologies) {
+      if (project.technologies) {
         content.push({
-          text: `Technologies: ${project.project_technologies}`,
+          text: `Technologies: ${project.technologies}`,
           style: 'duration',
           margin: [0, 0, 0, 5]
         });
       }
-      if (project.project_link || project.project_github) {
+      if (project.link || project.github) {
         const links = [];
-        if (project.project_link) links.push(`Link: ${project.project_link}`);
-        if (project.project_github) links.push(`GitHub: ${project.project_github}`);
+        if (project.link) links.push(`Link: ${project.link}`);
+        if (project.github) links.push(`GitHub: ${project.github}`);
         content.push({
           text: links.join(' | '),
           style: 'duration',
           margin: [0, 0, 0, 5]
         });
       }
-      if (project.project_description) {
-        const bullets = project.project_description.split('\n').filter(line => line.trim());
+      if (project.description) {
+        const bullets = project.description.split('\n').filter(line => line.trim());
         bullets.forEach(bullet => {
           content.push({
             text: `• ${bullet.replace(/^[•\-\*]\s*/, '')}`,
@@ -555,10 +555,10 @@ function createPDFDocumentDefinition(data) {
   if (data.certifications && data.certifications.length > 0) {
     content.push({ text: 'CERTIFICATIONS', style: 'sectionHeader' });
     data.certifications.forEach(cert => {
-      if (cert.certification_name) {
-        let certText = cert.certification_name;
-        if (cert.certification_org) {
-          certText += ` | ${cert.certification_org}`;
+      if (cert.name) {
+        let certText = cert.name;
+        if (cert.organization) {
+          certText += ` | ${cert.organization}`;
         }
         content.push({
           text: certText,
@@ -566,16 +566,16 @@ function createPDFDocumentDefinition(data) {
           margin: [0, 0, 0, 2]
         });
       }
-      if (cert.certification_date) {
+      if (cert.date) {
         content.push({
-          text: cert.certification_date,
+          text: cert.date,
           style: 'duration',
           margin: [0, 0, 0, 5]
         });
       }
-      if (cert.credential_id) {
+      if (cert.credentialId) {
         content.push({
-          text: `Credential ID: ${cert.credential_id}`,
+          text: `Credential ID: ${cert.credentialId}`,
           style: 'body',
           margin: [0, 0, 0, 8]
         });
@@ -587,23 +587,23 @@ function createPDFDocumentDefinition(data) {
   if (data.achievements && data.achievements.length > 0) {
     content.push({ text: 'ACHIEVEMENTS', style: 'sectionHeader' });
     data.achievements.forEach(achievement => {
-      if (achievement.achievement_title) {
+      if (achievement.title) {
         content.push({
-          text: achievement.achievement_title,
+          text: achievement.title,
           style: 'jobTitle',
           margin: [0, 0, 0, 2]
         });
       }
-      if (achievement.achievement_date) {
+      if (achievement.date) {
         content.push({
-          text: achievement.achievement_date,
+          text: achievement.date,
           style: 'duration',
           margin: [0, 0, 0, 5]
         });
       }
-      if (achievement.achievement_description) {
+      if (achievement.description) {
         content.push({
-          text: achievement.achievement_description,
+          text: achievement.description,
           style: 'body',
           margin: [0, 0, 0, 8]
         });
@@ -699,13 +699,13 @@ function generatePlainText() {
           // Check if there are rated skills
           if (data.ratedSkills && data.ratedSkills.length > 0) {
             data.ratedSkills.forEach(skill => {
-              if (skill.skill_name) {
+              if (skill.name) {
                 let stars = '';
-                const rating = parseInt(skill.skill_rating) || 0;
+                const rating = parseInt(skill.rating) || 0;
                 for (let i = 0; i < 5; i++) {
                   stars += i < rating ? '★' : '☆';
                 }
-                plainText += `${skill.skill_name} ${stars}\n`;
+                plainText += `${skill.name} ${stars}\n`;
               }
             });
             plainText += '\n';
@@ -721,10 +721,10 @@ function generatePlainText() {
           plainText += 'EXPERIENCE\n';
           plainText += '==========\n';
           data.experience.forEach(exp => {
-            plainText += `${exp.job_title || 'Position'}\n`;
-            plainText += `${exp.company_name || 'Company'}`;
-            if (exp.start_date || exp.end_date) {
-              plainText += ` | ${exp.start_date || ''} - ${exp.end_date || ''}`;
+            plainText += `${exp.title || 'Position'}\n`;
+            plainText += `${exp.company || 'Company'}`;
+            if (exp.startDate || exp.endDate) {
+              plainText += ` | ${exp.startDate || ''} - ${exp.endDate || ''}`;
             }
             if (exp.location) {
               plainText += ` | ${exp.location}`;
@@ -744,16 +744,16 @@ function generatePlainText() {
           plainText += '=========\n';
           data.education.forEach(edu => {
             plainText += `${edu.degree || 'Degree'}\n`;
-            plainText += `${edu.school_name || 'School'}`;
-            if (edu.education_start_date || edu.education_end_date) {
-              plainText += ` | ${edu.education_start_date || ''} - ${edu.education_end_date || ''}`;
+            plainText += `${edu.institution || 'School'}`;
+            if (edu.educationStartDate || edu.educationEndDate) {
+              plainText += ` | ${edu.educationStartDate || ''} - ${edu.educationEndDate || ''}`;
             }
-            if (edu.education_location) {
-              plainText += ` | ${edu.education_location}`;
+            if (edu.educationLocation) {
+              plainText += ` | ${edu.educationLocation}`;
             }
             plainText += '\n';
-            if (edu.gpa && edu.score_type !== 'none') {
-              plainText += `${edu.score_type === 'percentage' ? 'Percentage' : 'GPA'}: ${edu.gpa}\n`;
+            if (edu.gpa && edu.scoreType !== 'none') {
+              plainText += `${edu.scoreType === 'percentage' ? 'Percentage' : 'GPA'}: ${edu.gpa}\n`;
             }
             plainText += '\n';
           });
@@ -765,22 +765,22 @@ function generatePlainText() {
           plainText += 'PROJECTS\n';
           plainText += '========\n';
           data.projects.forEach(proj => {
-            plainText += `${proj.project_name || 'Project'}`;
-            if (proj.project_technologies) {
-              plainText += ` | ${proj.project_technologies}`;
+            plainText += `${proj.name || 'Project'}`;
+            if (proj.technologies) {
+              plainText += ` | ${proj.technologies}`;
             }
             plainText += '\n';
             
             // Project links
-            if (proj.project_link || proj.project_github) {
+            if (proj.link || proj.github) {
               let links = [];
-              if (proj.project_link) links.push(proj.project_link);
-              if (proj.project_github) links.push(proj.project_github);
+              if (proj.link) links.push(proj.link);
+              if (proj.github) links.push(proj.github);
               plainText += `${links.join(' | ')}\n`;
             }
             
-            if (proj.project_description) {
-              plainText += `${proj.project_description}\n`;
+            if (proj.description) {
+              plainText += `${proj.description}\n`;
             }
             plainText += '\n';
           });
@@ -792,18 +792,18 @@ function generatePlainText() {
           plainText += 'CERTIFICATIONS\n';
           plainText += '==============\n';
           data.certifications.forEach(cert => {
-            plainText += `${cert.certification_name || 'Certification'}`;
-            if (cert.certification_date) {
-              if (cert.certification_expiration) {
-                plainText += ` | ${cert.certification_date} - ${cert.certification_expiration}`;
+            plainText += `${cert.name || 'Certification'}`;
+            if (cert.date) {
+              if (cert.expiration) {
+                plainText += ` | ${cert.date} - ${cert.expiration}`;
               } else {
-                plainText += ` | ${cert.certification_date}`;
+                plainText += ` | ${cert.date}`;
               }
             }
             plainText += '\n';
-            plainText += `${cert.certification_org || ''}`;
-            if (cert.credential_id) {
-              plainText += ` (ID: ${cert.credential_id})`;
+            plainText += `${cert.organization || ''}`;
+            if (cert.credentialId) {
+              plainText += ` (ID: ${cert.credentialId})`;
             }
             plainText += '\n\n';
           });
@@ -831,13 +831,13 @@ function generatePlainText() {
           plainText += 'ACHIEVEMENTS & HONORS\n';
           plainText += '=====================\n';
           data.achievements.forEach(achieve => {
-            plainText += `${achieve.achievement_title || 'Achievement'}`;
-            if (achieve.achievement_date) {
-              plainText += ` | ${achieve.achievement_date}`;
+            plainText += `${achieve.title || 'Achievement'}`;
+            if (achieve.date) {
+              plainText += ` | ${achieve.date}`;
             }
             plainText += '\n';
-            if (achieve.achievement_description) {
-              plainText += `${achieve.achievement_description}\n`;
+            if (achieve.description) {
+              plainText += `${achieve.description}\n`;
             }
             plainText += '\n';
           });
