@@ -182,7 +182,7 @@ function setupEventListeners() {
   // Preview button (keep for manual refresh)
   const previewButton = document.querySelector('button[onclick="generateResume()"]');
   if (previewButton) {
-    previewButton.addEventListener('click', generateResume);
+    // Removed duplicate event listener
   }
   
   // Plain text buttons
@@ -191,22 +191,16 @@ function setupEventListeners() {
     viewPlainTextButton.addEventListener('click', viewPlainText);
   }
   
-  // Removed duplicate listener to prevent double download triggering; inline onclick already handles it.
-  // const downloadPlainTextButton = document.querySelector('button[onclick="downloadPlainText()"]');
-  // if (downloadPlainTextButton) {
-  //   downloadPlainTextButton.addEventListener('click', downloadPlainText);
-  // }
-  
   // Versions button
   const versionsButton = document.querySelector('button[onclick="showVersionsModal()"]');
   if (versionsButton) {
-    versionsButton.addEventListener('click', showVersionsModal);
+    // Removed duplicate event listener
   }
   
   // Save named version button
   const saveNamedVersionButton = document.querySelector('button[onclick="saveNamedVersion()"]');
   if (saveNamedVersionButton) {
-    saveNamedVersionButton.addEventListener('click', saveNamedVersion);
+    // Removed duplicate event listener
   }
   
   // Export data button - using onclick attribute, no need for addEventListener to prevent double execution
@@ -220,7 +214,7 @@ function setupEventListeners() {
   // Clear form button
   const clearFormButton = document.querySelector('button[onclick="clearForm()"]');
   if (clearFormButton) {
-    clearFormButton.addEventListener('click', clearForm);
+    // Removed duplicate event listener
   }
   
   // Copy plain text button
