@@ -391,8 +391,8 @@ function collectFormData() {
     
     if (skillName) {
       data.ratedSkills.push({
-        skill_name: skillName,
-        skill_rating: skillRating
+        name: skillName,
+        rating: skillRating
       });
     }
   });
@@ -409,10 +409,10 @@ function collectFormData() {
     
     if (company || title || startDate || endDate || description) {
       data.experience.push({
-        company_name: company,
-        job_title: title,
-        start_date: startDate,
-        end_date: endDate,
+        company: company,
+        title: title,
+        startDate: startDate,
+        endDate: endDate,
         description: description,
         location: location
       });
@@ -432,13 +432,13 @@ function collectFormData() {
     
     if (institution || degree || startDate || endDate) {
       data.education.push({
-        school_name: institution,
+        institution: institution,
         degree: degree,
-        education_start_date: startDate,
-        education_end_date: endDate,
+        educationStartDate: startDate,
+        educationEndDate: endDate,
         gpa: gpa,
-        score_type: scoreType,
-        education_location: location
+        scoreType: scoreType,
+        educationLocation: location
       });
     }
   });
@@ -454,11 +454,11 @@ function collectFormData() {
     
     if (name || description || technologies) {
       data.projects.push({
-        project_name: name,
-        project_description: description,
-        project_technologies: technologies,
-        project_link: link,
-        project_github: github
+        name: name,
+        description: description,
+        technologies: technologies,
+        link: link,
+        github: github
       });
     }
   });
@@ -474,11 +474,11 @@ function collectFormData() {
     
     if (name || org || date) {
       data.certifications.push({
-        certification_name: name,
-        certification_org: org,
-        certification_date: date,
-        certification_expiration: expiration,
-        credential_id: credentialId
+        name: name,
+        organization: org,
+        date: date,
+        expiration: expiration,
+        credentialId: credentialId
       });
     }
   });
@@ -506,9 +506,9 @@ function collectFormData() {
     
     if (title || description) {
       data.achievements.push({
-        achievement_title: title,
-        achievement_date: date,
-        achievement_description: description
+        title: title,
+        date: date,
+        description: description
       });
     }
   });

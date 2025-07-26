@@ -1,7 +1,19 @@
 // Generate resume preview based on form data
 function generateResume() {
+  console.log('🔄 generateResume() called');
   const preview = document.getElementById("resumePreview");
   const data = collectFormData();
+  
+  // Debug: Log the collected data structure
+  console.log('📊 Collected form data:', {
+    hasProjects: !!(data.projects && data.projects.length > 0),
+    projectsCount: data.projects ? data.projects.length : 0,
+    hasRatedSkills: !!(data.ratedSkills && data.ratedSkills.length > 0),
+    ratedSkillsCount: data.ratedSkills ? data.ratedSkills.length : 0,
+    sectionOrder: data.sectionOrder,
+    projects: data.projects,
+    ratedSkills: data.ratedSkills
+  });
   
   // Save current data
   saveCurrentData();
@@ -61,13 +73,13 @@ function generateResume() {
           if (data.ratedSkills && data.ratedSkills.length > 0) {
             html += '<div class="rated-skills">';
             data.ratedSkills.forEach(skill => {
-              if (skill.skill_name) {
+              if (skill.name) {
                 let stars = '';
-                const rating = parseInt(skill.skill_rating) || 0;
+                const rating = parseInt(skill.rating) || 0;
                 for (let i = 0; i < 5; i++) {
                   stars += i < rating ? '★' : '☆';
                 }
-                html += `<div class="rated-skill"><span class="skill-name">${skill.skill_name}</span> ${stars}</div>`;
+                html += `<div class="rated-skill"><span class="skill-name">${skill.name}</span> ${stars}</div>`;
               }
             });
             html += '</div>';
@@ -84,13 +96,13 @@ function generateResume() {
           data.experience.forEach(exp => {
             html += '<div class="experience-entry">';
             html += '<div class="d-flex justify-content-between">';
-            html += `<strong>${exp.job_title || 'Position'}</strong>`;
-            if (exp.start_date || exp.end_date) {
-              html += `<span>${exp.start_date || ''} - ${exp.end_date || ''}</span>`;
+            html += `<strong>${exp.title || 'Position'}</strong>`;
+            if (exp.startDate || exp.endDate) {
+              html += `<span>${exp.startDate || ''} - ${exp.endDate || ''}</span>`;
             }
             html += '</div>';
             html += '<div class="d-flex justify-content-between">';
-            html += `<em>${exp.company_name || 'Company'}</em>`;
+            html += `<em>${exp.company || 'Company'}</em>`;
             if (exp.location) {
               html += `<span>${exp.location}</span>`;
             }
@@ -110,18 +122,18 @@ function generateResume() {
             html += '<div class="education-entry">';
             html += '<div class="d-flex justify-content-between">';
             html += `<strong>${edu.degree || 'Degree'}</strong>`;
-            if (edu.education_start_date || edu.education_end_date) {
-              html += `<span>${edu.education_start_date || ''} - ${edu.education_end_date || ''}</span>`;
+            if (edu.educationStartDate || edu.educationEndDate) {
+              html += `<span>${edu.educationStartDate || ''} - ${edu.educationEndDate || ''}</span>`;
             }
             html += '</div>';
             html += '<div class="d-flex justify-content-between">';
-            html += `<em>${edu.school_name || 'School'}</em>`;
-            if (edu.education_location) {
-              html += `<span>${edu.education_location}</span>`;
+            html += `<em>${edu.institution || 'School'}</em>`;
+            if (edu.educationLocation) {
+              html += `<span>${edu.educationLocation}</span>`;
             }
             html += '</div>';
-            if (edu.gpa && edu.score_type !== 'none') {
-              html += `<p>${edu.score_type === 'percentage' ? 'Percentage' : 'GPA'}: ${edu.gpa}</p>`;
+            if (edu.gpa && edu.scoreType !== 'none') {
+              html += `<p>${edu.scoreType === 'percentage' ? 'Percentage' : 'GPA'}: ${edu.gpa}</p>`;
             }
             html += '</div>';
           });
@@ -134,22 +146,22 @@ function generateResume() {
           data.projects.forEach(proj => {
             html += '<div class="project-entry">';
             html += '<div class="d-flex justify-content-between">';
-            html += `<strong>${proj.project_name || 'Project'}</strong>`;
-            if (proj.project_technologies) {
-              html += `<span>${proj.project_technologies}</span>`;
+            html += `<strong>${proj.name || 'Project'}</strong>`;
+            if (proj.technologies) {
+              html += `<span>${proj.technologies}</span>`;
             }
             html += '</div>';
             
             // Project links
-            if (proj.project_link || proj.project_github) {
+            if (proj.link || proj.github) {
               let links = [];
-              if (proj.project_link) links.push(`<a href="#">${proj.project_link}</a>`);
-              if (proj.project_github) links.push(`<a href="#">${proj.project_github}</a>`);
+              if (proj.link) links.push(`<a href="#">${proj.link}</a>`);
+              if (proj.github) links.push(`<a href="#">${proj.github}</a>`);
               html += `<p>${links.join(' | ')}</p>`;
             }
             
-            if (proj.project_description) {
-              html += `<p>${proj.project_description.replace(/\n/g, '<br>')}</p>`;
+            if (proj.description) {
+              html += `<p>${proj.description.replace(/\n/g, '<br>')}</p>`;
             }
             html += '</div>';
           });
@@ -162,18 +174,18 @@ function generateResume() {
           data.certifications.forEach(cert => {
             html += '<div class="certification-entry">';
             html += '<div class="d-flex justify-content-between">';
-            html += `<strong>${cert.certification_name || 'Certification'}</strong>`;
-            if (cert.certification_date) {
-              if (cert.certification_expiration) {
-                html += `<span>${cert.certification_date} - ${cert.certification_expiration}</span>`;
+            html += `<strong>${cert.name || 'Certification'}</strong>`;
+            if (cert.date) {
+              if (cert.expiration) {
+                html += `<span>${cert.date} - ${cert.expiration}</span>`;
               } else {
-                html += `<span>${cert.certification_date}</span>`;
+                html += `<span>${cert.date}</span>`;
               }
             }
             html += '</div>';
-            html += `<p><em>${cert.certification_org || ''}</em>`;
-            if (cert.credential_id) {
-              html += ` (ID: ${cert.credential_id})`;
+            html += `<p><em>${cert.organization || ''}</em>`;
+            if (cert.credentialId) {
+              html += ` (ID: ${cert.credentialId})`;
             }
             html += '</p>';
             html += '</div>';
@@ -204,13 +216,13 @@ function generateResume() {
           data.achievements.forEach(achieve => {
             html += '<div class="achievement-entry">';
             html += '<div class="d-flex justify-content-between">';
-            html += `<strong>${achieve.achievement_title || 'Achievement'}</strong>`;
-            if (achieve.achievement_date) {
-              html += `<span>${achieve.achievement_date}</span>`;
+            html += `<strong>${achieve.title || 'Achievement'}</strong>`;
+            if (achieve.date) {
+              html += `<span>${achieve.date}</span>`;
             }
             html += '</div>';
-            if (achieve.achievement_description) {
-              html += `<p>${achieve.achievement_description}</p>`;
+            if (achieve.description) {
+              html += `<p>${achieve.description}</p>`;
             }
             html += '</div>';
           });
