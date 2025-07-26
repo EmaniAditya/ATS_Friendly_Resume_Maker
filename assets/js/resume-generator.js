@@ -341,7 +341,7 @@ function downloadPDF() {
   }
 }
 
-// Text-based PDF generation function
+// Text-based PDF generation function that mirrors live preview formatting exactly
 function generateTextPDF(data) {
   try {
     // Import jsPDF if not already available
@@ -349,18 +349,20 @@ function generateTextPDF(data) {
       throw new Error('jsPDF library not loaded');
     }
     
+    console.log('📄 Generating text-based PDF that mirrors live preview formatting');
+    
     const { jsPDF } = window.jsPDF;
     const doc = new jsPDF();
     
-    // PDF settings
+    // PDF settings that mirror live preview styling
     let yPosition = 20;
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
     const margin = 15;
     const maxWidth = pageWidth - (margin * 2);
     
-    // Helper function to add text with wrapping
-    function addText(text, fontSize = 12, isBold = false, isCenter = false) {
+    // Helper function to add text with consistent spacing like live preview
+    function addText(text, fontSize = 11, isBold = false, isCenter = false, extraSpacing = 0) {
       if (!text) return yPosition;
       
       doc.setFontSize(fontSize);
@@ -368,47 +370,60 @@ function generateTextPDF(data) {
       
       const lines = doc.splitTextToSize(text, maxWidth);
       
-      lines.forEach(line => {
-        if (yPosition > pageHeight - 20) {
+      lines.forEach((line, index) => {
+        if (yPosition > pageHeight - 25) {
           doc.addPage();
           yPosition = 20;
         }
         
         const xPosition = isCenter ? (pageWidth - doc.getTextWidth(line)) / 2 : margin;
         doc.text(line, xPosition, yPosition);
-        yPosition += fontSize * 0.5;
+        yPosition += (fontSize * 0.4) + 2; // Consistent line spacing
       });
       
+      yPosition += extraSpacing; // Extra spacing after sections
       return yPosition;
     }
     
-    // Header Section
+    // Add horizontal line separator like in preview
+    function addSeparator() {
+      if (yPosition > pageHeight - 25) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, yPosition, pageWidth - margin, yPosition);
+      yPosition += 8;
+    }
+    
+    // Header Section - Mirror live preview layout
     if (data.fullName) {
-      yPosition = addText(data.fullName, 18, true, true);
-      yPosition += 5;
+      yPosition = addText(data.fullName, 16, true, true, 3);
     }
     
     if (data.jobTitle) {
-      yPosition = addText(data.jobTitle, 14, false, true);
-      yPosition += 5;
+      yPosition = addText(data.jobTitle, 12, false, true, 5);
     }
     
-    // Contact Information
+    // Contact Information - Single line like preview
     let contactInfo = [];
     if (data.phone) contactInfo.push(data.phone);
     if (data.email) contactInfo.push(data.email);
+    if (data.github) contactInfo.push(data.github);
+    if (data.linkedin) contactInfo.push(data.linkedin);
     if (data.website) contactInfo.push(data.website);
     if (data.location) contactInfo.push(data.location);
     
     if (contactInfo.length > 0) {
-      yPosition = addText(contactInfo.join(' | '), 10, false, true);
-      yPosition += 10;
+      yPosition = addText(contactInfo.join(' | '), 9, false, true, 8);
     }
     
-    // Get section order
+    // Use the same section order as the live preview
     const sectionOrder = data.sectionOrder && data.sectionOrder.length > 0 ? data.sectionOrder : [
       'summary', 'experience', 'projects', 'skills', 'education', 'certifications', 'achievements', 'languages'
     ];
+    
+    addSeparator(); // Add separator after header
     
     // Generate sections
     sectionOrder.forEach(section => {

@@ -54,9 +54,15 @@ function loadSampleData() {
       console.warn('Error saving sample data to localStorage:', storageError);
     }
     
-    // Generate preview
+    // Generate preview from populated form fields
+    console.log('🔄 Triggering generateResume after sample data population');
     if (typeof generateResume === 'function') {
-      generateResume();
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        generateResume();
+      }, 100);
+    } else {
+      console.error('generateResume function not available');
     }
     
     showToast("Sample resume loaded! Edit to customize your own resume.");
@@ -232,21 +238,38 @@ function populateFormData(data) {
   // Helper function to safely set element value
   const safeSetValue = (elementId, value) => {
     const element = document.getElementById(elementId);
-    if (element) {
+    if (element && value !== undefined) {
       element.value = value || '';
-    } else {
+      populatedFields.push({ field: elementId, value: value });
+      // Trigger input event to ensure live preview updates
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+    } else if (!element) {
+      failedFields.push({ field: elementId, reason: 'Element not found' });
       console.warn(`Element with ID '${elementId}' not found in the DOM`);
+    } else {
+      failedFields.push({ field: elementId, reason: 'Value undefined' });
     }
   };
   
   // Debug: Log what data we're trying to populate
   console.log('🔧 populateFormData called with:', {
     fullName: data.fullName,
+    jobTitle: data.jobTitle,
     hasSkills: !!data.skills,
     hasTechnicalSkills: !!data.technicalSkills,
     hasSoftSkills: !!data.softSkills,
-    skills: data.skills
+    hasExperience: !!(data.experience && data.experience.length > 0),
+    hasEducation: !!(data.education && data.education.length > 0),
+    hasProjects: !!(data.projects && data.projects.length > 0),
+    skills: data.skills,
+    experienceCount: data.experience ? data.experience.length : 0,
+    educationCount: data.education ? data.education.length : 0,
+    projectsCount: data.projects ? data.projects.length : 0
   });
+  
+  // Track which fields are successfully populated
+  const populatedFields = [];
+  const failedFields = [];
   
   // Populate simple fields
   safeSetValue('fullName', data.fullName);
@@ -287,6 +310,18 @@ function populateFormData(data) {
   
   // Set template
   safeSetValue('template', data.template || 'classic');
+  
+  // Log population results
+  console.log('✅ Form field population complete:', {
+    totalPopulated: populatedFields.length,
+    totalFailed: failedFields.length,
+    populatedFields: populatedFields.map(f => f.field),
+    failedFields: failedFields
+  });
+  
+  if (failedFields.length > 0) {
+    console.warn('⚠️ Some fields failed to populate:', failedFields);
+  }
   
   // Populate multi-item sections
   if (data.experience && data.experience.length > 0) {
