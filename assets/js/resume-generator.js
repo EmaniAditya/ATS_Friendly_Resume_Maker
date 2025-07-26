@@ -567,15 +567,32 @@ function createPDFDocumentDefinition(data) {
 
   // ----- END DYNAMIC SECTION ORDERING -----
 
+  // ----- PDF STYLE MAPPING BASED ON SELECTED TEMPLATE -----
+  const stylePalettes = {
+    classic:      { primary: '#000000', secondary: '#000000', headerFill: null },
+    professional: { primary: '#2c3e50', secondary: '#34495e', headerFill: '#f8f9fa' },
+    modern:       { primary: '#1a5276', secondary: '#1a5276', headerFill: '#e8f6f3' },
+    minimalist:   { primary: '#222222', secondary: '#222222', headerFill: null }
+  };
+  const palette = stylePalettes[data.template] || stylePalettes.classic;
+
   return {
     content: content,
     styles: {
-      name: { fontSize: 20, bold: true, color: '#2c3e50' },
+      name: { fontSize: 20, bold: true, color: palette.primary },
       contact: { fontSize: 10, color: '#5a6c7d' },
-      sectionHeader: { fontSize: 12, bold: true, color: '#2c3e50', margin: [0, 15, 0, 8], decoration: 'underline' },
-      jobTitle: { fontSize: 11, bold: true, color: '#34495e' },
+      sectionHeader: {
+        fontSize: 12,
+        bold: true,
+        color: palette.primary,
+        margin: [0, 15, 0, 8],
+        decoration: data.template === 'professional' ? 'underline' : undefined,
+        fillColor: palette.headerFill || undefined,
+        alignment: 'left'
+      },
+      jobTitle: { fontSize: 11, bold: true, color: palette.secondary },
       duration: { fontSize: 9, color: '#7f8c8d', italics: true },
-      body: { fontSize: 10, color: '#2c3e50', lineHeight: 1.3 }
+      body: { fontSize: 10, color: palette.primary, lineHeight: 1.3 }
     },
     pageMargins: [40, 40, 40, 40]
   };

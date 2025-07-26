@@ -64,9 +64,9 @@ body {
 
 .template-modern h4 {
   margin-top: 15px;
-  color: #2a5885;
   font-weight: bold;
-  border-bottom: 2px solid #2a5885;
+  color: #1a5276; /* Teal */
+  border-bottom: 2px solid #1a5276;
   padding-bottom: 4px;
 }
 
@@ -79,9 +79,9 @@ body {
 .template-minimalist h4 {
   margin-top: 15px;
   font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 14px;
+  color: #222222; /* Charcoal */
+  border-bottom: 1px solid #222222;
+  padding-bottom: 4px;
 }
 
 .template-professional h2 {
@@ -93,8 +93,9 @@ body {
 .template-professional h4 {
   margin-top: 15px;
   font-weight: bold;
-  background-color: #f8f9fa;
-  padding: 5px;
+  color: #2c3e50; /* Deep blue */
+  border-bottom: 2px solid #2c3e50;
+  padding-bottom: 4px;
 }
 
 .form-label {
