@@ -381,7 +381,185 @@ function createPDFDocumentDefinition(data) {
     });
   }
   
-  // Professional Summary
+  // ----- DYNAMIC SECTION ORDERING -----
+  // Insert job title (if any) beneath the name before contact details
+  if (data.jobTitle) {
+    content.push({
+      text: data.jobTitle,
+      style: 'jobTitle',
+      alignment: 'center',
+      margin: [0, 0, 0, 5]
+    });
+  }
+
+  // Determine the order from the same array the preview uses
+  const sectionOrder = (Array.isArray(data.sectionOrder) && data.sectionOrder.length)
+    ? data.sectionOrder
+    : ['summary', 'experience', 'projects', 'skills', 'education', 'certifications', 'achievements', 'languages'];
+
+  // Helper to add a blank spacer at the end of a section
+  const addSpacer = () => content.push({ text: '', margin: [0, 0, 0, 10] });
+
+  sectionOrder.forEach(section => {
+    switch (section) {
+      case 'summary':
+        if (data.summary) {
+          content.push({ text: 'PROFESSIONAL SUMMARY', style: 'sectionHeader' });
+          content.push({ text: data.summary, style: 'body', margin: [0, 0, 0, 10] });
+        }
+        break;
+
+      case 'experience':
+        if (data.experience && data.experience.length) {
+          content.push({ text: 'PROFESSIONAL EXPERIENCE', style: 'sectionHeader' });
+          data.experience.forEach(exp => {
+            if (exp.title && exp.company) {
+              content.push({ text: `${exp.title} | ${exp.company}`, style: 'jobTitle', margin: [0, 0, 0, 2] });
+            }
+            if (exp.startDate || exp.endDate) {
+              const range = `${exp.startDate || ''}${exp.startDate && exp.endDate ? ' - ' : ''}${exp.endDate || 'Present'}`;
+              content.push({ text: range, style: 'duration', margin: [0, 0, 0, 5] });
+            }
+            if (exp.location) {
+              content.push({ text: exp.location, style: 'duration', margin: [0, 0, 0, 5] });
+            }
+            if (exp.description) {
+              exp.description.split('\n').filter(Boolean).forEach(bullet => {
+                content.push({ text: `• ${bullet.replace(/^[•\-*]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
+              });
+            }
+            addSpacer();
+          });
+        }
+        break;
+
+      case 'projects':
+        if (data.projects && data.projects.length) {
+          content.push({ text: 'PROJECTS', style: 'sectionHeader' });
+          data.projects.forEach(project => {
+            if (project.name) {
+              content.push({ text: project.name, style: 'jobTitle', margin: [0, 0, 0, 2] });
+            }
+            if (project.technologies) {
+              content.push({ text: `Technologies: ${project.technologies}`, style: 'duration', margin: [0, 0, 0, 5] });
+            }
+            if (project.link || project.github) {
+              const links = [];
+              if (project.link) links.push(`Link: ${project.link}`);
+              if (project.github) links.push(`GitHub: ${project.github}`);
+              content.push({ text: links.join(' | '), style: 'duration', margin: [0, 0, 0, 5] });
+            }
+            if (project.description) {
+              project.description.split('\n').filter(Boolean).forEach(bullet => {
+                content.push({ text: `• ${bullet.replace(/^[•\-*]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
+              });
+            }
+            addSpacer();
+          });
+        }
+        break;
+
+      case 'skills':
+        if (data.skills || (data.ratedSkills && data.ratedSkills.length)) {
+          content.push({ text: 'SKILLS', style: 'sectionHeader' });
+          // Rated skills first (stars)
+          if (data.ratedSkills && data.ratedSkills.length) {
+            data.ratedSkills.forEach(skill => {
+              if (skill.name) {
+                const ratingNum = parseInt(skill.rating) || 0;
+                const stars = '★★★★★☆☆☆☆☆'.substring(5 - ratingNum, 10 - ratingNum);
+                content.push({ text: `${skill.name} ${stars}`, style: 'body', margin: [0, 0, 0, 3] });
+              }
+            });
+            addSpacer();
+          }
+          if (data.skills) {
+            data.skills.split('\n').filter(Boolean).forEach(line => {
+              content.push({ text: line, style: 'body', margin: [0, 0, 0, 3] });
+            });
+          }
+          addSpacer();
+        }
+        break;
+
+      case 'education':
+        if (data.education && data.education.length) {
+          content.push({ text: 'EDUCATION', style: 'sectionHeader' });
+          data.education.forEach(edu => {
+            if (edu.degree && edu.institution) {
+              content.push({ text: `${edu.degree} | ${edu.institution}`, style: 'jobTitle', margin: [0, 0, 0, 2] });
+            }
+            if (edu.educationStartDate || edu.educationEndDate) {
+              const range = `${edu.educationStartDate || ''}${edu.educationStartDate && edu.educationEndDate ? ' - ' : ''}${edu.educationEndDate || 'Present'}`;
+              content.push({ text: range, style: 'duration', margin: [0, 0, 0, 5] });
+            }
+            if (edu.educationLocation) {
+              content.push({ text: edu.educationLocation, style: 'duration', margin: [0, 0, 0, 5] });
+            }
+            if (edu.gpa && edu.scoreType) {
+              content.push({ text: `${edu.scoreType.toUpperCase()}: ${edu.gpa}`, style: 'body', margin: [0, 0, 0, 8] });
+            }
+            addSpacer();
+          });
+        }
+        break;
+
+      case 'certifications':
+        if (data.certifications && data.certifications.length) {
+          content.push({ text: 'CERTIFICATIONS', style: 'sectionHeader' });
+          data.certifications.forEach(cert => {
+            const header = `${cert.name || 'Certification'}${cert.organization ? ' | ' + cert.organization : ''}`;
+            content.push({ text: header, style: 'jobTitle', margin: [0, 0, 0, 2] });
+            if (cert.date) {
+              const dateLine = cert.expiration ? `${cert.date} - ${cert.expiration}` : cert.date;
+              content.push({ text: dateLine, style: 'duration', margin: [0, 0, 0, 5] });
+            }
+            if (cert.credentialId) {
+              content.push({ text: `Credential ID: ${cert.credentialId}`, style: 'body', margin: [0, 0, 0, 8] });
+            }
+            addSpacer();
+          });
+        }
+        break;
+
+      case 'achievements':
+        if (data.achievements && data.achievements.length) {
+          content.push({ text: 'ACHIEVEMENTS', style: 'sectionHeader' });
+          data.achievements.forEach(a => {
+            if (a.title) content.push({ text: a.title, style: 'jobTitle', margin: [0, 0, 0, 2] });
+            if (a.date) content.push({ text: a.date, style: 'duration', margin: [0, 0, 0, 5] });
+            if (a.description) content.push({ text: a.description, style: 'body', margin: [0, 0, 0, 8] });
+            addSpacer();
+          });
+        }
+        break;
+
+      case 'languages':
+        if (data.languages && data.languages.length) {
+          content.push({ text: 'LANGUAGES', style: 'sectionHeader' });
+          const list = data.languages.map(l => l.proficiency ? `${l.language} (${l.proficiency})` : l.language).join(', ');
+          content.push({ text: list, style: 'body', margin: [0, 0, 0, 10] });
+        }
+        break;
+    }
+  });
+
+  // ----- END DYNAMIC SECTION ORDERING -----
+
+  return {
+    content: content,
+    styles: {
+      name: { fontSize: 20, bold: true, color: '#2c3e50' },
+      contact: { fontSize: 10, color: '#5a6c7d' },
+      sectionHeader: { fontSize: 12, bold: true, color: '#2c3e50', margin: [0, 15, 0, 8], decoration: 'underline' },
+      jobTitle: { fontSize: 11, bold: true, color: '#34495e' },
+      duration: { fontSize: 9, color: '#7f8c8d', italics: true },
+      body: { fontSize: 10, color: '#2c3e50', lineHeight: 1.3 }
+    },
+    pageMargins: [40, 40, 40, 40]
+  };
+
+// Professional Summary
   if (data.summary) {
     content.push({ text: 'PROFESSIONAL SUMMARY', style: 'sectionHeader' });
     content.push({ text: data.summary, style: 'body', margin: [0, 0, 0, 10] });
