@@ -250,9 +250,9 @@ input.form-control, textarea.form-control, select.form-select {
 }
 
 .section-content {
-  overflow: hidden;
+  overflow: visible;
   transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
-  max-height: 1000px;
+  max-height: none;
   opacity: 1;
 }
 

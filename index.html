@@ -581,6 +581,15 @@
     
     // Initialize collapsible sections on page load
     document.addEventListener('DOMContentLoaded', function() {
+      // Reorder input sections to desired sequence
+      const desiredOrder = ['Personal Information','Summary','Experience','Projects','Skills','Education','Certifications','Achievements & Honors','Languages','ATS Optimization','Export'];
+      const container = document.querySelector('.input-container');
+      desiredOrder.forEach(name => {
+        const titleEl = Array.from(document.querySelectorAll('.section-title')).find(t => t.textContent.trim() === name);
+        if (titleEl) {
+          container.appendChild(titleEl.closest('.form-section'));
+        }
+      });
       // Collapse all sections by default except Personal Information
       const alwaysOpen = ['Personal Information'];
       document.querySelectorAll('.section-title').forEach(title => {
