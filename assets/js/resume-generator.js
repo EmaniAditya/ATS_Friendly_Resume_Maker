@@ -297,7 +297,7 @@ function generateResume() {
 function checkPageOverflow() {
   const preview = document.getElementById('resumePreview');
   const pageWarning = document.getElementById('pageWarning');
-  const compactMode = document.getElementById('compactMode');
+  const singlePageMode = document.getElementById('singlePageMode');
 
   if (!preview) return;
 
@@ -305,20 +305,20 @@ function checkPageOverflow() {
   preview.style.maxHeight = '';
   preview.style.overflowY = '';
 
-  if (compactMode && compactMode.checked) {
+  if (singlePageMode && singlePageMode.checked) {
     // Single-page mode: restrict to A4 height with scrolling
     preview.style.maxHeight = '1123px'; // 297mm at 96dpi
     preview.style.overflowY = 'auto';
     if (preview.scrollHeight > 1123) {
       if (pageWarning) {
         pageWarning.style.display = 'block';
-        pageWarning.textContent = 'Warning: Content exceeds one page. Enable compact mode or reduce content.';
+        pageWarning.textContent = 'Warning: Content exceeds one page. Reduce content for single-page mode.';
       }
     } else {
       if (pageWarning) pageWarning.style.display = 'none';
     }
   } else {
-    // Multi-page mode: enable scrolling for full content visibility
+    // Free flow mode: enable scrolling for full content visibility
     preview.style.maxHeight = '80vh'; // Set reasonable max height for viewport
     preview.style.overflowY = 'auto'; // Enable vertical scrolling
     if (pageWarning) pageWarning.style.display = 'none';
@@ -358,6 +358,16 @@ function applyDensitySetting(densityValue) {
 
 // Download resume as text-based PDF using pdfmake
 function downloadTextBasedPDF() {
+  // Check which export mode is selected
+  const singlePageMode = document.getElementById('singlePageMode');
+  const freeFlowMode = document.getElementById('freeFlowMode');
+  
+  if (singlePageMode && singlePageMode.checked) {
+    // Show feature in development toast for single-page mode
+    showToast('Feature in development', 'warning');
+    return;
+  }
+  
   showLoading();
   
   try {
@@ -370,12 +380,8 @@ function downloadTextBasedPDF() {
       return;
     }
     
-    // Check if single-page mode is enabled
-    const compactMode = document.getElementById('compactMode');
-    const isSinglePageMode = compactMode && compactMode.checked;
-    
-    // Create PDF document definition with single-page mode setting
-    const docDefinition = createPDFDocumentDefinition(data, isSinglePageMode);
+    // Free flow mode: use normal PDF generation without single-page restrictions
+    const docDefinition = createPDFDocumentDefinition(data, false);
     
     // Generate filename
     const fileName = (data.fullName || 'Resume').replace(/\s+/g, '_') + '_Resume.pdf';
@@ -391,6 +397,46 @@ function downloadTextBasedPDF() {
     hideLoading();
     showToast('Error generating PDF. Please try again.', 'error');
   }
+}
+
+// Limit content to fit within a single page for strict single-page mode
+function limitContentForSinglePage(content) {
+  // Estimate content height and reduce if necessary
+  const maxItemsPerSection = {
+    experience: 2,
+    education: 2,
+    projects: 2,
+    certifications: 3,
+    achievements: 2,
+    languages: 5
+  };
+  
+  const limitedContent = [];
+  let currentSection = null;
+  let sectionItemCount = 0;
+  
+  content.forEach(item => {
+    if (item.text && typeof item.text === 'string' && item.text.match(/^[A-Z\s&]+$/)) {
+      // This is likely a section header
+      currentSection = item.text.toLowerCase().replace(/\s+/g, '');
+      sectionItemCount = 0;
+      limitedContent.push(item);
+    } else if (currentSection && maxItemsPerSection[currentSection]) {
+      // This is content within a section that has limits
+      if (sectionItemCount < maxItemsPerSection[currentSection]) {
+        limitedContent.push(item);
+        if (item.text && item.text.trim() !== '') {
+          sectionItemCount++;
+        }
+      }
+      // Skip items that exceed the limit
+    } else {
+      // This is either header content or unlimited section content
+      limitedContent.push(item);
+    }
+  });
+  
+  return limitedContent;
 }
 
 // Create PDF document definition for pdfmake
@@ -893,9 +939,23 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
   
   // Add single-page mode specific settings
   if (isSinglePageMode) {
+    // Strict single-page enforcement: limit content and prevent page breaks
     docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
       // Prevent page breaks in single-page mode
       return false;
+    };
+    
+    // Apply more aggressive content reduction for single-page mode
+    content = limitContentForSinglePage(content);
+    
+    // Set page size and margins for strict single-page mode
+    docDefinition.pageSize = 'A4';
+    docDefinition.pageOrientation = 'portrait';
+    
+    // Add page overflow handling
+    docDefinition.defaultStyle = {
+      fontSize: 8, // Even smaller base font size
+      lineHeight: 1.1
     };
   }
   
