@@ -1,13 +1,35 @@
 body {
   background-color: #f8f9fa;
   padding: 20px;
+  padding-top: 90px; /* space for fixed top bar */
   min-height: 100vh;
-  overflow-y: auto; /* allow page scroll so footer is reachable */
+  overflow-y: auto;
+}
+
+/* Fixed Top Navigation Bar */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  padding: 15px 25px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  z-index: 1000;
+}
+
+.top-bar h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.top-bar a {
+  text-decoration: none;
 }
 
 /* Main layout containers */
 .main-layout {
-  height: calc(100vh - 160px); /* fixed height ensures independent scroll panes */
+  height: calc(100vh - 100px); /* account for fixed top-bar and page padding */
   display: flex;
   gap: 20px;
 }
@@ -303,7 +325,7 @@ h1.text-center {
   font-weight: 600;
 }
 
-/* Compact footer overlay */
+/* Compact footer overlay (removed) */
 footer {
   position: fixed;
   bottom: 4px;
