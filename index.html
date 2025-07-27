@@ -581,11 +581,10 @@
     
     // Initialize collapsible sections on page load
     document.addEventListener('DOMContentLoaded', function() {
-      // Optionally collapse some sections by default (except Personal Information)
-      const sectionsToCollapse = ['Summary', 'Experience', 'Projects'];
-      
+      // Collapse all sections by default except Personal Information
+      const alwaysOpen = ['Personal Information'];
       document.querySelectorAll('.section-title').forEach(title => {
-        if (sectionsToCollapse.includes(title.textContent.trim())) {
+        if (!alwaysOpen.includes(title.textContent.trim())) {
           toggleSection(title);
         }
       });
