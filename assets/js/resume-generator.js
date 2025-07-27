@@ -306,7 +306,7 @@ function checkPageOverflow() {
   preview.style.overflowY = '';
 
   if (compactMode && compactMode.checked) {
-    // Single-page mode: restrict to A4 height
+    // Single-page mode: restrict to A4 height with scrolling
     preview.style.maxHeight = '1123px'; // 297mm at 96dpi
     preview.style.overflowY = 'auto';
     if (preview.scrollHeight > 1123) {
@@ -318,9 +318,9 @@ function checkPageOverflow() {
       if (pageWarning) pageWarning.style.display = 'none';
     }
   } else {
-    // Multi-page mode: no restriction
-    preview.style.maxHeight = '';
-    preview.style.overflowY = '';
+    // Multi-page mode: enable scrolling for full content visibility
+    preview.style.maxHeight = '80vh'; // Set reasonable max height for viewport
+    preview.style.overflowY = 'auto'; // Enable vertical scrolling
     if (pageWarning) pageWarning.style.display = 'none';
   }
 }
@@ -370,8 +370,12 @@ function downloadTextBasedPDF() {
       return;
     }
     
-    // Create PDF document definition
-    const docDefinition = createPDFDocumentDefinition(data);
+    // Check if single-page mode is enabled
+    const compactMode = document.getElementById('compactMode');
+    const isSinglePageMode = compactMode && compactMode.checked;
+    
+    // Create PDF document definition with single-page mode setting
+    const docDefinition = createPDFDocumentDefinition(data, isSinglePageMode);
     
     // Generate filename
     const fileName = (data.fullName || 'Resume').replace(/\s+/g, '_') + '_Resume.pdf';
@@ -390,7 +394,7 @@ function downloadTextBasedPDF() {
 }
 
 // Create PDF document definition for pdfmake
-function createPDFDocumentDefinition(data) {
+function createPDFDocumentDefinition(data, isSinglePageMode = false) {
   const content = [];
   
   // Header with name
@@ -848,43 +852,54 @@ function createPDFDocumentDefinition(data) {
     });
   }
   
-  return {
+  // Configure document based on single-page mode
+  const docDefinition = {
     content: content,
     styles: {
       name: {
-        fontSize: 20,
+        fontSize: isSinglePageMode ? 18 : 20, // Slightly smaller in single-page mode
         bold: true,
         color: '#2c3e50'
       },
       contact: {
-        fontSize: 10,
+        fontSize: isSinglePageMode ? 9 : 10, // Smaller contact info in single-page mode
         color: '#5a6c7d'
       },
       sectionHeader: {
-        fontSize: 12,
+        fontSize: isSinglePageMode ? 11 : 12, // Smaller headers in single-page mode
         bold: true,
         color: '#2c3e50',
-        margin: [0, 15, 0, 8],
+        margin: isSinglePageMode ? [0, 10, 0, 6] : [0, 15, 0, 8], // Reduced margins
         decoration: 'underline'
       },
       jobTitle: {
-        fontSize: 11,
+        fontSize: isSinglePageMode ? 10 : 11,
         bold: true,
         color: '#34495e'
       },
       duration: {
-        fontSize: 9,
+        fontSize: isSinglePageMode ? 8 : 9,
         color: '#7f8c8d',
         italics: true
       },
       body: {
-        fontSize: 10,
+        fontSize: isSinglePageMode ? 9 : 10, // Smaller body text in single-page mode
         color: '#2c3e50',
-        lineHeight: 1.3
+        lineHeight: isSinglePageMode ? 1.2 : 1.3 // Tighter line height
       }
     },
-    pageMargins: [40, 40, 40, 40]
+    pageMargins: isSinglePageMode ? [30, 30, 30, 30] : [40, 40, 40, 40] // Smaller margins
   };
+  
+  // Add single-page mode specific settings
+  if (isSinglePageMode) {
+    docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
+      // Prevent page breaks in single-page mode
+      return false;
+    };
+  }
+  
+  return docDefinition;
 }
 
 // Generate plain text version of the resume
