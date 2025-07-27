@@ -954,35 +954,35 @@ if (!isSinglePageMode) {
     content: content,
     styles: {
       name: {
-        fontSize: isSinglePageMode ? 14 : 20, // Slightly smaller in single-page mode
+        fontSize: isSinglePageMode ? 18 : 20, // Increased from 14 to 18
         bold: true,
         color: '#2c3e50'
       },
       contact: {
-        fontSize: isSinglePageMode ? 7 : 10, // Extreme compact contact info
+        fontSize: isSinglePageMode ? 9 : 10, // Increased from 7 to 9
         color: '#5a6c7d'
       },
       sectionHeader: {
-        fontSize: isSinglePageMode ? 9 : 12, // Extreme compact headers
+        fontSize: isSinglePageMode ? 10 : 12, // Increased from 9 to 10
         bold: true,
         color: '#2c3e50',
-        margin: isSinglePageMode ? [0, 8, 0, 4] : [0, 12, 0, 6], // Further reduced margins for single-page
+        margin: isSinglePageMode ? [0, 4, 0, 2] : [0, 12, 0, 6], // Further reduced margins for space
         decoration: 'underline'
       },
       jobTitle: {
-        fontSize: isSinglePageMode ? 8 : 11,
+        fontSize: isSinglePageMode ? 9 : 11, // Increased from 8 to 9
         bold: true,
         color: '#34495e'
       },
       duration: {
-        fontSize: isSinglePageMode ? 6 : 9,
+        fontSize: isSinglePageMode ? 8 : 9, // Increased from 6 to 8
         color: '#7f8c8d',
         italics: true
       },
       body: {
-        fontSize: isSinglePageMode ? 7 : 10, // Extreme compact body
+        fontSize: isSinglePageMode ? 9 : 10, // Increased from 7 to 9
         color: '#2c3e50',
-        lineHeight: isSinglePageMode ? 1.1 : 1.3 // Tighter line height
+        lineHeight: isSinglePageMode ? 1.0 : 1.3 // Further reduced for even tighter spacing
       }
     },
     pageMargins: isSinglePageMode ? [20, 15, 20, 15] : [40, 40, 40, 40] // Smaller margins
