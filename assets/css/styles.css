@@ -1,19 +1,20 @@
 body {
   background-color: #f8f9fa;
   padding: 20px;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-y: auto; /* allow page scroll so footer is reachable */
 }
 
 /* Main layout containers */
 .main-layout {
-  height: calc(100vh - 140px); /* Account for header and padding */
+  height: calc(100vh - 160px); /* fixed height ensures independent scroll panes */
   display: flex;
   gap: 20px;
 }
 
 .input-container {
-  flex: 1;
+  flex: 1 1 50%; /* prevent overgrowing */
+  min-height: 0; /* important for flex scroll */
   background: white;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -290,8 +291,40 @@ body {
   align-items: center;
 }
 
-/* Sticky preview on scroll for desktop */
+h1.text-center {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  h1.text-center {
+    font-size: 1.4rem;
+  }
+}
+
+/* Desktop width ratio 25/75 */
 @media (min-width: 992px) {
+  .input-container {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  .preview-container {
+    flex: 0 0 75%;
+    max-width: 75%;
+  }
+
+  /* Remove default Bootstrap padding and center for full-width layout */
+  .container {
+    max-width: 100% !important;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .main-layout {
+    gap: 0;
+  }
+
+  /* Sticky preview on scroll */
   .sticky-preview {
     position: sticky;
     top: 20px;
