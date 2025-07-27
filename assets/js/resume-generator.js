@@ -362,11 +362,8 @@ function downloadTextBasedPDF() {
   const singlePageMode = document.getElementById('singlePageMode');
   const freeFlowMode = document.getElementById('freeFlowMode');
   
-  if (singlePageMode && singlePageMode.checked) {
-    // Show feature in development toast for single-page mode
-    showToast('Feature in development', 'warning');
-    return;
-  }
+  const isSinglePage = singlePageMode && singlePageMode.checked;
+  // (legacy toast removed – feature now implemented)
   
   showLoading();
   
@@ -380,8 +377,7 @@ function downloadTextBasedPDF() {
       return;
     }
     
-    // Free flow mode: use normal PDF generation without single-page restrictions
-    const docDefinition = createPDFDocumentDefinition(data, false);
+    const docDefinition = createPDFDocumentDefinition(data, isSinglePage);
     
     // Generate filename
     const fileName = (data.fullName || 'Resume').replace(/\s+/g, '_') + '_Resume.pdf';
@@ -403,12 +399,12 @@ function downloadTextBasedPDF() {
 function limitContentForSinglePage(content) {
   // Estimate content height and reduce if necessary
   const maxItemsPerSection = {
-    experience: 2,
-    education: 2,
-    projects: 2,
-    certifications: 3,
-    achievements: 2,
-    languages: 5
+    experience: 1,
+    education: 1,
+    projects: 1,
+    certifications: 2,
+    achievements: 1,
+    languages: 4
   };
   
   const limitedContent = [];
@@ -441,7 +437,7 @@ function limitContentForSinglePage(content) {
 
 // Create PDF document definition for pdfmake
 function createPDFDocumentDefinition(data, isSinglePageMode = false) {
-  const content = [];
+  let content = [];
   
   // Header with name
   if (data.fullName) {
@@ -487,8 +483,37 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
     ? data.sectionOrder
     : ['summary', 'experience', 'projects', 'skills', 'education', 'certifications', 'achievements', 'languages'];
 
-  // Helper to add a blank spacer at the end of a section
-  const addSpacer = () => content.push({ text: '', margin: [0, 0, 0, 10] });
+  // ----- Dynamic spacing for single-page mode -----
+  const includedSectionsArr = sectionOrder.filter(sec => {
+    switch (sec) {
+      case 'summary': return !!data.summary;
+      case 'experience': return data.experience && data.experience.length;
+      case 'projects': return data.projects && data.projects.length;
+      case 'skills':
+        return (data.ratedSkills && data.ratedSkills.length) || (data.skills && data.skills.trim());
+      case 'education': return data.education && data.education.length;
+      case 'certifications': return data.certifications && data.certifications.length;
+      case 'achievements': return data.achievements && data.achievements.length;
+      case 'languages': return data.languages && data.languages.length;
+      default: return false;
+    }
+  });
+  const includedSections = includedSectionsArr.length;
+
+  let spacerSize = 10;
+  if (isSinglePageMode) {
+    if (includedSections <= 2) spacerSize = 60;
+    else if (includedSections <= 4) spacerSize = 40;
+    else if (includedSections <= 6) spacerSize = 25;
+    else spacerSize = 15;
+  }
+
+  // Helper adds divider + spacer in single-page mode, or just spacer otherwise
+  const divider = { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, color: '#cccccc' }], margin: [0, 4, 0, 8] };
+  const addSpacer = () => {
+    if (isSinglePageMode) content.push(divider);
+    content.push({ text: '', margin: [0, 0, 0, spacerSize] });
+  };
 
   sectionOrder.forEach(section => {
     switch (section) {
@@ -514,10 +539,15 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
               content.push({ text: exp.location, style: 'duration', margin: [0, 0, 0, 5] });
             }
             if (exp.description) {
-              exp.description.split('\n').filter(Boolean).forEach(bullet => {
-                content.push({ text: `• ${bullet.replace(/^[•\-*]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
-              });
-            }
+               const bulletLines = exp.description.split('\n').filter(Boolean);
+               const maxLines = isSinglePageMode ? 3 : bulletLines.length;
+               bulletLines.slice(0, maxLines).forEach(bullet => {
+                 content.push({ text: `• ${bullet.replace(/^[•\-*]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
+               });
+               if (isSinglePageMode && bulletLines.length > maxLines) {
+                 content.push({ text: '…', style: 'body', margin: [10, 0, 0, 3] });
+               }
+             }
             addSpacer();
           });
         }
@@ -540,33 +570,46 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
               content.push({ text: links.join(' | '), style: 'duration', margin: [0, 0, 0, 5] });
             }
             if (project.description) {
-              project.description.split('\n').filter(Boolean).forEach(bullet => {
-                content.push({ text: `• ${bullet.replace(/^[•\-*]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
-              });
-            }
+               const bulletLines = project.description.split('\n').filter(Boolean);
+               const maxLines = isSinglePageMode ? 3 : bulletLines.length;
+               bulletLines.slice(0, maxLines).forEach(bullet => {
+                 content.push({ text: `• ${bullet.replace(/^[•\-*]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
+               });
+               if (isSinglePageMode && bulletLines.length > maxLines) {
+                 content.push({ text: '…', style: 'body', margin: [10, 0, 0, 3] });
+               }
+             }
             addSpacer();
           });
         }
         break;
 
       case 'skills':
-        if (data.skills || (data.ratedSkills && data.ratedSkills.length)) {
+        if ((data.ratedSkills && data.ratedSkills.length) || (data.skills && data.skills.trim())) {
           content.push({ text: 'SKILLS', style: 'sectionHeader' });
-          // Rated skills first (stars)
+
+          // Build combined bullet list
+          const bullets = [];
           if (data.ratedSkills && data.ratedSkills.length) {
             data.ratedSkills.forEach(skill => {
               if (skill.name) {
                 const ratingNum = getRatingNumber(skill.rating);
                 const stars = '★'.repeat(ratingNum) + '☆'.repeat(5 - ratingNum);
-                content.push({ text: `${skill.name} ${stars}`, style: 'body', margin: [0, 0, 0, 3] });
+                bullets.push(`${skill.name} ${stars}`);
               }
             });
-            addSpacer();
           }
           if (data.skills) {
-            data.skills.split('\n').filter(Boolean).forEach(line => {
-              content.push({ text: line, style: 'body', margin: [0, 0, 0, 3] });
-            });
+            data.skills.split('\n').filter(Boolean).forEach(line => bullets.push(line));
+          }
+
+          if (isSinglePageMode && bullets.length > 4) {
+            const half = Math.ceil(bullets.length / 2);
+            const col1 = bullets.slice(0, half).map(b => ({ text: `• ${b}`, style: 'body', margin: [0, 0, 0, 2] }));
+            const col2 = bullets.slice(half).map(b => ({ text: `• ${b}`, style: 'body', margin: [0, 0, 0, 2] }));
+            content.push({ columns: [{ width: '50%', stack: col1 }, { width: '50%', stack: col2 }] });
+          } else {
+            bullets.forEach(b => content.push({ text: `• ${b}`, style: 'body', margin: [0, 0, 0, 2] }));
           }
           addSpacer();
         }
@@ -625,10 +668,20 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
         break;
 
       case 'languages':
-        if (data.languages && data.languages.length) {
+        if (data.languages && data.languages.length > 0) {
           content.push({ text: 'LANGUAGES', style: 'sectionHeader' });
-          const list = data.languages.map(l => l.proficiency ? `${l.language} (${l.proficiency})` : l.language).join(', ');
-          content.push({ text: list, style: 'body', margin: [0, 0, 0, 10] });
+
+          const langStrings = data.languages.map(l => l.proficiency ? `${l.language} (${l.proficiency})` : l.language);
+
+          if (isSinglePageMode && langStrings.length > 4) {
+            const half = Math.ceil(langStrings.length / 2);
+            const col1 = langStrings.slice(0, half).map(l => ({ text: `• ${l}`, style: 'body', margin: [0, 0, 0, 2] }));
+            const col2 = langStrings.slice(half).map(l => ({ text: `• ${l}`, style: 'body', margin: [0, 0, 0, 2] }));
+            content.push({ columns: [{ width: '50%', stack: col1 }, { width: '50%', stack: col2 }] });
+          } else {
+            langStrings.forEach(l => content.push({ text: `• ${l}`, style: 'body', margin: [0, 0, 0, 2] }));
+          }
+          addSpacer();
         }
         break;
     }
@@ -903,38 +956,38 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
     content: content,
     styles: {
       name: {
-        fontSize: isSinglePageMode ? 18 : 20, // Slightly smaller in single-page mode
+        fontSize: isSinglePageMode ? 16 : 20, // Slightly smaller in single-page mode
         bold: true,
         color: '#2c3e50'
       },
       contact: {
-        fontSize: isSinglePageMode ? 9 : 10, // Smaller contact info in single-page mode
+        fontSize: isSinglePageMode ? 8 : 10, // Smaller contact info in single-page mode
         color: '#5a6c7d'
       },
       sectionHeader: {
-        fontSize: isSinglePageMode ? 11 : 12, // Smaller headers in single-page mode
+        fontSize: isSinglePageMode ? 10 : 12, // Smaller headers in single-page mode
         bold: true,
         color: '#2c3e50',
-        margin: isSinglePageMode ? [0, 10, 0, 6] : [0, 15, 0, 8], // Reduced margins
+        margin: isSinglePageMode ? [0, 8, 0, 4] : [0, 12, 0, 6], // Further reduced margins for single-page
         decoration: 'underline'
       },
       jobTitle: {
-        fontSize: isSinglePageMode ? 10 : 11,
+        fontSize: isSinglePageMode ? 9 : 11,
         bold: true,
         color: '#34495e'
       },
       duration: {
-        fontSize: isSinglePageMode ? 8 : 9,
+        fontSize: isSinglePageMode ? 7 : 9,
         color: '#7f8c8d',
         italics: true
       },
       body: {
-        fontSize: isSinglePageMode ? 9 : 10, // Smaller body text in single-page mode
+        fontSize: isSinglePageMode ? 8 : 10, // Smaller body text in single-page mode
         color: '#2c3e50',
-        lineHeight: isSinglePageMode ? 1.2 : 1.3 // Tighter line height
+        lineHeight: isSinglePageMode ? 1.15 : 1.3 // Tighter line height
       }
     },
-    pageMargins: isSinglePageMode ? [30, 30, 30, 30] : [40, 40, 40, 40] // Smaller margins
+    pageMargins: isSinglePageMode ? [25, 25, 25, 25] : [40, 40, 40, 40] // Smaller margins
   };
   
   // Add single-page mode specific settings
@@ -945,16 +998,23 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
       return false;
     };
     
-    // Apply more aggressive content reduction for single-page mode
+    // Remove trailing blank lines/dividers to save space
+    while (content.length && ((content[content.length - 1].text === '') || content[content.length - 1].canvas)) {
+      content.pop();
+    }
+
+    // Apply aggressive content reduction for single-page mode
     content = limitContentForSinglePage(content);
-    
-    // Set page size and margins for strict single-page mode
+    docDefinition.content = content;
+
+    // Set page size and restrict to one page
     docDefinition.pageSize = 'A4';
     docDefinition.pageOrientation = 'portrait';
-    
-    // Add page overflow handling
+    docDefinition.maxPagesNumber = 1;
+
+    // Slightly smaller default style for extra room
     docDefinition.defaultStyle = {
-      fontSize: 8, // Even smaller base font size
+      fontSize: 8,
       lineHeight: 1.1
     };
   }
