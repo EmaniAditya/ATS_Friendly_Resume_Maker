@@ -724,7 +724,8 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
     pageMargins: [40, 40, 40, 40]
   };
 
-// Professional Summary
+if (!isSinglePageMode) {
+   // Professional Summary
   if (data.summary) {
     content.push({ text: 'PROFESSIONAL SUMMARY', style: 'sectionHeader' });
     content.push({ text: data.summary, style: 'body', margin: [0, 0, 0, 10] });
@@ -954,6 +955,8 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
     });
   }
   
+  }
+
   // Configure document based on single-page mode
   const docDefinition = {
     content: content,
@@ -1020,6 +1023,9 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
       fontSize: 8,
       lineHeight: 1.1
     };
+
+    // Return immediately to prevent legacy multi-page section builders from executing
+    return docDefinition;
   }
   
   return docDefinition;
