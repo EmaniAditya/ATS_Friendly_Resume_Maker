@@ -1,6 +1,64 @@
 body {
   background-color: #f8f9fa;
   padding: 20px;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Main layout containers */
+.main-layout {
+  height: calc(100vh - 140px); /* Account for header and padding */
+  display: flex;
+  gap: 20px;
+}
+
+.input-container {
+  flex: 1;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  padding: 20px;
+  max-height: 100%;
+}
+
+.preview-container {
+  flex: 1;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  padding: 20px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Mobile responsive layout */
+@media (max-width: 767px) {
+  body {
+    padding: 10px;
+    height: 100vh;
+  }
+  
+  .main-layout {
+    flex-direction: column;
+    height: calc(100vh - 100px);
+    gap: 10px;
+  }
+  
+  .preview-container {
+    flex: 1;
+    order: 1;
+    max-height: 50%;
+  }
+  
+  .input-container {
+    flex: 1;
+    order: 2;
+    max-height: 50%;
+  }
 }
 
 #resumePreview {
@@ -308,11 +366,16 @@ body {
 
 /* Ensure the resume preview is properly rendered */
 #resumePreview {
-  background-color: white;
+  background: white;
   padding: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  min-height: 297mm; /* A4 height */
-  width: 210mm; /* A4 width */
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  min-height: 400px;
+  font-family: 'Times New Roman', serif;
+  line-height: 1.4;
+  color: #333;
+  width: 100%;
+  max-width: 800px;
   margin: 0 auto;
   overflow-x: hidden;
-} 
+}
