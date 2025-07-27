@@ -181,9 +181,9 @@ body {
 
 .form-section {
   background-color: white;
-  padding: 20px;
+  padding: 15px; /* reduced */
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
 }
 
@@ -311,6 +311,11 @@ h1.text-center {
   .preview-container {
     flex: 0 0 75%;
     max-width: 75%;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+
   }
 
   /* Remove default Bootstrap padding and center for full-width layout */
@@ -401,6 +406,8 @@ h1.text-center {
 #resumePreview {
   background: white;
   padding: 20px;
+  overflow-y: auto;
+  max-height: 80vh;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   min-height: 400px;
