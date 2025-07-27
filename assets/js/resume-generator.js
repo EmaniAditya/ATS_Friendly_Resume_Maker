@@ -543,13 +543,9 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
             }
             if (exp.description) {
                const bulletLines = exp.description.split('\n').filter(Boolean);
-               const maxLines = isSinglePageMode ? 3 : bulletLines.length;
-               bulletLines.slice(0, maxLines).forEach(bullet => {
+               bulletLines.forEach(bullet => {
                  content.push({ text: `• ${bullet.replace(/^[•\-*]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
                });
-               if (isSinglePageMode && bulletLines.length > maxLines) {
-                 content.push({ text: '…', style: 'body', margin: [10, 0, 0, 3] });
-               }
              }
             addSpacer();
           });
@@ -574,13 +570,9 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
             }
             if (project.description) {
                const bulletLines = project.description.split('\n').filter(Boolean);
-               const maxLines = isSinglePageMode ? 3 : bulletLines.length;
-               bulletLines.slice(0, maxLines).forEach(bullet => {
+               bulletLines.forEach(bullet => {
                  content.push({ text: `• ${bullet.replace(/^[•\-*]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
                });
-               if (isSinglePageMode && bulletLines.length > maxLines) {
-                 content.push({ text: '…', style: 'body', margin: [10, 0, 0, 3] });
-               }
              }
             addSpacer();
           });
@@ -1009,8 +1001,8 @@ if (!isSinglePageMode) {
       content.pop();
     }
 
-    // Apply aggressive content reduction for single-page mode
-    content = limitContentForSinglePage(content);
+    // Single page mode: Include all content but use smaller fonts and tighter spacing
+    // (Content limiting removed to prevent data loss - formatting handles page constraints)
     docDefinition.content = content;
 
     // Set page size and restrict to one page
