@@ -511,9 +511,12 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
   // Helper adds divider + spacer in single-page mode, or just spacer otherwise
   const divider = { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, color: '#cccccc' }], margin: [0, 4, 0, 8] };
   const addSpacer = () => {
-    if (isSinglePageMode) content.push(divider);
-    content.push({ text: '', margin: [0, 0, 0, spacerSize] });
-  };
+      if (isSinglePageMode) {
+        // No extra vertical space in extreme compact mode
+        return;
+      }
+      content.push({ text: '', margin: [0, 0, 0, spacerSize] });
+    };
 
   sectionOrder.forEach(section => {
     switch (section) {
@@ -700,7 +703,7 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
   };
   const palette = stylePalettes[data.template] || stylePalettes.classic;
 
-  return {
+  if (!isSinglePageMode) return {
     content: content,
     styles: {
       name: { fontSize: 20, bold: true, color: palette.primary },
@@ -956,38 +959,38 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
     content: content,
     styles: {
       name: {
-        fontSize: isSinglePageMode ? 16 : 20, // Slightly smaller in single-page mode
+        fontSize: isSinglePageMode ? 14 : 20, // Slightly smaller in single-page mode
         bold: true,
         color: '#2c3e50'
       },
       contact: {
-        fontSize: isSinglePageMode ? 8 : 10, // Smaller contact info in single-page mode
+        fontSize: isSinglePageMode ? 7 : 10, // Extreme compact contact info
         color: '#5a6c7d'
       },
       sectionHeader: {
-        fontSize: isSinglePageMode ? 10 : 12, // Smaller headers in single-page mode
+        fontSize: isSinglePageMode ? 9 : 12, // Extreme compact headers
         bold: true,
         color: '#2c3e50',
         margin: isSinglePageMode ? [0, 8, 0, 4] : [0, 12, 0, 6], // Further reduced margins for single-page
         decoration: 'underline'
       },
       jobTitle: {
-        fontSize: isSinglePageMode ? 9 : 11,
+        fontSize: isSinglePageMode ? 8 : 11,
         bold: true,
         color: '#34495e'
       },
       duration: {
-        fontSize: isSinglePageMode ? 7 : 9,
+        fontSize: isSinglePageMode ? 6 : 9,
         color: '#7f8c8d',
         italics: true
       },
       body: {
-        fontSize: isSinglePageMode ? 8 : 10, // Smaller body text in single-page mode
+        fontSize: isSinglePageMode ? 7 : 10, // Extreme compact body
         color: '#2c3e50',
-        lineHeight: isSinglePageMode ? 1.15 : 1.3 // Tighter line height
+        lineHeight: isSinglePageMode ? 1.1 : 1.3 // Tighter line height
       }
     },
-    pageMargins: isSinglePageMode ? [25, 25, 25, 25] : [40, 40, 40, 40] // Smaller margins
+    pageMargins: isSinglePageMode ? [20, 15, 20, 15] : [40, 40, 40, 40] // Smaller margins
   };
   
   // Add single-page mode specific settings
