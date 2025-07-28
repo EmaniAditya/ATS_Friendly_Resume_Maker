@@ -522,14 +522,14 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
     switch (section) {
       case 'summary':
         if (data.summary) {
-          content.push({ text: 'PROFESSIONAL SUMMARY', style: 'sectionHeader' });
+          content.push({ text: 'SUMMARY', style: 'sectionHeader' });
           content.push({ text: data.summary, style: 'body', margin: [0, 0, 0, 10] });
         }
         break;
 
       case 'experience':
         if (data.experience && data.experience.length) {
-          content.push({ text: 'PROFESSIONAL EXPERIENCE', style: 'sectionHeader' });
+          content.push({ text: 'EXPERIENCE', style: 'sectionHeader' });
           data.experience.forEach(exp => {
             if (exp.title && exp.company) {
               content.push({ text: `${exp.title} | ${exp.company}`, style: 'jobTitle', margin: [0, 0, 0, 2] });
@@ -652,7 +652,7 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
 
       case 'achievements':
         if (data.achievements && data.achievements.length) {
-          content.push({ text: 'ACHIEVEMENTS', style: 'sectionHeader' });
+          content.push({ text: 'ACHIEVEMENTS & HONORS', style: 'sectionHeader' });
           data.achievements.forEach(a => {
             if (a.title) content.push({ text: a.title, style: 'jobTitle', margin: [0, 0, 0, 2] });
             if (a.date) content.push({ text: a.date, style: 'duration', margin: [0, 0, 0, 5] });
@@ -695,7 +695,8 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
   };
   const palette = stylePalettes[data.template] || stylePalettes.classic;
 
-  if (!isSinglePageMode) return {
+  /* if (!isSinglePageMode) return {
+    images: {},
     content: content,
     styles: {
       name: { fontSize: 20, bold: true, color: palette.primary },
@@ -706,22 +707,12 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
         color: palette.primary,
         margin: [0, 15, 0, 8],
         decoration: data.template === 'professional' ? 'underline' : undefined,
-        fillColor: palette.headerFill || undefined,
-        alignment: 'left'
-      },
-      jobTitle: { fontSize: 11, bold: true, color: palette.secondary },
-      duration: { fontSize: 9, color: '#7f8c8d', italics: true },
-      body: { fontSize: 10, color: palette.primary, lineHeight: 1.3 }
-    },
-    pageMargins: [40, 40, 40, 40]
-  };
 
-if (!isSinglePageMode) {
-   // Professional Summary
-  if (data.summary) {
-    content.push({ text: 'PROFESSIONAL SUMMARY', style: 'sectionHeader' });
-    content.push({ text: data.summary, style: 'body', margin: [0, 0, 0, 10] });
-  }
+// Professional Summary
+if (data.summary) {
+content.push({ text: 'SUMMARY', style: 'sectionHeader' });
+content.push({ text: data.summary, style: 'body', margin: [0, 0, 0, 10] });
+}
   
   // Skills
   if (data.skills) {
@@ -756,7 +747,7 @@ if (!isSinglePageMode) {
   
   // Experience
   if (data.experience && data.experience.length > 0) {
-    content.push({ text: 'PROFESSIONAL EXPERIENCE', style: 'sectionHeader' });
+    content.push({ text: 'EXPERIENCE', style: 'sectionHeader' });
     data.experience.forEach(exp => {
       if (exp.title && exp.company) {
         content.push({
@@ -921,7 +912,7 @@ if (!isSinglePageMode) {
   
   // Achievements
   if (data.achievements && data.achievements.length > 0) {
-    content.push({ text: 'ACHIEVEMENTS', style: 'sectionHeader' });
+    content.push({ text: 'ACHIEVEMENTS & HONORS', style: 'sectionHeader' });
     data.achievements.forEach(achievement => {
       if (achievement.title) {
         content.push({
@@ -947,47 +938,44 @@ if (!isSinglePageMode) {
     });
   }
   
+  */
+  // ----- Smart trimming for single-page mode -----
+  if (isSinglePageMode) {
+    const MAX_ITEMS = 220; // rough estimate of items that fit on one A4 page with compact style
+    if (content.length > MAX_ITEMS) {
+      let cutIndex = MAX_ITEMS;
+      for (let i = MAX_ITEMS; i >= 0; i--) {
+        if (content[i] && content[i].style === 'sectionHeader') {
+          cutIndex = i;
+          break;
+        }
+      }
+      content = content.slice(0, cutIndex);
+      content.push({ text: '…', style: 'body', alignment: 'center', margin: [0, 4, 0, 0] });
+    }
   }
 
-  // Configure document based on single-page mode
+  // ----- Build docDefinition (applies to both modes) -----
   const docDefinition = {
-    content: content,
+    images: {},
+    content,
     styles: {
-      name: {
-        fontSize: isSinglePageMode ? 18 : 20, // Increased from 14 to 18
-        bold: true,
-        color: '#2c3e50'
-      },
-      contact: {
-        fontSize: isSinglePageMode ? 9 : 10, // Increased from 7 to 9
-        color: '#5a6c7d'
-      },
+      name: { fontSize: isSinglePageMode ? 18 : 20, bold: true, color: palette.primary },
+      contact: { fontSize: isSinglePageMode ? 9 : 10, color: '#5a6c7d' },
       sectionHeader: {
-        fontSize: isSinglePageMode ? 10 : 12, // Increased from 9 to 10
+        fontSize: isSinglePageMode ? 10 : 12,
         bold: true,
-        color: '#2c3e50',
-        margin: isSinglePageMode ? [0, 4, 0, 2] : [0, 12, 0, 6], // Further reduced margins for space
-        decoration: 'underline'
+        color: palette.primary,
+        margin: isSinglePageMode ? [0, 4, 0, 2] : [0, 15, 0, 8],
+        decoration: isSinglePageMode ? 'underline' : undefined
       },
-      jobTitle: {
-        fontSize: isSinglePageMode ? 9 : 11, // Increased from 8 to 9
-        bold: true,
-        color: '#34495e'
-      },
-      duration: {
-        fontSize: isSinglePageMode ? 8 : 9, // Increased from 6 to 8
-        color: '#7f8c8d',
-        italics: true
-      },
-      body: {
-        fontSize: isSinglePageMode ? 9 : 10, // Increased from 7 to 9
-        color: '#2c3e50',
-        lineHeight: isSinglePageMode ? 1.0 : 1.3 // Further reduced for even tighter spacing
-      }
+      jobTitle: { fontSize: isSinglePageMode ? 9 : 11, bold: true, color: palette.secondary },
+      duration: { fontSize: isSinglePageMode ? 8 : 9, color: '#7f8c8d', italics: true },
+      body: { fontSize: isSinglePageMode ? 9 : 10, color: palette.primary, lineHeight: isSinglePageMode ? 1.0 : 1.3 }
     },
-    pageMargins: isSinglePageMode ? [20, 15, 20, 15] : [40, 40, 40, 40] // Smaller margins
+    pageMargins: isSinglePageMode ? [20, 15, 20, 15] : [40, 40, 40, 40]
   };
-  
+
   // Add single-page mode specific settings
   if (isSinglePageMode) {
     // Strict single-page enforcement: limit content and prevent page breaks
