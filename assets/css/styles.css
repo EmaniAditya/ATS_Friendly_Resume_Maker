@@ -1,6 +1,87 @@
 body {
   background-color: #f8f9fa;
   padding: 20px;
+  padding-top: 90px; /* space for fixed top bar */
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Fixed Top Navigation Bar */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  padding: 15px 25px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  z-index: 1000;
+}
+
+.top-bar h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.top-bar a {
+  text-decoration: none;
+}
+
+/* Main layout containers */
+.main-layout {
+  height: calc(100vh - 100px); /* account for fixed top-bar and page padding */
+  display: flex;
+  gap: 20px;
+}
+
+.input-container {
+  flex: 1 1 50%; /* prevent overgrowing */
+  min-height: 0; /* important for flex scroll */
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  padding: 20px;
+  max-height: 100%;
+}
+
+.preview-container {
+  flex: 1;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  padding: 20px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Mobile responsive layout */
+@media (max-width: 767px) {
+  body {
+    padding: 10px;
+    height: 100vh;
+  }
+  
+  .main-layout {
+    flex-direction: column;
+    height: calc(100vh - 100px);
+    gap: 10px;
+  }
+  
+  .preview-container {
+    flex: 1;
+    order: 1;
+    max-height: 50%;
+  }
+  
+  .input-container {
+    flex: 1;
+    order: 2;
+    max-height: 50%;
+  }
 }
 
 #resumePreview {
@@ -38,6 +119,11 @@ body {
 }
 
 /* Toggle switch for compact mode */
+input.form-control, textarea.form-control, select.form-select {
+  font-size: 0.9rem;
+  padding: 6px 8px;
+}
+
 .form-check-label {
   user-select: none;
 }
@@ -64,9 +150,9 @@ body {
 
 .template-modern h4 {
   margin-top: 15px;
-  color: #2a5885;
   font-weight: bold;
-  border-bottom: 2px solid #2a5885;
+  color: #1a5276; /* Teal */
+  border-bottom: 2px solid #1a5276;
   padding-bottom: 4px;
 }
 
@@ -79,9 +165,9 @@ body {
 .template-minimalist h4 {
   margin-top: 15px;
   font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 14px;
+  color: #222222; /* Charcoal */
+  border-bottom: 1px solid #222222;
+  padding-bottom: 4px;
 }
 
 .template-professional h2 {
@@ -93,12 +179,14 @@ body {
 .template-professional h4 {
   margin-top: 15px;
   font-weight: bold;
-  background-color: #f8f9fa;
-  padding: 5px;
+  color: #2c3e50; /* Deep blue */
+  border-bottom: 2px solid #2c3e50;
+  padding-bottom: 4px;
 }
 
 .form-label {
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .contact-info {
@@ -121,16 +209,58 @@ body {
 
 .form-section {
   background-color: white;
-  padding: 20px;
+  padding: 15px; /* reduced */
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
 }
 
 .section-title {
   border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-  margin-bottom: 15px;
+  font-size: 1rem; /* smaller */
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.section-title:hover {
+  color: #007bff;
+  background-color: #f8f9fa;
+  padding: 10px;
+  margin: -10px -10px 15px -10px;
+  border-radius: 5px;
+}
+
+.section-title::after {
+  content: '▼';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s ease;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.section-title.collapsed::after {
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+.section-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  max-height: none;
+  opacity: 1;
+}
+
+.section-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .ats-tip {
@@ -190,8 +320,70 @@ body {
   align-items: center;
 }
 
-/* Sticky preview on scroll for desktop */
+h1.text-center {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+/* Compact footer overlay (removed) */
+footer {
+  position: fixed;
+  bottom: 4px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 0.8rem;
+  padding: 2px 0;
+  background: transparent;
+  pointer-events: none; /* allow clicks to pass through */
+}
+
+footer a { pointer-events:auto; }
+
+@media (max-width: 767px) {
+  h1.text-center {
+    font-size: 1.4rem;
+  }
+}
+
+/* Desktop width ratio 25/75 */
 @media (min-width: 992px) {
+  /* Remove right-side padding so preview can touch the screen edge */
+  body {
+    padding-right: 0;
+  }
+  .input-container {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  .preview-container {
+    flex: 0 0 75%;
+    max-width: 75%;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    justify-content: flex-end; /* push preview to far right */
+
+  }
+
+  /* Remove default Bootstrap padding and center for full-width layout */
+  .container {
+    max-width: 100% !important;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .main-layout {
+    gap: 0;
+  }
+
+  #resumePreview {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  /* Sticky preview on scroll */
   .sticky-preview {
     position: sticky;
     top: 20px;
@@ -266,11 +458,18 @@ body {
 
 /* Ensure the resume preview is properly rendered */
 #resumePreview {
-  background-color: white;
+  background: white;
   padding: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  min-height: 297mm; /* A4 height */
-  width: 210mm; /* A4 width */
+  overflow-y: auto;
+  max-height: 80vh;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  min-height: 400px;
+  font-family: 'Times New Roman', serif;
+  line-height: 1.4;
+  color: #333;
+  width: 100%;
+  max-width: 800px;
   margin: 0 auto;
   overflow-x: hidden;
-} 
+}

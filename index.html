@@ -11,8 +11,16 @@
   <link href="assets/css/styles.css" rel="stylesheet" />
 </head>
 <body>
+  <!-- Top Navigation Bar -->
+  <div class="top-bar d-flex justify-content-between align-items-center">
+    <h1 class="m-0">ATS Friendly Resume Maker</h1>
+    <p class="mb-0 small text-muted">
+      Designed by <a href="https://github.com/anjalisahu4644" target="_blank">@anjalisahu4644</a> |
+      Developed by <a href="https://github.com/EmaniAditya" target="_blank">@EmaniAditya</a>
+    </p>
+  </div>
   <div class="container">
-    <h1 class="text-center mb-4">ATS Friendly Resume Maker</h1>
+
     
     <!-- Loading Spinner -->
     <div class="loading-spinner" id="loadingSpinner">
@@ -34,368 +42,392 @@
       </div>
     </div>
     
-    <div class="row">
-      <div class="col-md-6">
+    <div class="main-layout">
+      <div class="input-container">
         <!-- Form Sections -->
         <div class="form-section">
-          <h3 class="section-title">Personal Information</h3>
-          <div class="mb-3">
-            <label class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="fullName" placeholder="Full Name" required />
-            <div class="ats-tip">Use your legal name as it appears on official documents</div>
-          </div>
-          
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" placeholder="Email Address" />
+          <h3 class="section-title" onclick="toggleSection(this)">Personal Information</h3>
+          <div class="section-content">
+            <div class="mb-3">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="fullName" placeholder="Full Name" required />
+              <div class="ats-tip">Use your legal name as it appears on official documents</div>
             </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Phone Number</label>
-              <input type="text" class="form-control" id="phone" placeholder="Phone Number" />
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="Email Address" />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="phone" placeholder="Phone Number" />
+              </div>
             </div>
-          </div>
-          
-          <div class="row">
-            <div class="col-md-4 mb-3">
-              <label class="form-label">GitHub</label>
-              <input type="text" class="form-control" id="github" placeholder="GitHub URL" />
+            
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">GitHub</label>
+                <input type="text" class="form-control" id="github" placeholder="GitHub URL" />
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">LinkedIn</label>
+                <input type="text" class="form-control" id="linkedin" placeholder="LinkedIn URL" />
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Website</label>
+                <input type="text" class="form-control" id="website" placeholder="Personal Website URL" />
+              </div>
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">LinkedIn</label>
-              <input type="text" class="form-control" id="linkedin" placeholder="LinkedIn URL" />
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Job Title</label>
+                <input type="text" class="form-control" id="jobTitle" placeholder="e.g., Software Developer" />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-control" id="location" placeholder="City, State/Country" />
+              </div>
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Website</label>
-              <input type="text" class="form-control" id="website" placeholder="Personal Website URL" />
+            
+            <div class="mb-3">
+              <label class="form-label">Date of Birth (Optional)</label>
+              <input type="text" class="form-control" id="dob" placeholder="DD/MM/YYYY" />
+              <div class="ats-tip">Only include if specifically requested by the employer</div>
             </div>
-          </div>
-          
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Job Title</label>
-              <input type="text" class="form-control" id="jobTitle" placeholder="e.g., Software Developer" />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Location</label>
-              <input type="text" class="form-control" id="location" placeholder="City, State/Country" />
-            </div>
-          </div>
-          
-          <div class="mb-3">
-            <label class="form-label">Date of Birth (Optional)</label>
-            <input type="text" class="form-control" id="dob" placeholder="DD/MM/YYYY" />
-            <div class="ats-tip">Only include if specifically requested by the employer</div>
           </div>
         </div>
         
         <div class="form-section">
-          <h3 class="section-title">Summary</h3>
-          <div class="mb-3">
-            <textarea class="form-control" id="summary" rows="4" placeholder="Brief professional summary (3-4 sentences)"></textarea>
-            <div class="ats-tip">Include relevant keywords and highlight your expertise</div>
+          <h3 class="section-title" onclick="toggleSection(this)">Summary</h3>
+          <div class="section-content">
+            <div class="mb-3">
+              <textarea class="form-control" id="summary" rows="4" placeholder="Brief professional summary (3-4 sentences)"></textarea>
+              <div class="ats-tip">Include relevant keywords and highlight your expertise</div>
+            </div>
           </div>
         </div>
         
         <div class="form-section">
-          <h3 class="section-title">Skills</h3>
-          <div class="mb-3">
-            <div id="skillsContainer">
-              <div class="skill-group mb-2">
-                <label class="form-label">Technical Skills</label>
-                <input type="text" class="form-control" id="technicalSkills" placeholder="Technical skills (comma separated)" />
-              </div>
-              <div class="skill-group mb-2">
-                <label class="form-label">Soft Skills</label>
-                <input type="text" class="form-control" id="softSkills" placeholder="Soft skills (comma separated)" />
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Add Individual Skills with Ratings (Optional)</label>
-                <div class="ats-tip">Adding individual skills with ratings can help highlight your proficiency levels</div>
-                <div id="ratedSkillsContainer">
-                  <div class="rated-skill-item input-group mb-2">
-                    <input type="text" class="form-control skillName" placeholder="Skill name (e.g., Python, Project Management)" />
-                    <select class="form-select skillRating" style="max-width: 150px;">
-                      <option value="Beginner">Beginner</option>
-                      <option value="Intermediate">Intermediate</option>
-                      <option value="Advanced">Advanced</option>
-                      <option value="Expert">Expert</option>
-                    </select>
-                    <button type="button" class="btn btn-outline-secondary" onclick="removeRatedSkill(this)">×</button>
+          <h3 class="section-title" onclick="toggleSection(this)">Skills</h3>
+          <div class="section-content">
+            <div class="mb-3">
+              <div id="skillsContainer">
+                <div class="skill-group mb-2">
+                  <label class="form-label">Technical Skills</label>
+                  <input type="text" class="form-control" id="technicalSkills" placeholder="Technical skills (comma separated)" />
+                </div>
+                <div class="skill-group mb-2">
+                  <label class="form-label">Soft Skills</label>
+                  <input type="text" class="form-control" id="softSkills" placeholder="Soft skills (comma separated)" />
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Add Individual Skills with Ratings (Optional)</label>
+                  <div class="ats-tip">Adding individual skills with ratings can help highlight your proficiency levels</div>
+                  <div id="ratedSkillsContainer">
+                    <div class="rated-skill-item input-group mb-2">
+                      <input type="text" class="form-control skillName" placeholder="Skill name (e.g., Python, Project Management)" />
+                      <select class="form-select skillRating" style="max-width: 150px;">
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Expert">Expert</option>
+                      </select>
+                      <button type="button" class="btn btn-outline-secondary" onclick="removeRatedSkill(this)">×</button>
+                    </div>
                   </div>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addRatedSkill()">+ Add Skill with Rating</button>
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addRatedSkill()">+ Add Skill with Rating</button>
               </div>
+              <div class="ats-tip">Include specific technologies, programming languages, and tools</div>
             </div>
-            <div class="ats-tip">Include specific technologies, programming languages, and tools</div>
           </div>
         </div>
         
         <div class="form-section">
-          <h3 class="section-title">Languages</h3>
-          <div id="languagesContainer">
-            <div class="languages-item">
-              <div class="row mb-2">
-                <div class="col-md-6">
-                  <label class="form-label">Language</label>
-                  <input type="text" class="form-control language" placeholder="Language Name" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Proficiency</label>
-                  <select class="form-select proficiency">
-                    <option value="">Select Proficiency</option>
-                    <option value="Basic">Basic</option>
-                    <option value="Conversational">Conversational</option>
-                    <option value="Proficient">Proficient</option>
-                    <option value="Fluent">Fluent</option>
-                    <option value="Native">Native</option>
-                  </select>
-                </div>
-              </div>
-              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeLanguage(this)">Remove</button>
-            </div>
-          </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addLanguage()">+ Add Another Language</button>
-        </div>
-
-        <div class="form-section">
-          <h3 class="section-title">Achievements & Honors</h3>
-          <div id="achievementsContainer">
-            <div class="achievements-item">
-              <div class="row mb-2">
-                <div class="col-md-8">
-                  <label class="form-label">Achievement Title</label>
-                  <input type="text" class="form-control achievementTitle" placeholder="Achievement or Honor Title" />
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">Date (Optional)</label>
-                  <input type="text" class="form-control achievementDate" placeholder="MM/YYYY" />
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Description</label>
-                <textarea class="form-control achievementDescription" rows="2" placeholder="Describe the achievement or honor"></textarea>
-              </div>
-              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeAchievement(this)">Remove</button>
-            </div>
-          </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addAchievement()">+ Add Another Achievement</button>
-        </div>
-        
-        <div class="form-section">
-          <h3 class="section-title">Experience</h3>
-          <div id="experienceContainer">
-            <div class="experience-item">
-              <div class="row mb-2">
-                <div class="col-md-6">
-                  <label class="form-label">Company</label>
-                  <input type="text" class="form-control company" placeholder="Company Name" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Job Title</label>
-                  <input type="text" class="form-control title" placeholder="Job Title" />
-                </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-6">
-                  <label class="form-label">Start Date</label>
-                  <input type="text" class="form-control startDate" placeholder="MM/YYYY" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">End Date</label>
-                  <input type="text" class="form-control endDate" placeholder="MM/YYYY or Present" />
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Responsibilities & Achievements</label>
-                <textarea class="form-control description" rows="3" placeholder="• Use bullet points starting with action verbs&#10;• Quantify achievements when possible&#10;• Include relevant keywords"></textarea>
-              </div>
-              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeExperience(this)">Remove</button>
-            </div>
-          </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addExperience()">+ Add Another Experience</button>
-        </div>
-        
-        <div class="form-section">
-          <h3 class="section-title">Education</h3>
-          <div id="educationContainer">
-            <div class="education-item">
-              <div class="row mb-2">
-                <div class="col-md-6">
-                  <label class="form-label">Institution</label>
-                  <input type="text" class="form-control institution" placeholder="University/College Name" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Degree</label>
-                  <input type="text" class="form-control degree" placeholder="Degree & Major" />
-                </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-6">
-                  <label class="form-label">Start Date</label>
-                  <input type="text" class="form-control educationStartDate" placeholder="MM/YYYY" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">End Date</label>
-                  <input type="text" class="form-control educationEndDate" placeholder="MM/YYYY or Expected MM/YYYY" />
-                </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-6">
-                  <label class="form-label">GPA/Percentage</label>
-                  <div class="input-group">
-                    <input type="text" class="form-control gpa" placeholder="Score (e.g., 3.8 or 85%)" />
-                    <select class="form-select scoreType" style="max-width: 100px;">
-                      <option value="gpa">GPA</option>
-                      <option value="percentage">Percentage</option>
-                      <option value="none">None</option>
+          <h3 class="section-title" onclick="toggleSection(this)">Languages</h3>
+          <div class="section-content">
+            <div id="languagesContainer">
+              <div class="languages-item">
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <label class="form-label">Language</label>
+                    <input type="text" class="form-control language" placeholder="Language Name" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Proficiency</label>
+                    <select class="form-select proficiency">
+                      <option value="">Select Proficiency</option>
+                      <option value="Basic">Basic</option>
+                      <option value="Conversational">Conversational</option>
+                      <option value="Proficient">Proficient</option>
+                      <option value="Fluent">Fluent</option>
+                      <option value="Native">Native</option>
                     </select>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <label class="form-label">Location (Optional)</label>
-                  <input type="text" class="form-control educationLocation" placeholder="City, State/Country" />
-                </div>
-              </div>
-              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeEducation(this)">Remove</button>
-            </div>
-          </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addEducation()">+ Add Another Education</button>
-        </div>
-        
-        <div class="form-section">
-          <h3 class="section-title">Certifications</h3>
-          <div id="certificationsContainer">
-            <div class="certifications-item">
-              <div class="row mb-2">
-                <div class="col-md-6">
-                  <label class="form-label">Certification Name</label>
-                  <input type="text" class="form-control certificationName" placeholder="Certification Title" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Issuing Organization</label>
-                  <input type="text" class="form-control certificationOrg" placeholder="Issuing Organization" />
-                </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-6">
-                  <label class="form-label">Issue Date</label>
-                  <input type="text" class="form-control certificationDate" placeholder="MM/YYYY" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Expiration Date (Optional)</label>
-                  <input type="text" class="form-control certificationExpiration" placeholder="MM/YYYY or N/A" />
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Credential ID (Optional)</label>
-                <input type="text" class="form-control credentialID" placeholder="Credential ID" />
-              </div>
-              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeCertification(this)">Remove</button>
-            </div>
-          </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addCertification()">+ Add Another Certification</button>
-        </div>
-        
-        <div class="form-section">
-          <h3 class="section-title">Projects</h3>
-          <div id="projectsContainer">
-            <div class="project-item">
-              <div class="row mb-2">
-                <div class="col-md-6">
-                  <label class="form-label">Project Name</label>
-                  <input type="text" class="form-control projectName" placeholder="Project Name" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Technologies</label>
-                  <input type="text" class="form-control technologies" placeholder="Technologies Used" />
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Description</label>
-                <textarea class="form-control projectDescription" rows="3" placeholder="• Describe the project and your role&#10;• Highlight challenges overcome&#10;• Mention outcomes and impact"></textarea>
-              </div>
-              <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeProject(this)">Remove</button>
-            </div>
-          </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addProject()">+ Add Another Project</button>
-        </div>
-        
-        <div class="form-section">
-          <h3 class="section-title">ATS Optimization</h3>
-          <div class="mb-3">
-            <label class="form-label">Job Description Analysis</label>
-            <textarea class="form-control" id="jobDescription" rows="4" placeholder="Paste job description here to analyze keyword matches and optimize your resume"></textarea>
-            <div class="ats-tip">Paste the job description to highlight matching keywords and optimize your resume</div>
-          </div>
-          <div class="mb-3">
-            <button type="button" class="btn btn-outline-primary w-100" onclick="analyzeJobDescription()">Analyze Keywords</button>
-          </div>
-          <div id="keywordResults" class="mb-3" style="display: none;">
-            <div class="card">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Keyword Analysis</span>
-                <span class="badge bg-primary" id="matchScore">0%</span>
-              </div>
-              <div class="card-body">
-                <h6>Matched Keywords:</h6>
-                <div id="matchedKeywords" class="mb-2"></div>
-                <h6>Missing Keywords:</h6>
-                <div id="missingKeywords"></div>
+                <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeLanguage(this)">Remove</button>
               </div>
             </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addLanguage()">+ Add Another Language</button>
           </div>
         </div>
-        <div class="form-section">
-          <h3 class="section-title">Template & Export</h3>
-          <div class="mb-3">
-            <label class="form-label">Template Style</label>
-            <select class="form-select" id="template" onchange="generateResume()">
-              <option value="classic">Classic</option>
-              <option value="modern">Modern</option>
-              <option value="minimalist">Minimalist</option>
-              <option value="professional">Professional</option>
-            </select>
-            <div class="ats-tip">Classic template has the highest ATS compatibility</div>
-          </div>
 
-          <div class="mb-3">
-            <label class="form-label">Section Order</label>
-            <div class="ats-tip">Drag and drop sections to customize their order in your resume</div>
-            <div class="section-order-container">
-              <ul id="sectionOrder" class="list-group">
-                <li class="list-group-item" data-section="summary">Summary</li>
-                <li class="list-group-item" data-section="skills">Skills</li>
-                <li class="list-group-item" data-section="experience">Experience</li>
-                <li class="list-group-item" data-section="education">Education</li>
-                <li class="list-group-item" data-section="projects">Projects</li>
-                <li class="list-group-item" data-section="certifications">Certifications</li>
-                <li class="list-group-item" data-section="languages">Languages</li>
-                <li class="list-group-item" data-section="achievements">Achievements & Honors</li>
-              </ul>
+        <div class="form-section">
+          <h3 class="section-title" onclick="toggleSection(this)">Achievements & Honors</h3>
+          <div class="section-content">
+            <div id="achievementsContainer">
+              <div class="achievements-item">
+                <div class="row mb-2">
+                  <div class="col-md-8">
+                    <label class="form-label">Achievement Title</label>
+                    <input type="text" class="form-control achievementTitle" placeholder="Achievement or Honor Title" />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Date (Optional)</label>
+                    <input type="text" class="form-control achievementDate" placeholder="MM/YYYY" />
+                  </div>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-control achievementDescription" rows="2" placeholder="Describe the achievement or honor"></textarea>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeAchievement(this)">Remove</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addAchievement()">+ Add Another Achievement</button>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title" onclick="toggleSection(this)">Experience</h3>
+          <div class="section-content">
+            <div id="experienceContainer">
+              <div class="experience-item">
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <label class="form-label">Company</label>
+                    <input type="text" class="form-control company" placeholder="Company Name" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Job Title</label>
+                    <input type="text" class="form-control title" placeholder="Job Title" />
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <label class="form-label">Start Date</label>
+                    <input type="text" class="form-control startDate" placeholder="MM/YYYY" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">End Date</label>
+                    <input type="text" class="form-control endDate" placeholder="MM/YYYY or Present" />
+                  </div>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Responsibilities & Achievements</label>
+                  <textarea class="form-control description" rows="3" placeholder="• Use bullet points starting with action verbs&#10;• Quantify achievements when possible&#10;• Include relevant keywords"></textarea>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeExperience(this)">Remove</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addExperience()">+ Add Another Experience</button>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title" onclick="toggleSection(this)">Education</h3>
+          <div class="section-content">
+            <div id="educationContainer">
+              <div class="education-item">
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <label class="form-label">Institution</label>
+                    <input type="text" class="form-control institution" placeholder="University/College Name" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Degree</label>
+                    <input type="text" class="form-control degree" placeholder="Degree & Major" />
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <label class="form-label">Start Date</label>
+                    <input type="text" class="form-control educationStartDate" placeholder="MM/YYYY" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">End Date</label>
+                    <input type="text" class="form-control educationEndDate" placeholder="MM/YYYY or Expected MM/YYYY" />
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <label class="form-label">GPA/Percentage</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control gpa" placeholder="Score (e.g., 3.8 or 85%)" />
+                      <select class="form-select scoreType" style="max-width: 100px;">
+                        <option value="gpa">GPA</option>
+                        <option value="percentage">Percentage</option>
+                        <option value="none">None</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Location (Optional)</label>
+                    <input type="text" class="form-control educationLocation" placeholder="City, State/Country" />
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeEducation(this)">Remove</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addEducation()">+ Add Another Education</button>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title" onclick="toggleSection(this)">Certifications</h3>
+          <div class="section-content">
+            <div id="certificationsContainer">
+              <div class="certifications-item">
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <label class="form-label">Certification Name</label>
+                    <input type="text" class="form-control certificationName" placeholder="Certification Title" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Issuing Organization</label>
+                    <input type="text" class="form-control certificationOrg" placeholder="Issuing Organization" />
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <label class="form-label">Issue Date</label>
+                    <input type="text" class="form-control certificationDate" placeholder="MM/YYYY" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Expiration Date (Optional)</label>
+                    <input type="text" class="form-control certificationExpiration" placeholder="MM/YYYY or N/A" />
+                  </div>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Credential ID (Optional)</label>
+                  <input type="text" class="form-control credentialID" placeholder="Credential ID" />
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeCertification(this)">Remove</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addCertification()">+ Add Another Certification</button>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title" onclick="toggleSection(this)">Projects</h3>
+          <div class="section-content">
+            <div id="projectsContainer">
+              <div class="project-item">
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <label class="form-label">Project Name</label>
+                    <input type="text" class="form-control projectName" placeholder="Project Name" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Technologies</label>
+                    <input type="text" class="form-control technologies" placeholder="Technologies Used" />
+                  </div>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-control projectDescription" rows="3" placeholder="• Describe the project and your role&#10;• Highlight challenges overcome&#10;• Mention outcomes and impact"></textarea>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger mb-3" onclick="removeProject(this)">Remove</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary btn-add" onclick="addProject()">+ Add Another Project</button>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3 class="section-title" onclick="toggleSection(this)">ATS Optimization</h3>
+          <div class="section-content">
+            <div class="mb-3">
+              <label class="form-label">Job Description Analysis</label>
+              <textarea class="form-control" id="jobDescription" rows="4" placeholder="Paste job description here to analyze keyword matches and optimize your resume"></textarea>
+              <div class="ats-tip">Paste the job description to highlight matching keywords and optimize your resume</div>
+            </div>
+            <div class="mb-3">
+              <button type="button" class="btn btn-outline-primary w-100" onclick="analyzeJobDescription()">Analyze Keywords</button>
+            </div>
+            <div id="keywordResults" class="mb-3" style="display: none;">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <span>Keyword Analysis</span>
+                  <span class="badge bg-primary" id="matchScore">0%</span>
+                </div>
+                <div class="card-body">
+                  <h6>Matched Keywords:</h6>
+                  <div id="matchedKeywords" class="mb-2"></div>
+                  <h6>Missing Keywords:</h6>
+                  <div id="missingKeywords"></div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+        <div class="form-section">
+          <h3 class="section-title" onclick="toggleSection(this)">Export</h3>
+          <div class="section-content">
+            <div class="mb-3">
+              <label class="form-label">Section Order</label>
+              <div class="ats-tip">Drag and drop sections to customize their order in your resume</div>
+              <div class="section-order-container">
+                <ul id="sectionOrder" class="list-group">
+                  <li class="list-group-item" data-section="summary">Summary</li>
+                  <li class="list-group-item" data-section="skills">Skills</li>
+                  <li class="list-group-item" data-section="experience">Experience</li>
+                  <li class="list-group-item" data-section="education">Education</li>
+                  <li class="list-group-item" data-section="projects">Projects</li>
+                  <li class="list-group-item" data-section="certifications">Certifications</li>
+                  <li class="list-group-item" data-section="languages">Languages</li>
+                  <li class="list-group-item" data-section="achievements">Achievements & Honors</li>
+                </ul>
+              </div>
+            </div>
 
-          <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="compactMode" checked>
-            <label class="form-check-label" for="compactMode">Single-page mode (automatically fit content to one page)</label>
-          </div>
+            <div class="mb-3">
+              <label class="form-label">PDF Export Mode</label>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="exportMode" id="freeFlowMode" value="freeflow" checked>
+                <label class="form-check-label" for="freeFlowMode">
+                  Free Flow Mode
+                </label>
+                <div class="ats-tip">Natural content flow with multiple pages if needed</div>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="exportMode" id="singlePageMode" value="singlepage">
+                <label class="form-check-label" for="singlePageMode">
+                  Single-Page Mode
+                </label>
+                <div class="ats-tip">Automatically fit content to one page (Feature in development)</div>
+              </div>
+            </div>
 
           <div class="mb-3">
             <label class="form-label">Export Options</label>
             <div class="row">
-              <div class="col-md-6 mb-2">
+              <div class="col-md-12 mb-2">
                 <button type="button" class="btn btn-primary w-100" onclick="generateResume()">Preview Resume</button>
-              </div>
-              <div class="col-md-6 mb-2">
-                <button type="button" class="btn btn-success w-100" onclick="downloadPDF()">Download PDF</button>
               </div>
             </div>
             <div class="row mt-2">
-              <div class="col-md-6 mb-2">
-                <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#plainTextModal">View Plain Text</button>
+              <div class="col-12 mb-2">
+                <button type="button" class="btn btn-success w-100" onclick="downloadTextBasedPDF()" title="Generates searchable, text-based PDF">
+                  <i class="bi bi-file-earmark-pdf"></i> Download PDF
+                </button>
               </div>
-              <div class="col-md-6 mb-2">
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-12 mb-2">
                 <button type="button" class="btn btn-outline-secondary w-100" onclick="downloadPlainText()">Download Plain Text</button>
               </div>
             </div>
@@ -438,36 +470,16 @@
               Content may exceed one page. Enable single-page mode to auto-fit.
             </div>
           </div>
+          </div>
         </div>
       </div>
       
-      <div class="col-md-6">
-        <div id="resumePreview" class="mt-3"></div>
+      <div class="preview-container">
+        <div id="resumePreview"></div>
       </div>
     </div>
   </div>
 
-  <!-- Plain Text Modal -->
-  <div class="modal fade" id="plainTextModal" tabindex="-1" aria-labelledby="plainTextModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="plainTextModalLabel">Plain Text Resume (ATS-Friendly Format)</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p class="text-muted mb-2">Copy this text for pasting into online application forms:</p>
-          <div class="bg-light p-3 border rounded">
-            <pre id="plainTextContent" class="mb-0" style="white-space: pre-wrap; font-family: monospace;"></pre>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="copyPlainText()">Copy to Clipboard</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Versions Modal -->
   <div class="modal fade" id="versionsModal" tabindex="-1" aria-labelledby="versionsModalLabel" aria-hidden="true">
@@ -537,7 +549,9 @@
 
   <!-- External Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   
   <!-- Application Scripts -->
@@ -547,6 +561,44 @@
   <script src="assets/js/ats-optimizer.js"></script>
   <script src="assets/js/analytics.js"></script>
   <script src="assets/js/app.js"></script>
+  
+  <!-- Collapsible Sections Script -->
+  <script>
+    function toggleSection(titleElement) {
+      const sectionContent = titleElement.nextElementSibling;
+      const isCollapsed = titleElement.classList.contains('collapsed');
+      
+      if (isCollapsed) {
+        // Expand section
+        titleElement.classList.remove('collapsed');
+        sectionContent.classList.remove('collapsed');
+      } else {
+        // Collapse section
+        titleElement.classList.add('collapsed');
+        sectionContent.classList.add('collapsed');
+      }
+    }
+    
+    // Initialize collapsible sections on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Reorder input sections to desired sequence
+      const desiredOrder = ['Personal Information','Summary','Experience','Projects','Skills','Education','Certifications','Achievements & Honors','Languages','ATS Optimization','Export'];
+      const container = document.querySelector('.input-container');
+      desiredOrder.forEach(name => {
+        const titleEl = Array.from(document.querySelectorAll('.section-title')).find(t => t.textContent.trim() === name);
+        if (titleEl) {
+          container.appendChild(titleEl.closest('.form-section'));
+        }
+      });
+      // Collapse all sections by default except Personal Information
+      const alwaysOpen = ['Personal Information'];
+      document.querySelectorAll('.section-title').forEach(title => {
+        if (!alwaysOpen.includes(title.textContent.trim())) {
+          toggleSection(title);
+        }
+      });
+    });
+  </script>
   
   <!-- Service Worker Registration -->
   <script>
@@ -563,21 +615,10 @@
     }
   </script>
   
-  <!-- Footer -->
-  <footer class="mt-5 py-3 bg-light">
-    <div class="container">
-      <div class="row">
-        <div class="col-12 text-center">
-          <p class="mb-0">
-            <small class="text-muted">
-              Designed by <a href="https://github.com/anjalisahu4644" target="_blank">@anjalisahu4644</a> | 
-              Developed by <a href="https://github.com/EmaniAditya" target="_blank">@EmaniAditya</a>
-            </small>
-          </p>
-        </div>
-      </div>
-    </div>
-  </footer>
+
+  
+
+  
 </body>
 </html>
 

@@ -54,9 +54,15 @@ function loadSampleData() {
       console.warn('Error saving sample data to localStorage:', storageError);
     }
     
-    // Generate preview
+    // Generate preview from populated form fields
+    console.log('🔄 Triggering generateResume after sample data population');
     if (typeof generateResume === 'function') {
-      generateResume();
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        generateResume();
+      }, 100);
+    } else {
+      console.error('generateResume function not available');
     }
     
     showToast("Sample resume loaded! Edit to customize your own resume.");
@@ -68,122 +74,113 @@ function loadSampleData() {
 
 // Helper function to populate multi-item sections
 function populateMultiItemSection(sectionType, items) {
-  if (!items || !items.length) return;
+  if (!items || !items.length) {
+    console.log(`🚫 No items to populate for ${sectionType}`);
+    return;
+  }
+  
+  console.log(`📝 Populating ${sectionType} with ${items.length} items:`, items);
   
   try {
     // Get container
     const container = document.getElementById(`${sectionType}Container`);
     if (!container) {
-      console.warn(`Container for section '${sectionType}' not found`);
+      console.warn(`⚠️ Container for section '${sectionType}' not found`);
       return;
     }
     
-    // Get the first item template
+    // Get the first item template - try multiple class name patterns
     let itemClass = `${sectionType}-item`;
-    // Handle plural forms for consistency
+    if (sectionType === 'projects') itemClass = 'project-item';
     if (sectionType === 'certifications') itemClass = 'certifications-item';
     if (sectionType === 'languages') itemClass = 'languages-item';
     if (sectionType === 'achievements') itemClass = 'achievements-item';
+    if (sectionType === 'ratedSkills') itemClass = 'rated-skill-item';
     
-    const firstItem = container.querySelector(`.${itemClass}`);
+    let firstItem = container.querySelector(`.${itemClass}`);
+    
+    // Try alternative class name patterns if first attempt fails
     if (!firstItem) {
-      console.warn(`Template item for section '${sectionType}' not found`);
+      const alternativeClasses = [];
+      
+      switch(sectionType) {
+        case 'projects':
+          alternativeClasses.push('project-item', 'projects-section-item');
+          break;
+        case 'ratedSkills':
+          alternativeClasses.push('rated-skills-item', 'skill-item', 'skills-item');
+          break;
+        case 'certifications':
+          alternativeClasses.push('certification-item', 'cert-item');
+          break;
+        case 'achievements':
+          alternativeClasses.push('achievement-item', 'honor-item');
+          break;
+      }
+      
+      for (const altClass of alternativeClasses) {
+        firstItem = container.querySelector(`.${altClass}`);
+        if (firstItem) {
+          console.log(`✅ Found template using alternative class: ${altClass}`);
+          break;
+        }
+      }
+    }
+    
+    if (!firstItem) {
+      console.warn(`⚠️ Template item for section '${sectionType}' not found with class '${itemClass}' or alternatives`);
+      console.log(`🔍 Available elements in container:`, container.innerHTML);
       return;
     }
+    
+    // Store the template before clearing
+    const template = firstItem.cloneNode(true);
     
     // Clear the container
     container.innerHTML = '';
     
-    // Add and populate items
+    // Add and populate all items by cloning the template
     items.forEach((itemData, index) => {
       try {
-        // For the first item, clone the template
-        if (index === 0) {
-          const clonedItem = firstItem.cloneNode(true);
-          container.appendChild(clonedItem);
-          populateItemFields(clonedItem, itemData);
-        } else {
-          // For additional items, use the appropriate add function
-          let addFunctionCalled = false;
-          
-          // Check if the add function exists in the global scope
-          switch(sectionType) {
-            case 'experience':
-              if (typeof addExperience === 'function') {
-                addExperience();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'education':
-              if (typeof addEducation === 'function') {
-                addEducation();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'certifications':
-              if (typeof addCertification === 'function') {
-                addCertification();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'projects':
-              if (typeof addProject === 'function') {
-                addProject();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'languages':
-              if (typeof addLanguage === 'function') {
-                addLanguage();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'achievements':
-              if (typeof addAchievement === 'function') {
-                addAchievement();
-                addFunctionCalled = true;
-              }
-              break;
-            case 'ratedSkills':
-              if (typeof addRatedSkill === 'function') {
-                addRatedSkill();
-                addFunctionCalled = true;
-              }
-              break;
-          }
-          
-          if (!addFunctionCalled) {
-            // Fallback: manually clone and add the item
-            const clonedItem = firstItem.cloneNode(true);
-            container.appendChild(clonedItem);
-            populateItemFields(clonedItem, itemData);
-          } else {
-            // Populate the newly added item
-            const newItem = container.lastElementChild;
-            if (newItem) {
-              populateItemFields(newItem, itemData);
-            }
-          }
-        }
+        console.log(`🔄 Adding item ${index + 1}/${items.length} for ${sectionType}:`, itemData);
+        
+        // Clone the template for each item
+        const clonedItem = template.cloneNode(true);
+        container.appendChild(clonedItem);
+        
+        // Populate the cloned item with data
+        populateItemFields(clonedItem, itemData);
+        
+        console.log(`✅ Successfully populated item ${index + 1} for ${sectionType}`);
       } catch (itemError) {
-        console.warn(`Error populating item ${index} in section ${sectionType}:`, itemError);
+        console.error(`❌ Error populating item ${index + 1} in section ${sectionType}:`, itemError);
       }
     });
+    
+    console.log(`✅ Successfully populated all ${items.length} items for ${sectionType}`);
   } catch (error) {
-    console.error(`Error in populateMultiItemSection for ${sectionType}:`, error);
+    console.error(`❌ Error in populateMultiItemSection for ${sectionType}:`, error);
   }
 }
 
 // Helper function to populate fields in an item
 function populateItemFields(item, data) {
-  if (!item || !data) return;
+  if (!item || !data) {
+    console.warn('⚠️ populateItemFields: Missing item or data');
+    return;
+  }
+  
+  console.log('🔧 populateItemFields called with data:', data);
   
   try {
     // Get all input, select, and textarea elements
     const inputs = item.querySelectorAll('input, select, textarea');
+    console.log(`🎯 Found ${inputs.length} input fields to populate`);
+    
+    let populatedCount = 0;
     
     // For each input, find the corresponding data
-    inputs.forEach(input => {
+    inputs.forEach((input, index) => {
       try {
         const classList = input.className.split(' ');
         
@@ -191,17 +188,94 @@ function populateItemFields(item, data) {
         const className = classList.find(cls => 
           !cls.includes('form-') && 
           cls !== 'input-group' && 
-          cls !== 'form-check-input'
+          cls !== 'form-check-input' &&
+          cls !== 'btn' &&
+          cls !== 'w-100'
         );
         
         if (className) {
-          // Convert camelCase to snake_case for data lookup
-          const dataKey = className.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+          // Try direct mapping first (most common case)
+          let value = data[className];
           
-          if (data[dataKey] !== undefined) {
+          // If direct mapping fails, try camelCase to snake_case conversion
+          if (value === undefined) {
+            const dataKey = className.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+            value = data[dataKey];
+          }
+          
+          // Special handling for common field mappings
+          if (value === undefined) {
+            switch(className) {
+              // Generic field mappings
+              case 'name':
+                value = data.name || data.title || data.language;
+                break;
+              case 'title':
+                value = data.title || data.name;
+                break;
+              case 'organization':
+                value = data.organization || data.company;
+                break;
+              case 'date':
+                value = data.date || data.startDate;
+                break;
+              case 'credentialId':
+                value = data.credentialId || data.link;
+                break;
+                
+              // Certification-specific field mappings
+              case 'certificationName':
+                value = data.name;
+                break;
+              case 'certificationOrg':
+                value = data.organization;
+                break;
+              case 'certificationDate':
+                value = data.date;
+                break;
+              case 'certificationExpiration':
+                value = data.expiration;
+                break;
+              case 'credentialID':
+                value = data.credentialId;
+                break;
+                
+              // Achievement-specific field mappings
+              case 'achievementTitle':
+                value = data.title;
+                break;
+              case 'achievementDate':
+                value = data.date;
+                break;
+              case 'achievementDescription':
+                value = data.description;
+                break;
+                
+              // Rated skills field mappings
+              case 'skillName':
+                value = data.name;
+                break;
+              case 'skillRating':
+                value = data.rating;
+                break;
+                
+              // Projects field mappings
+              case 'projectName':
+                value = data.name;
+                break;
+              case 'projectDescription':
+                value = data.description;
+                break;
+              case 'technologies':
+                value = data.technologies;
+                break;
+            }
+          }
+          
+          if (value !== undefined) {
             if (input.tagName === 'SELECT') {
               // For select elements, set the value and trigger change event
-              input.value = data[dataKey] || '';
+              input.value = value || '';
               
               try {
                 // Create and dispatch change event
@@ -212,16 +286,25 @@ function populateItemFields(item, data) {
               }
             } else {
               // For regular inputs and textareas
-              input.value = data[dataKey] || '';
+              input.value = value || '';
             }
+            
+            populatedCount++;
+            console.log(`✅ Populated field ${className} with:`, value);
+          } else {
+            console.log(`⚠️ No data found for field ${className} in:`, Object.keys(data));
           }
+        } else {
+          console.log(`⚠️ No relevant class found for input ${index} with classes:`, classList);
         }
       } catch (inputError) {
-        console.warn('Error populating field:', inputError);
+        console.warn('❌ Error populating field:', inputError);
       }
     });
+    
+    console.log(`✅ populateItemFields completed: ${populatedCount}/${inputs.length} fields populated`);
   } catch (error) {
-    console.error('Error in populateItemFields:', error);
+    console.error('❌ Error in populateItemFields:', error);
   }
 }
 
@@ -232,12 +315,47 @@ function populateFormData(data) {
   // Helper function to safely set element value
   const safeSetValue = (elementId, value) => {
     const element = document.getElementById(elementId);
-    if (element) {
+    if (element && value !== undefined) {
       element.value = value || '';
-    } else {
+      populatedFields.push({ field: elementId, value: value });
+      // Trigger input event to ensure live preview updates
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+    } else if (!element) {
+      failedFields.push({ field: elementId, reason: 'Element not found' });
       console.warn(`Element with ID '${elementId}' not found in the DOM`);
+    } else {
+      failedFields.push({ field: elementId, reason: 'Value undefined' });
     }
   };
+  
+  // Debug: Log COMPLETE data structure to identify missing sections
+  console.log('🔧 populateFormData called with FULL DATA:', data);
+  
+  console.log('🔧 populateFormData DATA ANALYSIS:', {
+    fullName: data.fullName,
+    jobTitle: data.jobTitle,
+    hasSkills: !!data.skills,
+    hasTechnicalSkills: !!data.technicalSkills,
+    hasSoftSkills: !!data.softSkills,
+    hasExperience: !!(data.experience && data.experience.length > 0),
+    hasEducation: !!(data.education && data.education.length > 0),
+    hasProjects: !!(data.projects && data.projects.length > 0),
+    hasCertifications: !!(data.certifications && data.certifications.length > 0),
+    hasAchievements: !!(data.achievements && data.achievements.length > 0),
+    hasRatedSkills: !!(data.ratedSkills && data.ratedSkills.length > 0),
+    skills: data.skills,
+    experienceCount: data.experience ? data.experience.length : 0,
+    educationCount: data.education ? data.education.length : 0,
+    projectsCount: data.projects ? data.projects.length : 0,
+    certificationsCount: data.certifications ? data.certifications.length : 0,
+    achievementsCount: data.achievements ? data.achievements.length : 0,
+    ratedSkillsCount: data.ratedSkills ? data.ratedSkills.length : 0,
+    allKeys: Object.keys(data)
+  });
+  
+  // Track which fields are successfully populated
+  const populatedFields = [];
+  const failedFields = [];
   
   // Populate simple fields
   safeSetValue('fullName', data.fullName);
@@ -250,39 +368,121 @@ function populateFormData(data) {
   safeSetValue('location', data.location);
   safeSetValue('dob', data.dob);
   safeSetValue('summary', data.summary);
-  safeSetValue('technicalSkills', data.technicalSkills);
-  safeSetValue('softSkills', data.softSkills);
+  
+  // Handle skills - sample data uses unified 'skills' field
+  if (data.skills) {
+    // Split skills into technical and soft skills if possible
+    const skillsText = data.skills;
+    if (skillsText.includes('Technical Skills:') && skillsText.includes('Soft Skills:')) {
+      const parts = skillsText.split('\n\nSoft Skills:');
+      const technicalPart = parts[0].replace('Technical Skills:\n', '');
+      const softPart = parts[1] || '';
+      safeSetValue('technicalSkills', technicalPart);
+      safeSetValue('softSkills', softPart);
+    } else if (skillsText.includes('Technical Skills:')) {
+      const technicalPart = skillsText.replace('Technical Skills:\n', '');
+      safeSetValue('technicalSkills', technicalPart);
+      safeSetValue('softSkills', '');
+    } else {
+      // Treat as technical skills if no specific categorization
+      safeSetValue('technicalSkills', skillsText);
+      safeSetValue('softSkills', '');
+    }
+  } else {
+    // Fallback to individual fields if they exist
+    safeSetValue('technicalSkills', data.technicalSkills || '');
+    safeSetValue('softSkills', data.softSkills || '');
+  }
   
   // Set template
   safeSetValue('template', data.template || 'classic');
   
-  // Populate multi-item sections
+  // Log population results
+  console.log('✅ Form field population complete:', {
+    totalPopulated: populatedFields.length,
+    totalFailed: failedFields.length,
+    populatedFields: populatedFields.map(f => f.field),
+    failedFields: failedFields
+  });
+  
+  if (failedFields.length > 0) {
+    console.warn('⚠️ Some fields failed to populate:', failedFields);
+  }
+  
+  // Populate multi-item sections with debugging
+  console.log('🔍 Checking multi-item sections for population:', {
+    hasExperience: !!(data.experience && data.experience.length > 0),
+    hasEducation: !!(data.education && data.education.length > 0),
+    hasProjects: !!(data.projects && data.projects.length > 0),
+    hasCertifications: !!(data.certifications && data.certifications.length > 0),
+    hasLanguages: !!(data.languages && data.languages.length > 0),
+    hasAchievements: !!(data.achievements && data.achievements.length > 0),
+    hasRatedSkills: !!(data.ratedSkills && data.ratedSkills.length > 0),
+    projectsData: data.projects,
+    certificationsData: data.certifications,
+    achievementsData: data.achievements,
+    ratedSkillsData: data.ratedSkills
+  });
+  
   if (data.experience && data.experience.length > 0) {
+    console.log('✅ Populating experience section');
     populateMultiItemSection('experience', data.experience);
+  } else {
+    console.log('⚠️ Skipping experience: no data');
   }
   
   if (data.education && data.education.length > 0) {
+    console.log('✅ Populating education section');
     populateMultiItemSection('education', data.education);
+  } else {
+    console.log('⚠️ Skipping education: no data');
   }
   
+  console.log('🔍 Projects section check:', {
+    hasProjects: !!(data.projects),
+    projectsLength: data.projects ? data.projects.length : 'undefined',
+    projectsData: data.projects
+  });
+  
   if (data.projects && data.projects.length > 0) {
+    console.log('✅ Populating projects section');
     populateMultiItemSection('projects', data.projects);
+  } else {
+    console.log('⚠️ Skipping projects: no data or empty array');
   }
   
   if (data.certifications && data.certifications.length > 0) {
+    console.log('✅ Populating certifications section');
     populateMultiItemSection('certifications', data.certifications);
+  } else {
+    console.log('⚠️ Skipping certifications: no data or empty array');
   }
   
   if (data.languages && data.languages.length > 0) {
+    console.log('✅ Populating languages section');
     populateMultiItemSection('languages', data.languages);
+  } else {
+    console.log('⚠️ Skipping languages: no data');
   }
   
   if (data.achievements && data.achievements.length > 0) {
+    console.log('✅ Populating achievements section');
     populateMultiItemSection('achievements', data.achievements);
+  } else {
+    console.log('⚠️ Skipping achievements: no data or empty array');
   }
   
+  console.log('🔍 RatedSkills section check:', {
+    hasRatedSkills: !!(data.ratedSkills),
+    ratedSkillsLength: data.ratedSkills ? data.ratedSkills.length : 'undefined',
+    ratedSkillsData: data.ratedSkills
+  });
+  
   if (data.ratedSkills && data.ratedSkills.length > 0) {
+    console.log('✅ Populating ratedSkills section');
     populateMultiItemSection('ratedSkills', data.ratedSkills);
+  } else {
+    console.log('⚠️ Skipping ratedSkills: no data or empty array');
   }
   
   // Populate section order
@@ -348,6 +548,8 @@ function populateFormData(data) {
 
 // Collect form data into object
 function collectFormData() {
+  console.log('🔍 DEBUG: collectFormData() called - analyzing what data is being collected...');
+  
   const data = {
     fullName: document.getElementById('fullName')?.value || '',
     jobTitle: document.getElementById('jobTitle')?.value || '',
@@ -367,7 +569,9 @@ function collectFormData() {
     languages: [],
     achievements: [],
     ratedSkills: [],
-    template: document.getElementById('template')?.value || 'classic',
+    template: document.getElementById('template')?.value || 'default',
+    headerColor: document.getElementById('headerColor')?.value || '#000000',
+    subColor: document.getElementById('subColor')?.value || '#000000',
     sectionOrder: []
   };
   
@@ -391,15 +595,17 @@ function collectFormData() {
     
     if (skillName) {
       data.ratedSkills.push({
-        skill_name: skillName,
-        skill_rating: skillRating
+        name: skillName,
+        rating: skillRating
       });
     }
   });
   
   // Collect experience items
   const experienceItems = document.querySelectorAll('#experienceContainer .experience-item');
-  experienceItems.forEach(item => {
+  console.log(`🔍 DEBUG: Found ${experienceItems.length} experience items in DOM`);
+  
+  experienceItems.forEach((item, index) => {
     const company = item.querySelector('.company')?.value || '';
     const title = item.querySelector('.title')?.value || '';
     const startDate = item.querySelector('.startDate')?.value || '';
@@ -407,12 +613,16 @@ function collectFormData() {
     const description = item.querySelector('.description')?.value || '';
     const location = item.querySelector('.experienceLocation')?.value || '';
     
+    console.log(`🔍 DEBUG: Experience item ${index + 1}:`, {
+      company, title, startDate, endDate, description, location
+    });
+    
     if (company || title || startDate || endDate || description) {
       data.experience.push({
-        company_name: company,
-        job_title: title,
-        start_date: startDate,
-        end_date: endDate,
+        company: company,
+        title: title,
+        startDate: startDate,
+        endDate: endDate,
         description: description,
         location: location
       });
@@ -432,34 +642,39 @@ function collectFormData() {
     
     if (institution || degree || startDate || endDate) {
       data.education.push({
-        school_name: institution,
+        institution: institution,
         degree: degree,
-        education_start_date: startDate,
-        education_end_date: endDate,
+        educationStartDate: startDate,
+        educationEndDate: endDate,
         gpa: gpa,
-        score_type: scoreType,
-        education_location: location
+        scoreType: scoreType,
+        educationLocation: location
       });
     }
   });
   
   // Collect project items
   const projectItems = document.querySelectorAll('#projectsContainer .project-item');
-  projectItems.forEach(item => {
+  console.log(`🔍 DEBUG: Found ${projectItems.length} project items in DOM`);
+  
+  projectItems.forEach((item, index) => {
     const name = item.querySelector('.projectName')?.value || '';
     const description = item.querySelector('.projectDescription')?.value || '';
-    const technologies = item.querySelector('.projectTechnologies')?.value || '';
-    const link = item.querySelector('.projectLink')?.value || '';
-    const github = item.querySelector('.projectGithub')?.value || '';
+    const technologies = item.querySelector('.technologies')?.value || '';  // Fixed: was .projectTechnologies
+    
+    console.log(`🔍 DEBUG: Project item ${index + 1}:`, {
+      name, description, technologies
+    });
     
     if (name || description || technologies) {
       data.projects.push({
-        project_name: name,
-        project_description: description,
-        project_technologies: technologies,
-        project_link: link,
-        project_github: github
+        name: name,
+        description: description,
+        technologies: technologies
       });
+      console.log(`✅ DEBUG: Added project ${index + 1} to data.projects`);
+    } else {
+      console.log(`❌ DEBUG: Skipped project ${index + 1} - no data found`);
     }
   });
   
@@ -474,11 +689,11 @@ function collectFormData() {
     
     if (name || org || date) {
       data.certifications.push({
-        certification_name: name,
-        certification_org: org,
-        certification_date: date,
-        certification_expiration: expiration,
-        credential_id: credentialId
+        name: name,
+        organization: org,
+        date: date,
+        expiration: expiration,
+        credentialId: credentialId
       });
     }
   });
@@ -506,9 +721,9 @@ function collectFormData() {
     
     if (title || description) {
       data.achievements.push({
-        achievement_title: title,
-        achievement_date: date,
-        achievement_description: description
+        title: title,
+        date: date,
+        description: description
       });
     }
   });
@@ -528,6 +743,66 @@ function saveCurrentData() {
   localStorage.setItem(CURRENT_DATA_KEY, JSON.stringify(data));
 }
 
+// Initialize sample data as version "sample" if it doesn't exist
+function initializeSampleDataVersion() {
+  try {
+    const versions = getVersions();
+    
+    // Check if "sample" version already exists
+    const sampleVersionExists = versions.some(version => version.name === 'sample');
+    
+    if (!sampleVersionExists) {
+      console.log('📋 Initializing sample data as version "sample"');
+      
+      // Save sample data as version "sample"
+      const versionId = saveVersion('sample', false, SAMPLE_RESUME_DATA);
+      
+      if (versionId) {
+        console.log('✅ Sample data version "sample" created successfully');
+      }
+    }
+    
+    // Check if user has any current data, if not, load sample data
+    const currentData = localStorage.getItem(CURRENT_DATA_KEY);
+    if (!currentData || currentData === '{}' || JSON.parse(currentData || '{}').fullName === undefined) {
+      console.log('🚀 Loading sample data for first-time user');
+      loadSampleData();
+    }
+  } catch (error) {
+    console.error('Error initializing sample data version:', error);
+    // Fallback to regular sample data loading
+    loadSampleData();
+  }
+}
+
+// Auto-serve sample data on domain hit
+function autoServeSampleData() {
+  try {
+    // Initialize sample version if needed
+    initializeSampleDataVersion();
+    
+    // Always ensure sample data is available in versions
+    const versions = getVersions();
+    const sampleVersion = versions.find(version => version.name === 'sample');
+    
+    if (sampleVersion) {
+      console.log('📦 Sample data version available:', sampleVersion.id);
+      console.log('🔄 Auto-loading sample data into form fields...');
+      
+      // Actually populate the form fields with sample data
+      populateFormData(SAMPLE_RESUME_DATA);
+      
+      // Generate preview after population (with small delay to ensure DOM updates)
+      setTimeout(() => {
+        console.log('📋 Generating preview from populated form data...');
+        generateResume();
+      }, 300);
+    }
+  } catch (error) {
+    console.error('Error in auto-serving sample data:', error);
+  }
+}
+
 // Get saved versions from localStorage
 function getVersions() {
   const versionsJson = localStorage.getItem(VERSIONS_KEY);
@@ -535,37 +810,51 @@ function getVersions() {
 }
 
 // Save a version of the current resume data
-function saveVersion(name, showNotification = true) {
+function saveVersion(name, showNotification = true, customData = null) {
   try {
-    // Get current data
-    const currentData = collectFormData();
+    // Get current data or use custom data if provided
+    const currentData = customData || collectFormData();
     
     // Get existing versions
     const versions = getVersions();
     
-    // Create new version
-    const newVersion = {
-      id: Date.now().toString(),
-      name: name || `Version ${versions.length + 1}`,
-      date: new Date().toISOString(),
-      data: currentData
-    };
+    // Check if version with this name already exists
+    const existingVersionIndex = versions.findIndex(v => v.name === name);
     
-    // Add to versions array
-    versions.push(newVersion);
+    if (existingVersionIndex !== -1) {
+      // Update existing version
+      versions[existingVersionIndex] = {
+        ...versions[existingVersionIndex],
+        date: new Date().toISOString(),
+        data: currentData
+      };
+    } else {
+      // Create new version
+      const newVersion = {
+        id: Date.now().toString(),
+        name: name || `Version ${versions.length + 1}`,
+        date: new Date().toISOString(),
+        data: currentData
+      };
+      
+      // Add to versions array
+      versions.push(newVersion);
+    }
     
     // Save to localStorage
     localStorage.setItem(VERSIONS_KEY, JSON.stringify(versions));
     
     // Show success message if requested
     if (showNotification) {
-      showToast(`Version "${newVersion.name}" saved successfully!`);
+      showToast(`Version "${name}" saved successfully!`);
     }
     
-    return newVersion.id;
+    return existingVersionIndex !== -1 ? versions[existingVersionIndex].id : versions[versions.length - 1].id;
   } catch (error) {
     console.error('Error saving version:', error);
-    showToast('Error saving version. Please try again.', 'error');
+    if (showNotification) {
+      showToast('Error saving version. Please try again.', 'error');
+    }
     return null;
   }
 }
@@ -1054,6 +1343,10 @@ function importData() {
           // Don't show error here, will be handled in outer catch
           throw innerError;
         }
+      } else {
+        // User cancelled the import - hide loading and exit
+        hideLoading();
+        return;
       }
     } catch (error) {
       console.error('Import error:', error);

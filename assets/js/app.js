@@ -8,6 +8,15 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
+  // Auto-serve sample data as version "sample" on domain hit
+  if (typeof autoServeSampleData === 'function') {
+    try {
+      autoServeSampleData();
+    } catch (e) {
+      console.error("Error auto-serving sample data:", e);
+    }
+  }
+  
   // Initialize mobile sections
   if (window.innerWidth <= 768) {
     const sections = document.querySelectorAll('.mobile-collapsible');
@@ -136,20 +145,6 @@ function setupEventListeners() {
     }
   });
   
-  // Template change
-  const templateSelect = document.getElementById('template');
-  if (templateSelect) {
-    templateSelect.addEventListener('change', function() {
-      generateResume(); // Immediate update for template changes
-      
-      // Track template change
-      if (typeof trackTemplateUsage === 'function' && typeof trackFeatureUsage === 'function') {
-        trackTemplateUsage(this.value);
-        trackFeatureUsage('templateChange');
-      }
-    });
-  }
-  
   // Compact mode toggle
   const compactMode = document.getElementById('compactMode');
   if (compactMode) {
@@ -173,7 +168,7 @@ function setupEventListeners() {
   // Preview button (keep for manual refresh)
   const previewButton = document.querySelector('button[onclick="generateResume()"]');
   if (previewButton) {
-    previewButton.addEventListener('click', generateResume);
+    // Removed duplicate event listener
   }
   
   // Plain text buttons
@@ -182,28 +177,19 @@ function setupEventListeners() {
     viewPlainTextButton.addEventListener('click', viewPlainText);
   }
   
-  const downloadPlainTextButton = document.querySelector('button[onclick="downloadPlainText()"]');
-  if (downloadPlainTextButton) {
-    downloadPlainTextButton.addEventListener('click', downloadPlainText);
-  }
-  
   // Versions button
   const versionsButton = document.querySelector('button[onclick="showVersionsModal()"]');
   if (versionsButton) {
-    versionsButton.addEventListener('click', showVersionsModal);
+    // Removed duplicate event listener
   }
   
   // Save named version button
   const saveNamedVersionButton = document.querySelector('button[onclick="saveNamedVersion()"]');
   if (saveNamedVersionButton) {
-    saveNamedVersionButton.addEventListener('click', saveNamedVersion);
+    // Removed duplicate event listener
   }
   
-  // Export data button
-  const exportDataButton = document.querySelector('button[onclick="exportData()"]');
-  if (exportDataButton) {
-    exportDataButton.addEventListener('click', exportData);
-  }
+  // Export data button - using onclick attribute, no need for addEventListener to prevent double execution
   
   // Import data button
   const importDataButton = document.querySelector('button[onclick="importData()"]');
@@ -214,7 +200,7 @@ function setupEventListeners() {
   // Clear form button
   const clearFormButton = document.querySelector('button[onclick="clearForm()"]');
   if (clearFormButton) {
-    clearFormButton.addEventListener('click', clearForm);
+    // Removed duplicate event listener
   }
   
   // Copy plain text button
@@ -236,7 +222,7 @@ function setupEventListeners() {
   densityButtons.forEach((btn, index) => {
     btn.addEventListener('click', function() {
       applyDensitySetting(index + 1);
-      generateResume(); // Update preview when density changes
+      generateResume();
     });
   });
 
