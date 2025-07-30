@@ -554,6 +554,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   
+
+  <!-- Disable verbose console output except errors -->
+  <script>
+    // TEMP: disable normal logs in production-like environments
+    console.log = console.info = console.debug = console.warn = console.trace = function(){};
+  </script>
+
   <!-- Application Scripts -->
   <script src="assets/js/sample-data.js"></script>
   <script src="assets/js/core.js"></script>
