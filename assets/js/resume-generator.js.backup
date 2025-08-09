@@ -544,7 +544,7 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
             if (exp.description) {
                const bulletLines = exp.description.split('\n').filter(Boolean);
                bulletLines.forEach(bullet => {
-                 content.push({ text: `• ${bullet.trim().replace(/^[•*-]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
+                 content.push({ text: `• ${bullet.replace(/^[•*-]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
                });
              }
             addSpacer();
@@ -571,7 +571,7 @@ function createPDFDocumentDefinition(data, isSinglePageMode = false) {
             if (project.description) {
                const bulletLines = project.description.split('\n').filter(Boolean);
                bulletLines.forEach(bullet => {
-                 content.push({ text: `• ${bullet.trim().replace(/^[•*-]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
+                 content.push({ text: `• ${bullet.replace(/^[•*-]\s*/, '')}`, style: 'body', margin: [10, 0, 0, 3] });
                });
              }
             addSpacer();
@@ -778,7 +778,7 @@ content.push({ text: data.summary, style: 'body', margin: [0, 0, 0, 10] });
         const bullets = exp.description.split('\n').filter(line => line.trim());
         bullets.forEach(bullet => {
           content.push({
-            text: `• ${bullet.trim().replace(/^[•*-]\s*/, '')}`,
+            text: `• ${bullet.replace(/^[•*-]\s*/, '')}`,
             style: 'body',
             margin: [10, 0, 0, 3]
           });
@@ -859,7 +859,7 @@ content.push({ text: data.summary, style: 'body', margin: [0, 0, 0, 10] });
         const bullets = project.description.split('\n').filter(line => line.trim());
         bullets.forEach(bullet => {
           content.push({
-            text: `• ${bullet.trim().replace(/^[•*-]\s*/, '')}`,
+            text: `• ${bullet.replace(/^[•*-]\s*/, '')}`,
             style: 'body',
             margin: [10, 0, 0, 3]
           });

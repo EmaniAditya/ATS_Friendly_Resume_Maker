@@ -558,13 +558,14 @@
   <!-- Disable verbose console output except errors -->
   <script>
     // TEMP: disable normal logs in production-like environments
-    console.log = console.info = console.debug = console.warn = console.trace = function(){};
+    // Commented out for debugging
+    // console.log = console.info = console.debug = console.warn = console.trace = function(){};
   </script>
 
   <!-- Application Scripts -->
   <script src="assets/js/sample-data.js"></script>
   <script src="assets/js/core.js"></script>
-  <script src="assets/js/resume-generator.js"></script>
+  <script src="assets/js/resume-generator-fixed.js"></script>
   <script src="assets/js/ats-optimizer.js"></script>
   <script src="assets/js/analytics.js"></script>
   <script src="assets/js/app.js"></script>

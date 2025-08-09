@@ -56,14 +56,20 @@ function loadSampleData() {
     
     // Generate preview from populated form fields
     console.log('🔄 Triggering generateResume after sample data population');
-    if (typeof generateResume === 'function') {
-      // Small delay to ensure DOM is updated
-      setTimeout(() => {
+    
+    // Wait for all scripts to load before calling generateResume
+    const waitForGenerateResume = () => {
+      if (typeof generateResume === 'function') {
+        console.log('✅ generateResume function found, calling it now');
         generateResume();
-      }, 100);
-    } else {
-      console.error('generateResume function not available');
-    }
+      } else {
+        console.log('⏳ Waiting for generateResume function to load...');
+        setTimeout(waitForGenerateResume, 50);
+      }
+    };
+    
+    // Small delay to ensure DOM and scripts are loaded
+    setTimeout(waitForGenerateResume, 100);
     
     showToast("Sample resume loaded! Edit to customize your own resume.");
   } catch (error) {
