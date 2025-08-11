@@ -35,7 +35,49 @@ export default function Preview() {
           </section>
         )}
 
-        {/* Sections for experience, education, etc. will be added next */}
+        {resume.experience.length > 0 && (
+          <section className="mt-6">
+            <h2 className="text-sm font-semibold tracking-wide text-gray-700">EXPERIENCE</h2>
+            <div className="mt-2 space-y-3">
+              {resume.experience.map((it) => (
+                <div key={it.id} className="text-sm">
+                  <div className="font-medium text-gray-900">
+                    {it.role}{it.company ? `, ${it.company}` : ''}
+                  </div>
+                  <div className="text-gray-600">
+                    {[it.startDate, (it.current ? 'Present' : it.endDate)].filter(Boolean).join(' — ')}{it.location ? ` • ${it.location}` : ''}
+                  </div>
+                  {it.bullets?.length > 0 && (
+                    <ul className="mt-1 list-disc pl-5 space-y-1">
+                      {it.bullets.map((b, i) => (
+                        <li key={i}>{b}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {resume.education.length > 0 && (
+          <section className="mt-6">
+            <h2 className="text-sm font-semibold tracking-wide text-gray-700">EDUCATION</h2>
+            <div className="mt-2 space-y-3">
+              {resume.education.map((it) => (
+                <div key={it.id} className="text-sm">
+                  <div className="font-medium text-gray-900">{it.degree}{it.school ? `, ${it.school}` : ''}</div>
+                  <div className="text-gray-600">{[it.startDate, it.endDate].filter(Boolean).join(' — ')}</div>
+                  {it.details && (
+                    <ul className="mt-1 list-disc pl-5 space-y-1">
+                      {it.details.split('\n').map((b, i) => b.trim() && <li key={i}>{b.trim()}</li>)}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </main>
   )
