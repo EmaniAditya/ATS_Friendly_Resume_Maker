@@ -5,7 +5,14 @@ import './tailwind.css'
 import './index.css'
 import App from './App.jsx'
 
-createRoot(document.getElementById('root')).render(
+// Debug: verify mount
+console.log('[main] script loaded')
+const rootEl = document.getElementById('root')
+if (!rootEl) {
+  console.error('[main] #root not found')
+}
+
+createRoot(rootEl).render(
   <StrictMode>
     <BrowserRouter>
       <App />

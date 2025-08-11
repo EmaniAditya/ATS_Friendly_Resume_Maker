@@ -41,7 +41,7 @@ export const ResumeSchema = z.object({
     phone: z.string().default(''),
     location: z.string().default(''),
     links: z.array(LinkSchema).default([]),
-  }),
+  }).default({}),
   summary: z.string().default(''),
   experience: z.array(ExperienceItemSchema).default([]),
   education: z.array(EducationItemSchema).default([]),
