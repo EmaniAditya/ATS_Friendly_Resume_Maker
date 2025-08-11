@@ -32,6 +32,29 @@ export default function Builder() {
     update('experience', next)
   }
 
+  // Education helpers
+  function addEducation() {
+    const item = {
+      id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
+      school: '',
+      degree: '',
+      startDate: '',
+      endDate: '',
+      details: '',
+    }
+    update('education', [...resume.education, item])
+  }
+
+  function updateEducationAt(idx, patch) {
+    const next = resume.education.map((it, i) => i === idx ? { ...it, ...patch } : it)
+    update('education', next)
+  }
+
+  function removeEducationAt(idx) {
+    const next = resume.education.filter((_, i) => i !== idx)
+    update('education', next)
+  }
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
       <section className="space-y-4">
@@ -163,6 +186,75 @@ export default function Builder() {
             ))}
           </div>
         </div>
+
+        <div className="pt-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900">Education</h2>
+            <button
+              type="button"
+              onClick={addEducation}
+              className="rounded-md bg-brand-600 text-white px-3 py-1.5 text-sm hover:bg-brand-700"
+            >
+              Add Education
+            </button>
+          </div>
+          <div className="mt-3 space-y-4">
+            {resume.education.length === 0 && (
+              <p className="text-sm text-gray-600">No education added yet.</p>
+            )}
+            {resume.education.map((item, idx) => (
+              <div key={item.id} className="rounded-lg border p-4 bg-white">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    className="rounded-md border px-3 py-2"
+                    placeholder="School"
+                    value={item.school}
+                    onChange={(e) => updateEducationAt(idx, { school: e.target.value })}
+                  />
+                  <input
+                    className="rounded-md border px-3 py-2"
+                    placeholder="Degree"
+                    value={item.degree}
+                    onChange={(e) => updateEducationAt(idx, { degree: e.target.value })}
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      className="rounded-md border px-3 py-2"
+                      placeholder="Start (e.g., 2018)"
+                      value={item.startDate}
+                      onChange={(e) => updateEducationAt(idx, { startDate: e.target.value })}
+                    />
+                    <input
+                      className="rounded-md border px-3 py-2"
+                      placeholder="End (e.g., 2022)"
+                      value={item.endDate}
+                      onChange={(e) => updateEducationAt(idx, { endDate: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <label className="block text-sm font-medium text-gray-700">Details (one per line)</label>
+                  <textarea
+                    className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+                    rows={3}
+                    placeholder={"GPA: 3.8/4.0\nCoursework: DS, Algo, DB"}
+                    value={item.details || ''}
+                    onChange={(e) => updateEducationAt(idx, { details: e.target.value })}
+                  />
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => removeEducationAt(idx)}
+                    className="rounded-md border px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <aside className="border rounded-lg p-4 bg-white">
@@ -192,6 +284,25 @@ export default function Builder() {
                         {it.bullets.map((b, i) => (
                           <li key={i}>{b}</li>
                         ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {resume.education.length > 0 && (
+            <section className="mt-6">
+              <h3 className="text-sm font-semibold tracking-wide text-gray-700">EDUCATION</h3>
+              <div className="mt-2 space-y-3">
+                {resume.education.map((it) => (
+                  <div key={it.id} className="text-sm">
+                    <div className="font-medium text-gray-900">{it.degree}{it.school ? `, ${it.school}` : ''}</div>
+                    <div className="text-gray-600">{[it.startDate, it.endDate].filter(Boolean).join(' — ')}</div>
+                    {it.details && (
+                      <ul className="mt-1 list-disc pl-5 space-y-1">
+                        {it.details.split('\n').map((b, i) => b.trim() && <li key={i}>{b.trim()}</li>)}
                       </ul>
                     )}
                   </div>
