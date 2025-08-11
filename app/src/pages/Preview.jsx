@@ -1,7 +1,19 @@
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useResume } from '../context/ResumeContext'
 
 export default function Preview() {
   const { resume } = useResume()
+  const location = useLocation()
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    if (params.get('print') === '1') {
+      // Slight delay to ensure render is flushed before printing
+      const t = setTimeout(() => window.print(), 200)
+      return () => clearTimeout(t)
+    }
+  }, [location.search])
 
   return (
     <main className="px-4 py-6 flex justify-center">
