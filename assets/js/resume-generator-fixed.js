@@ -661,4 +661,19 @@ function downloadTextVersion() {
   }
 }
 
+// Backward-compatibility wrappers for existing HTML handlers
+// Honor export mode radios (freeflow/singlepage) for PDF
+function downloadTextBasedPDF() {
+  const mode = document.querySelector('input[name="exportMode"]:checked')?.value;
+  if (mode === 'freeflow') {
+    return downloadFreePDF();
+  }
+  return downloadSinglePagePDF();
+}
+
+// Legacy alias for plain text export
+function downloadPlainText() {
+  return downloadTextVersion();
+}
+
 console.log('✅ Resume generator functions loaded successfully');
