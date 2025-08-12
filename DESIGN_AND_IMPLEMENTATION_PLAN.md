@@ -9,11 +9,12 @@
 ## 2) Non-Goals (initially)
 - Multi-tenant accounts/cloud sync.
 - WYSIWYG rich text editor with advanced formatting beyond what ATS parsers handle.
+- Plain text resume export.
 - Server-side features (auth, DB). Initial app is fully client-side with local persistence.
 
 ## 3) Assumptions
 - Users primarily need clean, semantic, ATS-parseable resumes (no graphics, no tables that break parsing).
-- Export to PDF via print styles. Also support JSON import/export of data.
+- Export via direct print (react-to-print) and text-based PDF export (pdfmake). Support JSON import/export. Plain text export is not required.
 - Node 18+ available (we have Node v22+).
 - Git remote exists (origin set to GitHub).
 
@@ -23,7 +24,7 @@ Referencing images under `ideal-app-images/` (e.g., `Screenshot from 2025-08-11 
 - Builder: 2-pane layout
   - Left: Sectioned forms (Profile, Summary, Experience, Education, Projects, Skills, Certifications, Achievements, Links, Custom).
   - Right: Live preview (template selector + theme colors + density toggles).
-- Preview/Export: print-focused page with PDF-ready layout.
+- Preview/Export: print-focused page with PDF-ready layout. “Preview Resume” opens a full-screen preview mode.
 - Import/Export modal: JSON upload/download.
 - ATS Check panel: heuristics & tips (length, section headings, bullets/verbs, dates, contact info, links).
 
@@ -84,12 +85,22 @@ We’ll adapt spacing, typography, and component styling to match the spirit of 
   - Import/Export JSON.
 
 - Phase 4: Export and ATS checks
-  - Print/PDF via `react-to-print` with print CSS.
+  - Direct print via `react-to-print` with print CSS, and text-based PDF export using `pdfmake`.
   - ATS heuristics panel and warnings.
 
 - Phase 5: Accessibility, performance, deploy
   - Keyboard navigation, labels, readable contrast.
   - Build & optional deploy to Netlify/Vercel.
+
+## 9a) Feature Parity with Current Implementation
+Rebuild the existing features from the current `index.html` and `assets/js/*` in React, preserving behavior unless explicitly changed above:
+- Personal Information, Summary, Skills (incl. rated skills), Experience, Education, Projects, Certifications, Languages, Achievements.
+- Live resume preview with dynamic updates and template/density controls.
+- JSON data import/export; local storage persistence and version management.
+- Drag-and-drop section ordering.
+- ATS keyword analysis against a job description with match/miss reporting and highlight toggle.
+- Export: direct print to PDF and text-based PDF export. Plain text export is intentionally omitted.
+- PWA/service worker optional; keep if low-effort and beneficial.
 
 ## 10) Milestones (with commit strategy)
 - M0: Plan docs & repo hygiene
@@ -101,7 +112,7 @@ We’ll adapt spacing, typography, and component styling to match the spirit of 
 - M3: Builder core + preview
   - Commits: "feat: profile form", "feat: experience form", "feat: classic preview v1"
 - M4: Export + checks + JSON
-  - Commits: "feat: print export", "feat: ats checks", "feat: json import/export"
+  - Commits: "feat: direct print export", "feat: text-based PDF export", "feat: ats checks", "feat: json import/export"
 - M5: Polish & deploy
   - Commits: "style: print css", "fix: a11y labels", "chore: deploy config"
 
@@ -121,3 +132,8 @@ We’ll adapt spacing, typography, and component styling to match the spirit of 
 3) Create routes and state shell.
 4) Implement builder + preview sections in phases.
 5) Commit and push after each step.
+
+## 14) Debugging & Console Logs
+- Leverage browser console logs during development to validate data flow and UI events (e.g., `collectFormData()`, preview generation, SW registration).
+- Maintain helpful, non-noisy logs gated by an environment flag.
+- When implementing exports, verify console traces for PDF generation/print and ensure no runtime handler mismatches.
