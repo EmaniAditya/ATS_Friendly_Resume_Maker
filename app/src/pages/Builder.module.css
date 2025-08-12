@@ -1,0 +1,258 @@
+/* Builder Component CSS Modules */
+.container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  color: #111827;
+  padding: 1.5rem;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputRow {
+  display: grid;
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .inputRow {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.experienceCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.removeButton {
+  color: #dc2626;
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.removeButton:hover {
+  color: #991b1b;
+}
+
+.addButton {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.375rem;
+  background: none;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.addButton:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.preview {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.previewHeader {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+}
+
+.previewName {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.previewTitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.previewContact {
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.previewContact a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.previewSection {
+  margin-bottom: 1.5rem;
+}
+
+.previewSectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.25rem;
+}
+
+.previewText {
+  color: #374151;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.skillsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Container for experience entries in preview */
+.experienceContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* equivalent to space-y-4 */
+}
+
+/* Container for education entries in preview */
+.educationContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* equivalent to space-y-3 */
+}
+
+
+.skillTag {
+  padding: 0.25rem 0.75rem;
+  background-color: #dbeafe;
+  color: #1e40af;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+}
+
+.experienceItem {
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.experienceTitle {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.experienceCompany {
+  color: #6b7280;
+}
+
+.experienceDescription {
+  color: #374151;
+  margin-top: 0.25rem;
+}
+
+.educationItem {
+  padding-left: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.educationDegree {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.educationInstitution {
+  color: #6b7280;
+}
+
+.placeholder {
+  text-align: center;
+  color: #9ca3af;
+  margin-top: 2rem;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 1.5rem;
+}

@@ -1,0 +1,4 @@
+// PostCSS config using new Tailwind plugin
+module.exports = {
+  plugins: [],
+};
