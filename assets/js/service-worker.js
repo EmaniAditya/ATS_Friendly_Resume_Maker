@@ -1,16 +1,17 @@
 // Service Worker for ATS-Friendly Resume Maker
-const CACHE_NAME = 'ats-resume-maker-v1';
+const CACHE_NAME = 'ats-resume-maker-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './assets/css/styles.css',
   './assets/js/app.js',
   './assets/js/core.js',
-  './assets/js/resume-generator.js',
+  './assets/js/resume-generator-fixed.js',
   './assets/js/sample-data.js',
   './assets/js/analytics.js',
   './assets/images/favicon.svg',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
+  'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
 
   'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js'
