@@ -14,11 +14,11 @@
 ## 3) Assumptions
 - Users primarily need clean, semantic, ATS-parseable resumes (no graphics, no tables that break parsing).
 - Export to PDF via print styles. Also support JSON import/export of data.
-- Node 18+ available.
+- Node 18+ available (we have Node v22+).
 - Git remote exists (origin set to GitHub).
 
 ## 4) UX Overview (from provided images)
-Referencing images under `ideal-app-images/` (e.g., `Screenshot from 2025-08-11 ...`), we’ll build:
+Referencing images under `ideal-app-images/` (e.g., `Screenshot from 2025-08-11 06-41-34.png`, etc.), we’ll build:
 - Home/Landing: concise intro + CTA “Build Resume”. Quick links to create/import.
 - Builder: 2-pane layout
   - Left: Sectioned forms (Profile, Summary, Experience, Education, Projects, Skills, Certifications, Achievements, Links, Custom).
@@ -60,7 +60,7 @@ We’ll adapt spacing, typography, and component styling to match the spirit of 
 - Avoid multi-column layouts in export; if used, ensure linear reading order.
 
 ## 8) Architecture
-- Vite + React app in `app/`.
+- Vite + React app.
 - State management: React Context + `useReducer`.
 - Forms: controlled inputs; reusable components: `TextInput`, `TextArea`, `DateRange`, `ArrayField`, `LinkField`.
 - Preview templates: pluggable components with a shared `Resume` prop.
