@@ -1,4 +1,4 @@
-# ATS-Friendly Resume Maker — Design & Implementation Plan
+# ATS-Friendly Resume Maker — Design & Implementation Plan (React + Tailwind)
 
 ## 1) Objectives
 - Build a fast, modern resume builder that outputs ATS-friendly resumes.
@@ -116,8 +116,8 @@ We’ll adapt spacing, typography, and component styling to match the spirit of 
 - Small PR-style changes even on main.
 
 ## 13) Next Actions
-1) Add `.gitignore` and commit this plan.
-2) Scaffold Vite app in `app/`.
-3) Install Tailwind and wire up styles.
-4) Create routes and state shell.
+1) Commit this plan as the first commit on `react-app` (branched from `final-fix`).
+2) Add `app/` scaffold and Tailwind configs incrementally.
+3) Create routes and state shell.
+4) Implement builder + preview sections in phases.
 5) Commit and push after each step.
