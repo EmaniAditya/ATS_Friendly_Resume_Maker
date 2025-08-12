@@ -1,6 +1,22 @@
 import { useState, useEffect } from 'react'
 import styles from './Builder.module.css'
 
+const initialData = {
+  personal: {
+    name: '',
+    title: '',
+    email: '',
+    phone: '',
+    location: '',
+    linkedin: '',
+    website: ''
+  },
+  summary: '',
+  experience: [],
+  education: [],
+  skills: []
+}
+
 export default function Builder() {
   const [resumeData, setResumeData] = useState(() => {
     // Try load from localStorage
@@ -32,17 +48,54 @@ export default function Builder() {
     }
   })
 
-  // Autosave
+  const [saved, setSaved] = useState(false)
+
+  // Autosave with toast
   useEffect(() => {
     localStorage.setItem('resume_data', JSON.stringify(resumeData))
+    setSaved(true)
+    const t = setTimeout(() => setSaved(false), 1500)
+    return () => clearTimeout(t)
   }, [resumeData])
+
+  
+  // Handlers
+  const handleExportPDF = () => {
+          window.print()
+  }
+
+  const handleATSAnalyze = () => {
+    const jd = prompt('Paste the job description for ATS analysis:')
+    if (!jd) return
+    const words = jd.toLowerCase().match(/\b[a-z]{3,}\b/g) || []
+    const unique = [...new Set(words)]
+    const resumeText = (
+      [
+        resumeData.personal.name,
+        resumeData.personal.title,
+        resumeData.summary,
+        resumeData.skills.join(' '),
+        resumeData.experience.map(e => `${e.title} ${e.description}`).join(' '),
+        resumeData.education.map(e => e.degree).join(' ')
+      ].join(' ').toLowerCase()
+    )
+    const present = unique.filter(w => resumeText.includes(w)).length
+    alert(`ATS Score: ${((present / unique.length) * 100).toFixed(0)}% – ${present}/${unique.length} keywords matched`)
+  }
+
+  const handleReset = () => {
+    if (confirm('Are you sure you want to clear the resume and start over?')) {
+      setResumeData(initialData)
+      localStorage.removeItem('resume_data')
+    }
+  }
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>ATS-Friendly Resume Maker (React)</h1>
+      <h1 className={`${styles.title} no-print`}>ATS-Friendly Resume Maker (React)</h1>
       <div className={styles.grid}>
         {/* Form */}
-        <form className={styles.form}>
+        <form className={`${styles.form} no-print`}>
           {/* Personal Info */}
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Personal Info</h2>
@@ -351,7 +404,14 @@ export default function Builder() {
           )}
         </div>
       </div>
-      <p className={styles.footer}>Work in progress – more sections coming soon.</p>
+      <div className={`${styles.footer} no-print`}>
+        <div className={`${styles.actionBar} no-print`}>
+          <button onClick={handleExportPDF} className={styles.addButton}>Export PDF</button>
+          <button onClick={handleATSAnalyze} className={styles.addButton}>ATS Analyze</button>
+          <button onClick={handleReset} className={styles.removeButton}>Reset</button>
+        </div>
+        {saved && <span>Saved ✓</span>}
+      </div>
     </div>
   )
 }

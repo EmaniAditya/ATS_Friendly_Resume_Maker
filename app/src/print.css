@@ -1,0 +1,24 @@
+/* Global print styles */
+@media print {
+  /* Hide elements tagged with .no-print */
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    margin: 0;
+    background: white;
+  }
+
+  /* Ensure preview occupies full width */
+  .container {
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  .preview {
+    border: none !important;
+    box-shadow: none !important;
+    max-height: none !important;
+  }
+}
