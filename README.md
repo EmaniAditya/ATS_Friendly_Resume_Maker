@@ -173,8 +173,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Credits
 
-- Designed by [@anjalisahu4644](https://github.com/anjalisahu4644)
-- Developed by [@EmaniAditya](https://github.com/EmaniAditya)
+<!-- - Designed by [@anjalisahu4644](https://github.com/anjalisahu4644) -->
+<!-- - Developed by --> [@EmaniAditya](https://github.com/EmaniAditya) 
 
 ## License
 
